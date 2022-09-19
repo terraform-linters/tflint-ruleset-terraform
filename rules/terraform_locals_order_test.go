@@ -1,8 +1,9 @@
 package rules
 
 import (
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 	"testing"
+
+	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
 func Test_TerraformLocalsOrderRule(t *testing.T) {
