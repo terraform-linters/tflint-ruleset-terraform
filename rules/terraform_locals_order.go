@@ -112,11 +112,13 @@ func (r *TerraformLocalsOrderRule) attributesInLines(block *hclsyntax.Block) []*
 	for _, a := range block.Body.Attributes {
 		attributes = append(attributes, a)
 	}
-	sort.Slice(attributes, func(i, j int) bool {
-		if attributes[i].Range().Start.Line == attributes[j].Range().Start.Line {
-			return attributes[i].Range().Start.Column < attributes[j].Range().Start.Column
+	sort.Slice(attributes, func(x, y int) bool {
+		posX := attributes[x].Range().Start
+		posY := attributes[y].Range().Start
+		if posX.Line == posY.Line {
+			return posX.Column < posY.Column
 		}
-		return attributes[i].Range().Start.Line < attributes[j].Range().Start.Line
+		return posX.Line < posY.Line
 	})
 	return attributes
 }
