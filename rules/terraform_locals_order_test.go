@@ -51,6 +51,29 @@ locals {
 			},
 		},
 		{
+			Name: "json",
+			Content: `{
+  "locals": [
+    {
+      "instance_ids": [
+        "id1",
+        "id2"
+      ],
+      "common_tags": [
+        {
+          "Owner": "Dev",
+          "Service": "App"
+        }
+      ]
+    }
+  ]
+}`,
+			JSON: true,
+			Expected: helper.Issues{
+				expectedIssue,
+			},
+		},
+		{
 			Name: "multiple locals block in the same file",
 			Content: `
 locals {
