@@ -75,7 +75,7 @@ func (r *TerraformLocalsOrderRule) checkLocalsOrder(runner tflint.Runner, block 
 	if !r.sortedByAlphabetOrder(locals) {
 		err = runner.EmitIssue(
 			r,
-			"local values must be in alphabetical order",
+			"Local values must be in alphabetical order",
 			block.DefRange,
 		)
 		if err != nil {
