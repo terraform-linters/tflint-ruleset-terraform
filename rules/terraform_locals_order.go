@@ -1,18 +1,14 @@
 package rules
 
 import (
-	"fmt"
 	"github.com/hashicorp/hcl/v2"
-	"sort"
-	"strings"
-
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
+	"sort"
 )
 
-// TerraformLocalsOrderRule checks whether comments use the preferred syntax
+// TerraformLocalsOrderRule checks whether all arguments inside a `locals` block are sorted in alphabet order
 type TerraformLocalsOrderRule struct {
 	tflint.DefaultRule
 }
@@ -24,7 +20,7 @@ func NewTerraformLocalsOrderRule() *TerraformLocalsOrderRule {
 
 // Name returns the rule name
 func (r *TerraformLocalsOrderRule) Name() string {
-	return "terraform_locals_order"
+	return "terraform_ordered_locals"
 }
 
 // Enabled returns whether the rule is enabled by default
@@ -42,7 +38,7 @@ func (r *TerraformLocalsOrderRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
-// Check checks whether single line comments is used
+// Check checks whether all arguments inside a `locals` block are sorted in alphabet order
 func (r *TerraformLocalsOrderRule) Check(runner tflint.Runner) error {
 	files, err := runner.GetFiles()
 	if err != nil {
@@ -57,6 +53,7 @@ func (r *TerraformLocalsOrderRule) Check(runner tflint.Runner) error {
 }
 
 func (r *TerraformLocalsOrderRule) checkFile(runner tflint.Runner, file *hcl.File) error {
+	runner.
 	blocks := file.Body.(*hclsyntax.Body).Blocks
 	for _, block := range blocks {
 		if block.Type != "locals" {
@@ -74,11 +71,11 @@ func (r *TerraformLocalsOrderRule) checkLocalsOrder(runner tflint.Runner, block 
 	if r.sorted(attributes) {
 		return nil
 	}
-	file, err := runner.GetFile(block.Range().Filename)
-	if err != nil {
-		return err
-	}
-	return r.suggestOrder(runner, attributes, block, file)
+	return runner.EmitIssue(
+		r,
+		"local values must be in alphabetical order",
+		block.DefRange(),
+	)
 }
 
 func (r *TerraformLocalsOrderRule) sorted(attributes []*hclsyntax.Attribute) bool {
@@ -87,24 +84,6 @@ func (r *TerraformLocalsOrderRule) sorted(attributes []*hclsyntax.Attribute) boo
 		names = append(names, a.Name)
 	}
 	return sort.StringsAreSorted(names)
-}
-
-func (r *TerraformLocalsOrderRule) suggestOrder(runner tflint.Runner, attributes []*hclsyntax.Attribute, block *hclsyntax.Block, file *hcl.File) error {
-	sort.Slice(attributes, func(i, j int) bool {
-		return attributes[i].Name < attributes[j].Name
-	})
-	var locals []string
-	for _, a := range attributes {
-		locals = append(locals, string(a.SrcRange.SliceBytes(file.Bytes)))
-	}
-	suggestedBlock := strings.Join(locals, "\n")
-	suggestedBlock = fmt.Sprintf("%s {\n%s\n}", block.Type, suggestedBlock)
-	formattedBlock := string(hclwrite.Format([]byte(suggestedBlock)))
-	return runner.EmitIssue(
-		r,
-		fmt.Sprintf("Recommended locals variable order:\n%s", formattedBlock),
-		block.DefRange(),
-	)
 }
 
 func (r *TerraformLocalsOrderRule) attributesInLines(block *hclsyntax.Block) []*hclsyntax.Attribute {

@@ -7,6 +7,10 @@ import (
 )
 
 func Test_TerraformLocalsOrderRule(t *testing.T) {
+	expectedIssue := &helper.Issue{
+		Rule:    NewTerraformLocalsOrderRule(),
+		Message: "local values must be in alphabetical order",
+	}
 	cases := []struct {
 		Name     string
 		JSON     bool
@@ -43,17 +47,7 @@ locals {
   }
 }`,
 			Expected: helper.Issues{
-				{
-					Rule: NewTerraformLocalsOrderRule(),
-					Message: `Recommended locals variable order:
-locals {
-  common_tags = {
-    Service = local.service_name
-    Owner   = local.owner
-  }
-  instance_ids = concat(aws_instance.blue.*.id, aws_instance.green.*.id)
-}`,
-				},
+				expectedIssue,
 			},
 		},
 		{
@@ -72,25 +66,8 @@ locals {
   owner        = "Community Team"
 }`,
 			Expected: helper.Issues{
-				{
-					Rule: NewTerraformLocalsOrderRule(),
-					Message: `Recommended locals variable order:
-locals {
-  common_tags = {
-    Service = local.service_name
-    Owner   = local.owner
-  }
-  instance_ids = concat(aws_instance.blue.*.id, aws_instance.green.*.id)
-}`,
-				},
-				{
-					Rule: NewTerraformLocalsOrderRule(),
-					Message: `Recommended locals variable order:
-locals {
-  owner        = "Community Team"
-  service_name = "forum"
-}`,
-				},
+				expectedIssue,
+				expectedIssue,
 			},
 		},
 	}
