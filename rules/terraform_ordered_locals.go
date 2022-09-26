@@ -7,38 +7,38 @@ import (
 	"sort"
 )
 
-// TerraformLocalsOrderRule checks whether all arguments inside a `locals` block are sortedByAlphabetOrder in alphabet order
-type TerraformLocalsOrderRule struct {
+// TerraformOrderedLocalsRule checks whether all arguments inside a `locals` block are sortedByAlphabetOrder in alphabet order
+type TerraformOrderedLocalsRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformLocalsOrderRule returns a new rule
-func NewTerraformLocalsOrderRule() *TerraformLocalsOrderRule {
-	return &TerraformLocalsOrderRule{}
+// NewTerraformOrderedLocalsRule returns a new rule
+func NewTerraformOrderedLocalsRule() *TerraformOrderedLocalsRule {
+	return &TerraformOrderedLocalsRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformLocalsOrderRule) Name() string {
+func (r *TerraformOrderedLocalsRule) Name() string {
 	return "terraform_ordered_locals"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformLocalsOrderRule) Enabled() bool {
+func (r *TerraformOrderedLocalsRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformLocalsOrderRule) Severity() tflint.Severity {
+func (r *TerraformOrderedLocalsRule) Severity() tflint.Severity {
 	return tflint.NOTICE
 }
 
 // Link returns the rule reference link
-func (r *TerraformLocalsOrderRule) Link() string {
+func (r *TerraformOrderedLocalsRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether all arguments inside a `locals` block are sortedByAlphabetOrder in alphabet order
-func (r *TerraformLocalsOrderRule) Check(runner tflint.Runner) error {
+func (r *TerraformOrderedLocalsRule) Check(runner tflint.Runner) error {
 	files, err := runner.GetFiles()
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (r *TerraformLocalsOrderRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformLocalsOrderRule) checkFile(runner tflint.Runner, file *hcl.File) error {
+func (r *TerraformOrderedLocalsRule) checkFile(runner tflint.Runner, file *hcl.File) error {
 	content, _, schemaDiags := file.Body.PartialContent(&hcl.BodySchema{
 		Blocks: []hcl.BlockHeaderSchema{{Type: "locals"}},
 	})
@@ -67,7 +67,7 @@ func (r *TerraformLocalsOrderRule) checkFile(runner tflint.Runner, file *hcl.Fil
 	return nil
 }
 
-func (r *TerraformLocalsOrderRule) checkLocalsOrder(runner tflint.Runner, block *hcl.Block) error {
+func (r *TerraformOrderedLocalsRule) checkLocalsOrder(runner tflint.Runner, block *hcl.Block) error {
 	locals, err := r.attributesInLines(block)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (r *TerraformLocalsOrderRule) checkLocalsOrder(runner tflint.Runner, block 
 	return nil
 }
 
-func (r *TerraformLocalsOrderRule) sortedByAlphabetOrder(attributes []*hcl.Attribute) bool {
+func (r *TerraformOrderedLocalsRule) sortedByAlphabetOrder(attributes []*hcl.Attribute) bool {
 	var names []string
 	for _, a := range attributes {
 		names = append(names, a.Name)
@@ -93,7 +93,7 @@ func (r *TerraformLocalsOrderRule) sortedByAlphabetOrder(attributes []*hcl.Attri
 	return sort.StringsAreSorted(names)
 }
 
-func (r *TerraformLocalsOrderRule) attributesInLines(block *hcl.Block) ([]*hcl.Attribute, error) {
+func (r *TerraformOrderedLocalsRule) attributesInLines(block *hcl.Block) ([]*hcl.Attribute, error) {
 	attributesMaps, diagnostics := block.Body.JustAttributes()
 	if diagnostics.HasErrors() {
 		return nil, diagnostics

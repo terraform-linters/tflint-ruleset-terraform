@@ -8,7 +8,7 @@ import (
 
 func Test_TerraformLocalsOrderRule(t *testing.T) {
 	expectedIssue := &helper.Issue{
-		Rule:    NewTerraformLocalsOrderRule(),
+		Rule:    NewTerraformOrderedLocalsRule(),
 		Message: "Local values must be in alphabetical order",
 	}
 	cases := []struct {
@@ -94,7 +94,7 @@ locals {
 			},
 		},
 	}
-	rule := NewTerraformLocalsOrderRule()
+	rule := NewTerraformOrderedLocalsRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
