@@ -7,6 +7,10 @@ import (
 )
 
 func Test_TerraformVariableOrderRule(t *testing.T) {
+	expectedIssue := &helper.Issue{
+		Rule:    NewTerraformOrderedVariablesRule(),
+		Message: `Variables should be sorted in the following order: required(without default value) variables in alphabetical order, optional variables in alphabetical order.`,
+	}
 	cases := []struct {
 		Name     string
 		JSON     bool
@@ -58,20 +62,7 @@ variable "availability_zone_names" {
 variable "image_id" {
   type = string
 }`,
-			Expected: helper.Issues{
-				{
-					Rule: NewTerraformVariableOrderRule(),
-					Message: `Recommended variable order:
-variable "image_id" {
-  type = string
-}
-
-variable "availability_zone_names" {
-  type    = list(string)
-  default = ["us-west-1a"]
-}`,
-				},
-			},
+			Expected: helper.Issues{expectedIssue},
 		},
 		{
 			Name: "4. sorting in alphabetic order",
@@ -95,31 +86,7 @@ variable "availability_zone_names" {
   type    = list(string)
   default = ["us-west-1a"]
 }`,
-			Expected: helper.Issues{
-				{
-					Rule: NewTerraformVariableOrderRule(),
-					Message: `Recommended variable order:
-variable "availability_zone_names" {
-  type    = list(string)
-  default = ["us-west-1a"]
-}
-
-variable "docker_ports" {
-  type = list(object({
-    internal = number
-    external = number
-    protocol = string
-  }))
-  default = [
-    {
-      internal = 8300
-      external = 8300
-      protocol = "tcp"
-    }
-  ]
-}`,
-				},
-			},
+			Expected: helper.Issues{expectedIssue},
 		},
 		{
 			Name: "5. mixed",
@@ -147,38 +114,64 @@ variable "availability_zone_names" {
 variable "image_id" {
   type = string
 }`,
-			Expected: helper.Issues{
-				{
-					Rule: NewTerraformVariableOrderRule(),
-					Message: `Recommended variable order:
+			Expected: helper.Issues{expectedIssue},
+		},
+		{
+			Name: "6. required only",
+			Content: `
+variable "availability_zone_names" {
+  type = list(string)
+}
+
+variable "image_id" {
+  type = string
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "7. optional only",
+			Content: `
+variable "availability_zone_names" {
+  type    = list(string)
+  default = ["ap-northeast-1"]
+}
+
+variable "image_id" {
+  type    = string
+  default = "ami-063a9ea2ff5685f7f"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "8. incorrect required only",
+			Content: `
 variable "image_id" {
   type = string
 }
 
 variable "availability_zone_names" {
-  type    = list(string)
-  default = ["us-west-1a"]
+  type = list(string)
+}
+`,
+			Expected: helper.Issues{expectedIssue},
+		},
+		{
+			Name: "9. incorrect optional only",
+			Content: `
+variable "image_id" {
+  type    = string
+  default = "ami-063a9ea2ff5685f7f"
 }
 
-variable "docker_ports" {
-  type = list(object({
-    internal = number
-    external = number
-    protocol = string
-  }))
-  default = [
-    {
-      internal = 8300
-      external = 8300
-      protocol = "tcp"
-    }
-  ]
-}`,
-				},
-			},
+variable "availability_zone_names" {
+  type    = list(string)
+  default = ["ap-northeast-1"]
+}
+`,
+			Expected: helper.Issues{expectedIssue},
 		},
 	}
-	rule := NewTerraformVariableOrderRule()
+	rule := NewTerraformOrderedVariablesRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
