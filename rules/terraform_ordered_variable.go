@@ -1,7 +1,7 @@
 package rules
 
 import (
-	"reflect"
+	"github.com/google/go-cmp/cmp"
 	"sort"
 
 	"github.com/hashicorp/hcl/v2"
@@ -10,38 +10,38 @@ import (
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
-// TerraformVariableOrderRule checks whether the variables are sorted in expected order
-type TerraformVariableOrderRule struct {
+// TerraformOrderedVariablesRule checks whether the variables are sorted in expected order
+type TerraformOrderedVariablesRule struct {
 	tflint.DefaultRule
 }
 
 // NewTerraformOrderedVariablesRule returns a new rule
-func NewTerraformOrderedVariablesRule() *TerraformVariableOrderRule {
-	return &TerraformVariableOrderRule{}
+func NewTerraformOrderedVariablesRule() *TerraformOrderedVariablesRule {
+	return &TerraformOrderedVariablesRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformVariableOrderRule) Name() string {
+func (r *TerraformOrderedVariablesRule) Name() string {
 	return "terraform_ordered_variables"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformVariableOrderRule) Enabled() bool {
+func (r *TerraformOrderedVariablesRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformVariableOrderRule) Severity() tflint.Severity {
+func (r *TerraformOrderedVariablesRule) Severity() tflint.Severity {
 	return tflint.NOTICE
 }
 
 // Link returns the rule reference link
-func (r *TerraformVariableOrderRule) Link() string {
+func (r *TerraformOrderedVariablesRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether the variables are sorted in expected order
-func (r *TerraformVariableOrderRule) Check(runner tflint.Runner) error {
+func (r *TerraformOrderedVariablesRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (r *TerraformVariableOrderRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformVariableOrderRule) variablesGroupByFile(body *hclext.BodyContent) map[string]hclext.Blocks {
+func (r *TerraformOrderedVariablesRule) variablesGroupByFile(body *hclext.BodyContent) map[string]hclext.Blocks {
 	variables := make(map[string]hclext.Blocks)
 	for _, b := range body.Blocks {
 		variables[b.DefRange.Filename] = append(variables[b.DefRange.Filename], b)
@@ -88,13 +88,13 @@ func (r *TerraformVariableOrderRule) variablesGroupByFile(body *hclext.BodyConte
 	return variables
 }
 
-func (r *TerraformVariableOrderRule) checkVariableOrder(runner tflint.Runner, blocks []*hclext.Block) error {
+func (r *TerraformOrderedVariablesRule) checkVariableOrder(runner tflint.Runner, blocks []*hclext.Block) error {
 	requiredVars := r.getSortedVariableNames(blocks, false)
 	optionalVars := r.getSortedVariableNames(blocks, true)
 	sortedVariableNames := append(requiredVars, optionalVars...)
 
 	variableNames := r.getVariableNames(blocks)
-	if reflect.DeepEqual(variableNames, sortedVariableNames) {
+	if cmp.Equal(variableNames, sortedVariableNames) {
 		return nil
 	}
 
@@ -105,32 +105,51 @@ func (r *TerraformVariableOrderRule) checkVariableOrder(runner tflint.Runner, bl
 	)
 }
 
-func (r *TerraformVariableOrderRule) issueRange(blocks hclext.Blocks) *hcl.Range {
+func (r *TerraformOrderedVariablesRule) issueRange(blocks hclext.Blocks) *hcl.Range {
 	requiredVariables := r.getVariables(blocks, false)
 	optionalVariables := r.getVariables(blocks, true)
 
-	for i, b := range requiredVariables {
-		if i > 0 && (b.Labels[0] < requiredVariables[i-1].Labels[0]) {
-			return &b.DefRange
-		}
+	if r.overlapped(requiredVariables, optionalVariables) {
+		return &optionalVariables[0].DefRange
 	}
-	for i, b := range optionalVariables {
-		if i > 0 && (b.Labels[0] < optionalVariables[i-1].Labels[0]) {
-			return &b.DefRange
-		}
+
+	firstRange := r.firstNonSortedBlockRange(requiredVariables)
+	if firstRange != nil {
+		return firstRange
+	}
+	firstRange = r.firstNonSortedBlockRange(optionalVariables)
+	if firstRange != nil {
+		return firstRange
+	}
+	panic("expected issue not found")
+}
+
+func (r *TerraformOrderedVariablesRule) overlapped(requiredVariables, optionalVariables hclext.Blocks) bool {
+	if len(requiredVariables) == 0 || len(optionalVariables) == 0 {
+		return false
 	}
 
 	firstOptional := optionalVariables[0].DefRange
 	lastRequired := requiredVariables[len(requiredVariables)-1].DefRange
 
-	if firstOptional.Start.Line < lastRequired.Start.Line {
-		return &lastRequired
-	}
+	return firstOptional.Start.Line < lastRequired.Start.Line
+}
 
+func (r *TerraformOrderedVariablesRule) firstNonSortedBlockRange(blocks hclext.Blocks) *hcl.Range {
+	for i, b := range blocks {
+		if i == 0 {
+			continue
+		}
+		previousVariableName := blocks[i-1].Labels[0]
+		currentVariableName := b.Labels[0]
+		if currentVariableName < previousVariableName {
+			return &b.DefRange
+		}
+	}
 	return nil
 }
 
-func (r *TerraformVariableOrderRule) getVariableNames(blocks hclext.Blocks) []string {
+func (r *TerraformOrderedVariablesRule) getVariableNames(blocks hclext.Blocks) []string {
 	var variableNames []string
 	for _, b := range blocks {
 		variableNames = append(variableNames, b.Labels[0])
@@ -138,7 +157,7 @@ func (r *TerraformVariableOrderRule) getVariableNames(blocks hclext.Blocks) []st
 	return variableNames
 }
 
-func (r *TerraformVariableOrderRule) getSortedVariableNames(blocks hclext.Blocks, defaultWanted bool) []string {
+func (r *TerraformOrderedVariablesRule) getSortedVariableNames(blocks hclext.Blocks, defaultWanted bool) []string {
 	var names []string
 	filteredBlocks := r.getVariables(blocks, defaultWanted)
 	for _, b := range filteredBlocks {
@@ -148,7 +167,7 @@ func (r *TerraformVariableOrderRule) getSortedVariableNames(blocks hclext.Blocks
 	return names
 }
 
-func (r *TerraformVariableOrderRule) getVariables(blocks hclext.Blocks, defaultWanted bool) hclext.Blocks {
+func (r *TerraformOrderedVariablesRule) getVariables(blocks hclext.Blocks, defaultWanted bool) hclext.Blocks {
 	var c hclext.Blocks
 	for _, b := range blocks {
 		if _, hasDefault := b.Body.Attributes["default"]; hasDefault == defaultWanted {

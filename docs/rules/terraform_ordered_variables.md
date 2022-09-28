@@ -50,3 +50,31 @@ It helps to improve the readability of terraform code by sorting variable blocks
 ## How To Fix
 
 Sort variables in the following order: required(without default value) variables in alphabetical order, optional variables in alphabetical order.
+
+For the code in [example](#Example), it should be sorted as the following order:
+
+```hcl
+variable "image_id" {
+  type = string
+}
+
+variable "availability_zone_names" {
+  type    = list(string)
+  default = ["us-west-1a"]
+}
+
+variable "docker_ports" {
+  type = list(object({
+    internal = number
+    external = number
+    protocol = string
+  }))
+  default = [
+    {
+      internal = 8300
+      external = 8300
+      protocol = "tcp"
+    }
+  ]
+}
+```

@@ -1,15 +1,20 @@
 package rules
 
 import (
+	"github.com/hashicorp/hcl/v2"
 	"testing"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
 func Test_TerraformVariableOrderRule(t *testing.T) {
-	expectedIssue := &helper.Issue{
-		Rule:    NewTerraformOrderedVariablesRule(),
-		Message: `Variables should be sorted in the following order: required(without default value) variables in alphabetical order, optional variables in alphabetical order.`,
+	var expectedVariableOrderIssue = func(r hcl.Range) *helper.Issue {
+		r.Filename = "config.tf"
+		return &helper.Issue{
+			Rule:    NewTerraformOrderedVariablesRule(),
+			Message: `Variables should be sorted in the following order: required(without default value) variables in alphabetical order, optional variables in alphabetical order.`,
+			Range:   r,
+		}
 	}
 	cases := []struct {
 		Name     string
@@ -62,7 +67,12 @@ variable "availability_zone_names" {
 variable "image_id" {
   type = string
 }`,
-			Expected: helper.Issues{expectedIssue},
+			Expected: helper.Issues{
+				expectedVariableOrderIssue(hcl.Range{
+					Start: hcl.Pos{Line: 2, Column: 1},
+					End:   hcl.Pos{Line: 2, Column: 35},
+				}),
+			},
 		},
 		{
 			Name: "4. sorting in alphabetic order",
@@ -86,7 +96,12 @@ variable "availability_zone_names" {
   type    = list(string)
   default = ["us-west-1a"]
 }`,
-			Expected: helper.Issues{expectedIssue},
+			Expected: helper.Issues{
+				expectedVariableOrderIssue(hcl.Range{
+					Start: hcl.Pos{Line: 17, Column: 1},
+					End:   hcl.Pos{Line: 17, Column: 35},
+				}),
+			},
 		},
 		{
 			Name: "5. mixed",
@@ -114,7 +129,12 @@ variable "availability_zone_names" {
 variable "image_id" {
   type = string
 }`,
-			Expected: helper.Issues{expectedIssue},
+			Expected: helper.Issues{
+				expectedVariableOrderIssue(hcl.Range{
+					Start: hcl.Pos{Line: 2, Column: 1},
+					End:   hcl.Pos{Line: 2, Column: 24},
+				}),
+			},
 		},
 		{
 			Name: "6. required only",
@@ -153,7 +173,12 @@ variable "availability_zone_names" {
   type = list(string)
 }
 `,
-			Expected: helper.Issues{expectedIssue},
+			Expected: helper.Issues{
+				expectedVariableOrderIssue(hcl.Range{
+					Start: hcl.Pos{Line: 6, Column: 1},
+					End:   hcl.Pos{Line: 6, Column: 35},
+				}),
+			},
 		},
 		{
 			Name: "9. incorrect optional only",
@@ -168,7 +193,12 @@ variable "availability_zone_names" {
   default = ["ap-northeast-1"]
 }
 `,
-			Expected: helper.Issues{expectedIssue},
+			Expected: helper.Issues{
+				expectedVariableOrderIssue(hcl.Range{
+					Start: hcl.Pos{Line: 7, Column: 1},
+					End:   hcl.Pos{Line: 7, Column: 35},
+				}),
+			},
 		},
 	}
 	rule := NewTerraformOrderedVariablesRule()
@@ -185,7 +215,7 @@ variable "availability_zone_names" {
 				t.Fatalf("Unexpected error occurred: %s", err)
 			}
 
-			helper.AssertIssuesWithoutRange(t, tc.Expected, runner.Issues)
+			helper.AssertIssues(t, tc.Expected, runner.Issues)
 		})
 	}
 }
