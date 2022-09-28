@@ -61,6 +61,10 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 Providers are plugins released on a separate rhythm from Terraform itself, and so they have their own version numbers. For production use, you should constrain the acceptable provider versions via configuration, to ensure that new versions with breaking changes will not be automatically installed by `terraform init` in future.
 
+### Should we follow this rule in modules?
+
+It depends on the module. Declaring the required versions is the recommended practice if the module is intended to be widely used. On the other hand, if the scope is limited, it may be sufficient to declare the required versions in the root module. You can ignore this rule if you find it redundant.
+
 ## How To Fix
 
 Add the [`required_providers`](https://www.terraform.io/docs/configuration/terraform.html#specifying-required-provider-versions) block to the `terraform` configuration block and include current versions for all providers. For example:

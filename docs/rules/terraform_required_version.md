@@ -31,8 +31,11 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 The `required_version` setting can be used to constrain which versions of the Terraform CLI can be used with your configuration. 
-If the running version of Terraform doesn't match the constraints specified, Terraform will produce an error and exit without 
-taking any further actions.
+If the running version of Terraform doesn't match the constraints specified, Terraform will produce an error and exit without taking any further actions.
+
+### Should we follow this rule in modules?
+
+It depends on the module. Declaring the required version is the recommended practice if the module is intended to be widely used. On the other hand, if the scope is limited, it may be sufficient to declare the required version in the root module. You can ignore this rule if you find it redundant.
 
 ## How To Fix
 
