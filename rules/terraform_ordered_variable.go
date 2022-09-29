@@ -101,25 +101,25 @@ func (r *TerraformOrderedVariablesRule) checkVariableOrder(runner tflint.Runner,
 	return runner.EmitIssue(
 		r,
 		"Variables should be sorted in the following order: required(without default value) variables in alphabetical order, optional variables in alphabetical order.",
-		*r.issueRange(blocks),
+		r.issueRange(blocks),
 	)
 }
 
-func (r *TerraformOrderedVariablesRule) issueRange(blocks hclext.Blocks) *hcl.Range {
+func (r *TerraformOrderedVariablesRule) issueRange(blocks hclext.Blocks) hcl.Range {
 	requiredVariables := r.getVariables(blocks, false)
 	optionalVariables := r.getVariables(blocks, true)
 
 	if r.overlapped(requiredVariables, optionalVariables) {
-		return &optionalVariables[0].DefRange
+		return optionalVariables[0].DefRange
 	}
 
 	firstRange := r.firstNonSortedBlockRange(requiredVariables)
 	if firstRange != nil {
-		return firstRange
+		return *firstRange
 	}
 	firstRange = r.firstNonSortedBlockRange(optionalVariables)
 	if firstRange != nil {
-		return firstRange
+		return *firstRange
 	}
 	panic("expected issue not found")
 }
