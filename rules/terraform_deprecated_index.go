@@ -66,6 +66,8 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 
 			tokens, diags := hclsyntax.LexExpression(bytes, filename, variable.SourceRange().Start)
 			if diags.HasErrors() {
+				// HACK: If the expression cannot be lexed, try to lex it as a template.
+				// If it still cannot be lexed, return the original error.
 				tTokens, tDiags := hclsyntax.LexTemplate(bytes, filename, variable.SourceRange().Start)
 				if tDiags.HasErrors() {
 					return diags
