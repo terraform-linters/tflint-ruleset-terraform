@@ -48,27 +48,15 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 		return nil
 	}
 
-	files := map[string]*hcl.File{}
+	files, err := runner.GetFiles()
+	if err != nil {
+		return err
+	}
 
 	diags := runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
 		for _, variable := range expr.Variables() {
 			filename := expr.Range().Filename
-			file, ok := files[filename]
-
-			if !ok {
-				file, err = runner.GetFile(filename)
-				if err != nil {
-					return hcl.Diagnostics{
-						{
-							Severity: hcl.DiagError,
-							Summary:  "failed to call GetFile()",
-							Detail:   err.Error(),
-						},
-					}
-				}
-
-				files[filename] = file
-			}
+			file := files[filename]
 
 			bytes := expr.Range().SliceBytes(file.Bytes)
 

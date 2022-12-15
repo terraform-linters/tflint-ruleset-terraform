@@ -1,9 +1,6 @@
 package rules
 
 import (
-	"bytes"
-	"fmt"
-	"html/template"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2"
@@ -142,76 +139,6 @@ EOF
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Issues)
-		})
-	}
-}
-
-func BenchmarkTerraformDeprecatedInterpolation(b *testing.B) {
-	cases := []struct {
-		Size    int
-		Content string
-	}{
-		{
-			Size: 10,
-		},
-		{
-			Size: 100,
-		},
-		{
-			Size: 1000,
-		},
-		// {
-		// 	Size: 10000,
-		// },
-	}
-
-	for _, tc := range cases {
-		tc := tc
-
-		// Generate a list of n objects as locals, where each has keys a-z
-		// and values 0-n
-		ct, err := template.New("test").Parse(`
-				locals {
-					alphas = [
-						{{- range .Size }}
-							{
-								{{- range $i, $c := $.Alpha }}
-								{{ $c }} = {{ $i }},
-								{{- end }}
-							},
-						{{- end }}
-					]
-				}`)
-
-		if err != nil {
-			b.Fatalf("Error rendering content template: %v", err)
-		}
-
-		buf := bytes.Buffer{}
-
-		err = ct.Execute(&buf, struct {
-			Size  []struct{}
-			Alpha []string
-		}{
-			Size:  make([]struct{}, tc.Size),
-			Alpha: []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"},
-		})
-
-		if err != nil {
-			b.Fatalf("Error executing content template: %v", err)
-		}
-
-		tc.Content = buf.String()
-
-		b.Run(fmt.Sprintf("size=%d", tc.Size), func(b *testing.B) {
-			rule := NewTerraformDeprecatedIndexRule()
-			runner := helper.TestRunner(b, map[string]string{"config.tf": tc.Content})
-
-			if err := rule.Check(runner); err != nil {
-				b.Fatalf("Unexpected error occurred: %s", err)
-			}
-
-			helper.AssertIssues(b, helper.Issues{}, runner.Issues)
 		})
 	}
 }
