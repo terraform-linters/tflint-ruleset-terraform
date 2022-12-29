@@ -27,7 +27,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ```hcl
 locals {
-  list  = [{a = "b}, {a = "c"}]
+  list  = [{a = "b"}, {a = "c"}]
   value = list.*.a 
 }
 ```
