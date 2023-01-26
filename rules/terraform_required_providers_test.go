@@ -133,12 +133,12 @@ provider "template" {}
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
-							Line:   10,
-							Column: 1,
+							Line:   4,
+							Column: 14,
 						},
 						End: hcl.Pos{
-							Line:   10,
-							Column: 20,
+							Line:   6,
+							Column: 4,
 						},
 					},
 				},
