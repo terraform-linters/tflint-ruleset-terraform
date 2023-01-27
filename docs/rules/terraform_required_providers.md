@@ -64,30 +64,6 @@ provider "template" {}
 
 terraform {
   required_providers {
-    template = "~> 2"
-  }
-}
-```
-
-```
-$ tflint
-1 issue(s) found:
-
-Warning: Legacy version constraint for provider "template" in `required_providers` (terraform_required_providers)
-
-  on main.tf line 5:
-   5:     template = "~> 2"
-
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
-```
-
-<hr>
-
-```hcl
-provider "template" {}
-
-terraform {
-  required_providers {
     template = {
       version = "~> 2"
     }
