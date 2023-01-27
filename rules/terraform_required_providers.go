@@ -76,7 +76,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 		if _, exists := provider.Body.Attributes["version"]; exists {
 			if err := runner.EmitIssue(
 				r,
-				`provider version constraint should be specified via "required_providers"`,
+				"provider version constraint should be specified via `required_providers`",
 				provider.DefRange,
 			); err != nil {
 				return err
@@ -131,7 +131,11 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 
 		requiredProvider, exists := requiredProviders[name]
 		if !exists {
-			if err := runner.EmitIssue(r, fmt.Sprintf(`Missing version constraint for provider "%s" in "required_providers"`, name), ref.DefRange); err != nil {
+			if err := runner.EmitIssue(
+				r,
+				fmt.Sprintf("Missing version constraint for provider %q in `required_providers`", name),
+				ref.DefRange,
+			); err != nil {
 				return err
 			}
 			continue
@@ -148,25 +152,46 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 		if diags.HasErrors() {
 			return diags
 		}
-		// Look for a single static string, in case we have the legacy version-only
-		// format in the configuration.
+
 		if val.Type() == cty.String {
+			if err := runner.EmitIssue(
+				r,
+				fmt.Sprintf("Legacy version constraint for provider %q in `required_providers`", name),
+				requiredProvider.Expr.Range(),
+			); err != nil {
+				return err
+			}
+
 			continue
 		}
 
 		vm := val.AsValueMap()
-		if _, exists := vm["version"]; !exists {
-			if source, exists := vm["source"]; exists {
-				p, err := tfaddr.ParseProviderSource(source.AsString())
-				if err != nil {
-					return err
-				}
 
-				if p.IsBuiltIn() {
-					continue
-				}
+		if source, exists := vm["source"]; exists {
+			p, err := tfaddr.ParseProviderSource(source.AsString())
+			if err != nil {
+				return err
 			}
-			if err := runner.EmitIssue(r, fmt.Sprintf(`Missing version constraint for provider "%s" in "required_providers"`, name), requiredProvider.Expr.Range()); err != nil {
+
+			if p.IsBuiltIn() {
+				continue
+			}
+		} else {
+			if err := runner.EmitIssue(
+				r,
+				fmt.Sprintf("Missing `source` for provider %q in `required_providers`", name),
+				requiredProvider.Expr.Range(),
+			); err != nil {
+				return err
+			}
+		}
+
+		if _, exists := vm["version"]; !exists {
+			if err := runner.EmitIssue(
+				r,
+				fmt.Sprintf("Missing version constraint for provider %q in `required_providers`", name),
+				requiredProvider.Expr.Range(),
+			); err != nil {
 				return err
 			}
 		}
