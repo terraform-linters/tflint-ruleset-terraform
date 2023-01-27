@@ -129,7 +129,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			continue
 		}
 
-		provider, exists := requiredProviders[name]
+		requiredProvider, exists := requiredProviders[name]
 		if !exists {
 			if err := runner.EmitIssue(r, fmt.Sprintf(`Missing version constraint for provider "%s" in "required_providers"`, name), ref.DefRange); err != nil {
 				return err
@@ -137,7 +137,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			continue
 		}
 
-		val, diags := provider.Expr.Value(&hcl.EvalContext{
+		val, diags := requiredProvider.Expr.Value(&hcl.EvalContext{
 			Variables: map[string]cty.Value{
 				// configuration_aliases can declare additional provider instances
 				// required provider "foo" could have: configuration_aliases = [foo.a, foo.b]
@@ -166,7 +166,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 					continue
 				}
 			}
-			if err := runner.EmitIssue(r, fmt.Sprintf(`Missing version constraint for provider "%s" in "required_providers"`, name), ref.DefRange); err != nil {
+			if err := runner.EmitIssue(r, fmt.Sprintf(`Missing version constraint for provider "%s" in "required_providers"`, name), requiredProvider.Expr.Range()); err != nil {
 				return err
 			}
 		}
