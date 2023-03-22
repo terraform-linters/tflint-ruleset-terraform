@@ -17,6 +17,13 @@ type TerraformRequiredProvidersRule struct {
 	tflint.DefaultRule
 }
 
+type terraformRequiredProvidersRuleConfig struct {
+	// Source specifies whether the rule should assert the presence of a `source` attribute
+	Source *bool `hclext:"source,optional"`
+	// Version specifies whether the rule should assert the presence of a `version` attribute
+	Version *bool `hclext:"version,optional"`
+}
+
 // NewTerraformRequiredProvidersRule returns new rule with default attributes
 func NewTerraformRequiredProvidersRule() *TerraformRequiredProvidersRule {
 	return &TerraformRequiredProvidersRule{}
@@ -42,6 +49,26 @@ func (r *TerraformRequiredProvidersRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
+// config returns the rule config, with defaults
+func (r *TerraformRequiredProvidersRule) config(runner tflint.Runner) (*terraformRequiredProvidersRuleConfig, error) {
+	config := &terraformRequiredProvidersRuleConfig{}
+
+	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
+		return nil, err
+	}
+
+	dv := true
+	if config.Source == nil {
+		config.Source = &dv
+	}
+
+	if config.Version == nil {
+		config.Version = &dv
+	}
+
+	return config, nil
+}
+
 // Check Checks whether provider required version is set
 func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 	runner := rr.(*terraform.Runner)
@@ -53,6 +80,11 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 	if !path.IsRoot() {
 		// This rule does not evaluate child modules.
 		return nil
+	}
+
+	config, err := r.config(runner)
+	if err != nil {
+		return fmt.Errorf("failed to parse rule config: %w", err)
 	}
 
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
@@ -176,7 +208,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			if p.IsBuiltIn() {
 				continue
 			}
-		} else {
+		} else if *config.Source {
 			if err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("Missing `source` for provider %q in `required_providers`", name),
@@ -186,7 +218,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			}
 		}
 
-		if _, exists := vm["version"]; !exists {
+		if _, exists := vm["version"]; !exists && *config.Version {
 			if err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("Missing version constraint for provider %q in `required_providers`", name),

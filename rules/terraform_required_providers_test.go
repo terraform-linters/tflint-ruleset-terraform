@@ -11,6 +11,7 @@ func Test_TerraformRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		Config   string
 		Expected helper.Issues
 	}{
 		{
@@ -161,6 +162,28 @@ provider "template" {}
 			},
 		},
 		{
+			Name: "required_providers object missing version ignored",
+			Content: `
+terraform {
+	required_providers {
+		template = {
+			source = "hashicorp/template"
+		}
+	}
+}
+
+provider "template" {} 
+`,
+			Config: `
+rule "terraform_required_providers" {
+	enabled = true
+
+	version = false
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
 			Name: "required_providers object missing source",
 			Content: `
 terraform {
@@ -190,6 +213,28 @@ provider "template" {}
 					},
 				},
 			},
+		},
+		{
+			Name: "required_providers object missing source ignored",
+			Content: `
+terraform {
+	required_providers {
+		template = {
+			version = "~> 2"
+		}
+	}
+}
+
+provider "template" {} 
+`,
+			Config: `
+rule "terraform_required_providers" {
+	enabled = true
+
+	source = false
+}
+`,
+			Expected: helper.Issues{},
 		},
 		{
 			Name: "required_providers empty object",
@@ -439,7 +484,10 @@ resource "google_compute_instance" "foo" {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := testRunner(t, map[string]string{"module.tf": tc.Content})
+			runner := testRunner(t, map[string]string{
+				"module.tf":   tc.Content,
+				".tflint.hcl": tc.Config,
+			})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)
