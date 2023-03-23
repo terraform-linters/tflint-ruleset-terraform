@@ -11,6 +11,7 @@ func Test_TerraformRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		Config   string
 		Expected helper.Issues
 	}{
 		{
@@ -21,7 +22,7 @@ provider "template" {}
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "template" in "required_providers"`,
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -46,7 +47,7 @@ resource "random_string" "foo" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "random" in "required_providers"`,
+					Message: "Missing version constraint for provider \"random\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -71,7 +72,7 @@ data "template_file" "foo" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "template" in "required_providers"`,
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -102,16 +103,32 @@ provider "template" {}
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "required_providers string",
+			Name: "legacy required_providers string",
 			Content: `
 terraform {
 	required_providers {
-		template = "~> 2" 
+		template = "~> 2"
 	}
 }
 provider "template" {} 
 `,
-			Expected: helper.Issues{},
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 14,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 20,
+						},
+					},
+				},
+			},
 		},
 		{
 			Name: "required_providers object missing version",
@@ -129,7 +146,7 @@ provider "template" {}
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "template" in "required_providers"`,
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -145,6 +162,125 @@ provider "template" {}
 			},
 		},
 		{
+			Name: "required_providers object missing version ignored",
+			Content: `
+terraform {
+	required_providers {
+		template = {
+			source = "hashicorp/template"
+		}
+	}
+}
+
+provider "template" {} 
+`,
+			Config: `
+rule "terraform_required_providers" {
+	enabled = true
+
+	version = false
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "required_providers object missing source",
+			Content: `
+terraform {
+	required_providers {
+		template = {
+			version = "~> 2"
+		}
+	}
+}
+
+provider "template" {} 
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing `source` for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 14,
+						},
+						End: hcl.Pos{
+							Line:   6,
+							Column: 4,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "required_providers object missing source ignored",
+			Content: `
+terraform {
+	required_providers {
+		template = {
+			version = "~> 2"
+		}
+	}
+}
+
+provider "template" {} 
+`,
+			Config: `
+rule "terraform_required_providers" {
+	enabled = true
+
+	source = false
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "required_providers empty object",
+			Content: `
+terraform {
+	required_providers {
+		template = {}
+	}
+}
+
+provider "template" {} 
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing `source` for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 14,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 16,
+						},
+					},
+				},
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 14,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 16,
+						},
+					},
+				},
+			},
+		},
+		{
 			Name: "single provider with alias",
 			Content: `
 provider "template" {
@@ -154,7 +290,7 @@ provider "template" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "template" in "required_providers"`,
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -188,7 +324,7 @@ provider "template" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `provider version constraint should be specified via "required_providers"`,
+					Message: "provider version constraint should be specified via `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -242,7 +378,7 @@ provider "template" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `provider version constraint should be specified via "required_providers"`,
+					Message: "provider version constraint should be specified via `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -295,7 +431,7 @@ resource "google_compute_instance" "foo" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "google-beta" in "required_providers"`,
+					Message: "Missing version constraint for provider \"google-beta\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -327,7 +463,7 @@ resource "google_compute_instance" "foo" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformRequiredProvidersRule(),
-					Message: `Missing version constraint for provider "google-beta" in "required_providers"`,
+					Message: "Missing version constraint for provider \"google-beta\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start: hcl.Pos{
@@ -348,7 +484,10 @@ resource "google_compute_instance" "foo" {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := testRunner(t, map[string]string{"module.tf": tc.Content})
+			runner := testRunner(t, map[string]string{
+				"module.tf":   tc.Content,
+				".tflint.hcl": tc.Config,
+			})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)
