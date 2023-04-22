@@ -29,7 +29,7 @@ locals {
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 11,
+							Column: 15,
 						},
 						End: hcl.Pos{
 							Line:   4,
@@ -55,11 +55,11 @@ locals {
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 12,
+							Column: 19,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 23,
+							Column: 21,
 						},
 					},
 				},
@@ -116,11 +116,78 @@ EOF
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 16,
+							Column: 36,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 49,
+							Column: 38,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "legacy splat and legacy index",
+			Content: `
+locals {
+  nested_list = [["a"]]
+  value = nested_list.*.0
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedIndexRule(),
+					Message: "List items should be accessed using square brackets",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 22,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 24,
+						},
+					},
+				},
+				{
+					Rule:    NewTerraformDeprecatedIndexRule(),
+					Message: "List items should be accessed using square brackets",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 24,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 26,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "complex expression",
+			Content: `
+locals {
+  create_namespace = true
+  kubernetes_namespace = local.create_namespace ? join("", kubernetes_namespace.default.*.id) : var.kubernetes_namespace
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedIndexRule(),
+					Message: "List items should be accessed using square brackets",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 88,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 90,
 						},
 					},
 				},

@@ -1,6 +1,8 @@
 package rules
 
 import (
+	"strings"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
@@ -53,61 +55,60 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 		return err
 	}
 
-	diags := runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
-		for _, variable := range expr.Variables() {
-			filename := expr.Range().Filename
-			file := files[filename]
+	diags := runner.WalkExpressions(tflint.ExprWalkFunc(func(e hcl.Expression) hcl.Diagnostics {
+		filename := e.Range().Filename
+		file := files[filename]
 
-			bytes := expr.Range().SliceBytes(file.Bytes)
-
-			tokens, diags := hclsyntax.LexExpression(bytes, filename, variable.SourceRange().Start)
-			if diags.HasErrors() {
-				// HACK: If the expression cannot be lexed, try to lex it as a template.
-				// If it still cannot be lexed, return the original error.
-				tTokens, tDiags := hclsyntax.LexTemplate(bytes, filename, variable.SourceRange().Start)
-				if tDiags.HasErrors() {
-					return diags
-				}
-
-				tokens = tTokens
-			}
-
-			tokens = tokens[1:]
-
-			for i, token := range tokens {
-				if token.Type == hclsyntax.TokenDot {
-					if len(tokens) == i+1 {
-						return nil
-					}
-
-					next := tokens[i+1].Type
-					if next == hclsyntax.TokenNumberLit || next == hclsyntax.TokenStar {
-						if tokens[0].Type == hclsyntax.TokenDot {
-							if err := runner.EmitIssue(
-								r,
-								"List items should be accessed using square brackets",
-								expr.Range(),
-							); err != nil {
-								return hcl.Diagnostics{
-									{
-										Severity: hcl.DiagError,
-										Summary:  "failed to call EmitIssue()",
-										Detail:   err.Error(),
-									},
-								}
-							}
-						}
+		switch expr := e.(type) {
+		case *hclsyntax.ScopeTraversalExpr:
+			r.checkLegacyTraversalIndex(runner, expr.Traversal, file.Bytes)
+		case *hclsyntax.RelativeTraversalExpr:
+			r.checkLegacyTraversalIndex(runner, expr.Traversal, file.Bytes)
+		case *hclsyntax.SplatExpr:
+			if strings.HasPrefix(string(expr.MarkerRange.SliceBytes(file.Bytes)), ".") {
+				if err := runner.EmitIssue(
+					r,
+					"List items should be accessed using square brackets",
+					expr.MarkerRange,
+				); err != nil {
+					return hcl.Diagnostics{
+						{
+							Severity: hcl.DiagError,
+							Summary:  "failed to call EmitIssue()",
+							Detail:   err.Error(),
+						},
 					}
 				}
 			}
 		}
-
 		return nil
 	}))
-
 	if diags.HasErrors() {
 		return diags
 	}
 
+	return nil
+}
+
+func (r *TerraformDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.Runner, traversal hcl.Traversal, file []byte) hcl.Diagnostics {
+	for _, t := range traversal {
+		if _, ok := t.(hcl.TraverseIndex); ok {
+			if strings.HasPrefix(string(t.SourceRange().SliceBytes(file)), ".") {
+				if err := runner.EmitIssue(
+					r,
+					"List items should be accessed using square brackets",
+					t.SourceRange(),
+				); err != nil {
+					return hcl.Diagnostics{
+						{
+							Severity: hcl.DiagError,
+							Summary:  "failed to call EmitIssue()",
+							Detail:   err.Error(),
+						},
+					}
+				}
+			}
+		}
+	}
 	return nil
 }
