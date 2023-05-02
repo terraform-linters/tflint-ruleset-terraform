@@ -74,28 +74,31 @@ func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 	}
 
 	for _, variable := range decl.Variables {
-		if err := runner.EmitIssue(
+		if err := runner.EmitIssueWithFix(
 			r,
 			fmt.Sprintf(`variable "%s" is declared but not used`, variable.Labels[0]),
 			variable.DefRange,
+			func(f tflint.Fixer) error { return f.RemoveExtBlock(variable) },
 		); err != nil {
 			return err
 		}
 	}
 	for _, data := range decl.DataResources {
-		if err := runner.EmitIssue(
+		if err := runner.EmitIssueWithFix(
 			r,
 			fmt.Sprintf(`data "%s" "%s" is declared but not used`, data.Labels[0], data.Labels[1]),
 			data.DefRange,
+			func(f tflint.Fixer) error { return f.RemoveExtBlock(data) },
 		); err != nil {
 			return err
 		}
 	}
 	for _, local := range decl.Locals {
-		if err := runner.EmitIssue(
+		if err := runner.EmitIssueWithFix(
 			r,
 			fmt.Sprintf(`local.%s is declared but not used`, local.Name),
 			local.DefRange,
+			func(f tflint.Fixer) error { return f.RemoveAttribute(local.Attribute) },
 		); err != nil {
 			return err
 		}

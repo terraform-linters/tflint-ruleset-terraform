@@ -79,10 +79,13 @@ func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filenam
 		}
 
 		if strings.HasPrefix(string(token.Bytes), "//") {
-			if err := runner.EmitIssue(
+			if err := runner.EmitIssueWithFix(
 				r,
 				"Single line comments should begin with #",
 				token.Range,
+				func(f tflint.Fixer) error {
+					return f.ReplaceText(f.RangeTo("//", filename, token.Range.Start), "#")
+				},
 			); err != nil {
 				return err
 			}

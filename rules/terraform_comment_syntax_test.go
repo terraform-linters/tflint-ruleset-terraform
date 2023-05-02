@@ -13,6 +13,7 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 		Content  string
 		JSON     bool
 		Expected helper.Issues
+		Fixed    string
 	}{
 		{
 			Name:     "hash comment",
@@ -48,6 +49,7 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 					},
 				},
 			},
+			Fixed: `# foo`,
 		},
 		{
 			Name: "end-of-line hash comment",
@@ -82,6 +84,11 @@ variable "foo" {
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, runner.Changes())
 		})
 	}
 }

@@ -72,15 +72,18 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 			r.checkLegacyTraversalIndex(runner, expr.Traversal, file.Bytes)
 		case *hclsyntax.SplatExpr:
 			if strings.HasPrefix(string(expr.MarkerRange.SliceBytes(file.Bytes)), ".") {
-				if err := runner.EmitIssue(
+				if err := runner.EmitIssueWithFix(
 					r,
 					"List items should be accessed using square brackets",
 					expr.MarkerRange,
+					func(f tflint.Fixer) error {
+						return f.ReplaceText(expr.MarkerRange, "[*]")
+					},
 				); err != nil {
 					return hcl.Diagnostics{
 						{
 							Severity: hcl.DiagError,
-							Summary:  "failed to call EmitIssue()",
+							Summary:  "failed to call EmitIssueWithFix()",
 							Detail:   err.Error(),
 						},
 					}
@@ -98,17 +101,20 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 
 func (r *TerraformDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.Runner, traversal hcl.Traversal, file []byte) hcl.Diagnostics {
 	for _, t := range traversal {
-		if _, ok := t.(hcl.TraverseIndex); ok {
+		if tn, ok := t.(hcl.TraverseIndex); ok {
 			if strings.HasPrefix(string(t.SourceRange().SliceBytes(file)), ".") {
-				if err := runner.EmitIssue(
+				if err := runner.EmitIssueWithFix(
 					r,
 					"List items should be accessed using square brackets",
 					t.SourceRange(),
+					func(f tflint.Fixer) error {
+						return f.ReplaceText(t.SourceRange(), "[", f.ValueText(tn.Key), "]")
+					},
 				); err != nil {
 					return hcl.Diagnostics{
 						{
 							Severity: hcl.DiagError,
-							Summary:  "failed to call EmitIssue()",
+							Summary:  "failed to call EmitIssueWithFix()",
 							Detail:   err.Error(),
 						},
 					}

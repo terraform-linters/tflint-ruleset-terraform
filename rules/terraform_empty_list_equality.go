@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/zclconf/go-cty/cty"
 )
 
 // TerraformEmptyListEqualityRule checks whether is there a comparison with an empty list
@@ -59,23 +58,23 @@ func (r *TerraformEmptyListEqualityRule) Check(runner tflint.Runner) error {
 // checkEmptyList visits all blocks that can contain expressions and checks for comparisons with static empty list
 func (r *TerraformEmptyListEqualityRule) checkEmptyList(runner tflint.Runner) hcl.Diagnostics {
 	return runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
-		if binaryOpExpr, ok := expr.(*hclsyntax.BinaryOpExpr); ok && binaryOpExpr.Op.Type == cty.Bool {
+		if binaryOpExpr, ok := expr.(*hclsyntax.BinaryOpExpr); ok && (binaryOpExpr.Op == hclsyntax.OpEqual || binaryOpExpr.Op == hclsyntax.OpNotEqual) {
 			if tupleConsExpr, ok := binaryOpExpr.LHS.(*hclsyntax.TupleConsExpr); ok && len(tupleConsExpr.Exprs) == 0 {
-				if err := r.emitIssue(binaryOpExpr.Range(), runner); err != nil {
+				if err := r.emitIssue(binaryOpExpr, binaryOpExpr.RHS, runner); err != nil {
 					return hcl.Diagnostics{
 						{
 							Severity: hcl.DiagError,
-							Summary:  "failed to call EmitIssue()",
+							Summary:  "failed to call EmitIssueWithFix()",
 							Detail:   err.Error(),
 						},
 					}
 				}
 			} else if tupleConsExpr, ok := binaryOpExpr.RHS.(*hclsyntax.TupleConsExpr); ok && len(tupleConsExpr.Exprs) == 0 {
-				if err := r.emitIssue(binaryOpExpr.Range(), runner); err != nil {
+				if err := r.emitIssue(binaryOpExpr, binaryOpExpr.LHS, runner); err != nil {
 					return hcl.Diagnostics{
 						{
 							Severity: hcl.DiagError,
-							Summary:  "failed to call EmitIssue()",
+							Summary:  "failed to call EmitIssueWithFix()",
 							Detail:   err.Error(),
 						},
 					}
@@ -87,10 +86,20 @@ func (r *TerraformEmptyListEqualityRule) checkEmptyList(runner tflint.Runner) hc
 }
 
 // emitIssue emits issue for comparison with static empty list
-func (r *TerraformEmptyListEqualityRule) emitIssue(exprRange hcl.Range, runner tflint.Runner) error {
-	return runner.EmitIssue(
+func (r *TerraformEmptyListEqualityRule) emitIssue(binaryOpExpr *hclsyntax.BinaryOpExpr, hs hcl.Expression, runner tflint.Runner) error {
+	var opStr string
+	if binaryOpExpr.Op == hclsyntax.OpEqual {
+		opStr = "=="
+	} else {
+		opStr = "!="
+	}
+
+	return runner.EmitIssueWithFix(
 		r,
 		"Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
-		exprRange,
+		binaryOpExpr.Range(),
+		func(f tflint.Fixer) error {
+			return f.ReplaceText(binaryOpExpr.Range(), "length(", f.TextAt(hs.Range()), ") ", opStr, " 0")
+		},
 	)
 }
