@@ -56,14 +56,16 @@ Switch to the square bracket syntax when accessing items in list, including reso
 
 Example:
 
-```
+```hcl
 locals {
   list  = [{a = "b}, {a = "c"}]
   value = list.*.a
 }
 ```
+
 Change this to: 
-```
+
+```hcl
 locals {
   list  = [{a = "b}, {a = "c"}]
   value = list[*].a
