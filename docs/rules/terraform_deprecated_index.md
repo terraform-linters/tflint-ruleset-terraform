@@ -53,3 +53,21 @@ Terraform v0.12 supports traditional square brackets for accessing list items by
 ## How To Fix
 
 Switch to the square bracket syntax when accessing items in list, including resources that use `count`.
+
+Example:
+
+```hcl
+locals {
+  list  = [{a = "b}, {a = "c"}]
+  value = list.*.a
+}
+```
+
+Change this to: 
+
+```hcl
+locals {
+  list  = [{a = "b}, {a = "c"}]
+  value = list[*].a
+}
+```
