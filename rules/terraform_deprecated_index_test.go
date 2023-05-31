@@ -11,6 +11,7 @@ func Test_TerraformDeprecatedIndexRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		JSON     bool
 		Expected helper.Issues
 	}{
 		{
@@ -193,13 +194,70 @@ locals {
 				},
 			},
 		},
+		{
+			Name: "json invalid",
+			JSON: true,
+			Content: `
+			{
+				"locals": {
+					"list": ["a"],
+					"value": "${list.0}"
+				}
+			}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedIndexRule(),
+					Message: "List items should be accessed using square brackets",
+					Range: hcl.Range{
+						Filename: "config.tf.json",
+						Start: hcl.Pos{
+							Line:   5,
+							Column: 27,
+						},
+						End: hcl.Pos{
+							Line:   5,
+							Column: 29,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "json valid",
+			JSON: true,
+			Content: `
+			{
+				"locals": {
+					"list": ["a"],
+					"value": "${list[0]}"
+				}
+			}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "json strings",
+			JSON: true,
+			Content: `
+			{
+				"locals": {
+					"string": "foo",
+					"bool": "${local.string == \"foo\"}"
+				}
+			}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformDeprecatedIndexRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := helper.TestRunner(t, map[string]string{"config.tf": tc.Content})
+			filename := "config.tf"
+			if tc.JSON {
+				filename += ".json"
+			}
+
+			runner := helper.TestRunner(t, map[string]string{filename: tc.Content})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)

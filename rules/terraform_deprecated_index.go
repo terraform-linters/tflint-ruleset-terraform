@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/hashicorp/hcl/v2/json"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
@@ -59,6 +60,11 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 		filename := e.Range().Filename
 		file := files[filename]
 
+		if json.IsJSONExpression(e) {
+			r.checkJSONExpression(runner, e, file.Bytes)
+			return nil
+		}
+
 		switch expr := e.(type) {
 		case *hclsyntax.ScopeTraversalExpr:
 			r.checkLegacyTraversalIndex(runner, expr.Traversal, file.Bytes)
@@ -111,4 +117,14 @@ func (r *TerraformDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.R
 		}
 	}
 	return nil
+}
+
+func (r *TerraformDeprecatedIndexRule) checkJSONExpression(runner tflint.Runner, e hcl.Expression, file []byte) hcl.Diagnostics {
+	var diags hcl.Diagnostics
+
+	for _, v := range e.Variables() {
+		diags = append(diags, r.checkLegacyTraversalIndex(runner, v, file)...)
+	}
+
+	return diags
 }
