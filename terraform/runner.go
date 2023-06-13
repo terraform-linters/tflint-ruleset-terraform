@@ -93,8 +93,9 @@ func (r *Runner) GetLocals() (map[string]*Local, hcl.Diagnostics) {
 
 			for name, attr := range attrs {
 				locals[name] = &Local{
-					Name:     attr.Name,
-					DefRange: attr.Range,
+					Name:      attr.Name,
+					Attribute: attr,
+					DefRange:  attr.Range,
 				}
 			}
 		}

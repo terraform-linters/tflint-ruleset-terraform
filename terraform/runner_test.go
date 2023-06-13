@@ -165,6 +165,7 @@ locals {
 
 			opts := []cmp.Option{
 				cmpopts.IgnoreFields(hcl.Pos{}, "Byte"),
+				cmpopts.IgnoreFields(Local{}, "Attribute"),
 			}
 			if diff := cmp.Diff(got, test.want, opts...); diff != "" {
 				t.Error(diff)

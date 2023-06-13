@@ -11,8 +11,10 @@ func Test_TerraformRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		JSON     bool
 		Config   string
 		Expected helper.Issues
+		Fixed    string
 	}{
 		{
 			Name: "no version",
@@ -41,7 +43,7 @@ provider "template" {}
 			Name: "implicit provider - resource",
 			Content: `
 resource "random_string" "foo" {
-	length = 16
+  length = 16
 }
 `,
 			Expected: helper.Issues{
@@ -66,7 +68,7 @@ resource "random_string" "foo" {
 			Name: "implicit provider - data source",
 			Content: `
 data "template_file" "foo" {
-	template = ""
+  template = ""
 }
 `,
 			Expected: helper.Issues{
@@ -91,12 +93,12 @@ data "template_file" "foo" {
 			Name: "required_providers object",
 			Content: `
 terraform {
-	required_providers {
-		template = {
-			source  = "hashicorp/template"
-			version = "~> 2" 
-		}
-	}
+  required_providers {
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2" 
+    }
+  }
 }
 provider "template" {} 
 `,
@@ -106,9 +108,9 @@ provider "template" {}
 			Name: "legacy required_providers string",
 			Content: `
 terraform {
-	required_providers {
-		template = "~> 2"
-	}
+  required_providers {
+    template = "~> 2"
+  }
 }
 provider "template" {} 
 `,
@@ -120,25 +122,36 @@ provider "template" {}
 						Filename: "module.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 14,
+							Column: 16,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 20,
+							Column: 22,
 						},
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2"
+    }
+  }
+}
+provider "template" {}
+`,
 		},
 		{
 			Name: "required_providers object missing version",
 			Content: `
 terraform {
-	required_providers {
-		template = {
-			source = "hashicorp/template"
-		}
-	}
+  required_providers {
+    template = {
+      source = "hashicorp/template"
+    }
+  }
 }
 
 provider "template" {} 
@@ -151,11 +164,11 @@ provider "template" {}
 						Filename: "module.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 14,
+							Column: 16,
 						},
 						End: hcl.Pos{
 							Line:   6,
-							Column: 4,
+							Column: 6,
 						},
 					},
 				},
@@ -165,20 +178,20 @@ provider "template" {}
 			Name: "required_providers object missing version ignored",
 			Content: `
 terraform {
-	required_providers {
-		template = {
-			source = "hashicorp/template"
-		}
-	}
+  required_providers {
+    template = {
+      source = "hashicorp/template"
+    }
+  }
 }
 
 provider "template" {} 
 `,
 			Config: `
 rule "terraform_required_providers" {
-	enabled = true
+  enabled = true
 
-	version = false
+  version = false
 }
 `,
 			Expected: helper.Issues{},
@@ -187,11 +200,11 @@ rule "terraform_required_providers" {
 			Name: "required_providers object missing source",
 			Content: `
 terraform {
-	required_providers {
-		template = {
-			version = "~> 2"
-		}
-	}
+  required_providers {
+    template = {
+      version = "~> 2"
+    }
+  }
 }
 
 provider "template" {} 
@@ -204,34 +217,46 @@ provider "template" {}
 						Filename: "module.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 14,
+							Column: 16,
 						},
 						End: hcl.Pos{
 							Line:   6,
-							Column: 4,
+							Column: 6,
 						},
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2"
+    }
+  }
+}
+
+provider "template" {}
+`,
 		},
 		{
 			Name: "required_providers object missing source ignored",
 			Content: `
 terraform {
-	required_providers {
-		template = {
-			version = "~> 2"
-		}
-	}
+  required_providers {
+    template = {
+      version = "~> 2"
+    }
+  }
 }
 
 provider "template" {} 
 `,
 			Config: `
 rule "terraform_required_providers" {
-	enabled = true
+  enabled = true
 
-	source = false
+  source = false
 }
 `,
 			Expected: helper.Issues{},
@@ -240,9 +265,9 @@ rule "terraform_required_providers" {
 			Name: "required_providers empty object",
 			Content: `
 terraform {
-	required_providers {
-		template = {}
-	}
+  required_providers {
+    template = {}
+  }
 }
 
 provider "template" {} 
@@ -255,11 +280,11 @@ provider "template" {}
 						Filename: "module.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 14,
+							Column: 16,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 16,
+							Column: 18,
 						},
 					},
 				},
@@ -270,21 +295,32 @@ provider "template" {}
 						Filename: "module.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 14,
+							Column: 16,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 16,
+							Column: 18,
 						},
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+    template = {
+      source = "hashicorp/template"
+    }
+  }
+}
+
+provider "template" {}
+`,
 		},
 		{
 			Name: "single provider with alias",
 			Content: `
 provider "template" {
-	alias = "b"
+  alias = "b"
 }
 `,
 			Expected: helper.Issues{
@@ -311,14 +347,14 @@ provider "template" {
 terraform {
   required_providers {
     template = {
-			source = "hashicorp/template"
-			version = "~> 2"
-		}
+      source = "hashicorp/template"
+      version = "~> 2"
+    }
   }
 }
 
 provider "template" {
-	version = "~> 2"
+  version = "~> 2"
 } 
 `,
 			Expected: helper.Issues{
@@ -345,15 +381,15 @@ provider "template" {
 terraform {
   required_providers {
     template = {
-			source = "hashicorp/template"
-			version = "~> 2"
-			configuration_aliases = [template.alias]
-		}
+      source = "hashicorp/template"
+      version = "~> 2"
+      configuration_aliases = [template.alias]
+    }
   }
 }
 
 data "template_file" "foo" {
-	provider = template.alias
+  provider = template.alias
 }
 `,
 			Expected: helper.Issues{},
@@ -364,15 +400,15 @@ data "template_file" "foo" {
 terraform {
   required_providers {
     template = {
-			source = "hashicorp/template"
-			version = "~> 2"
-		}
+      source = "hashicorp/template"
+      version = "~> 2"
+    }
   }
 }
 
 provider "template" {
-	alias   = "foo"
-	version = "~> 2"
+  alias   = "foo"
+  version = "~> 2"
 } 
 `,
 			Expected: helper.Issues{
@@ -404,11 +440,11 @@ data "terraform_remote_state" "foo" {}
 			Name: "builtin provider",
 			Content: `
 terraform {
-	required_providers {
-		test = {
-			source = "terraform.io/builtin/test"
-		}
-	}
+  required_providers {
+    test = {
+      source = "terraform.io/builtin/test"
+    }
+  }
 }
 resource "test_assertions" "foo" {}
 `,
@@ -478,14 +514,51 @@ resource "google_compute_instance" "foo" {
 				},
 			},
 		},
+		{
+			Name: "JSON syntax",
+			Content: `
+{
+  "terraform": {
+    "required_providers": {
+      "template": "~> 2"
+	}
+  },
+  "provider": {
+    "template": {}
+  }
+}`,
+			JSON: true,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf.json",
+						Start: hcl.Pos{
+							Line:   5,
+							Column: 19,
+						},
+						End: hcl.Pos{
+							Line:   5,
+							Column: 25,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformRequiredProvidersRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
+			filename := "module.tf"
+			if tc.JSON {
+				filename += ".json"
+			}
+
 			runner := testRunner(t, map[string]string{
-				"module.tf":   tc.Content,
+				filename:      tc.Content,
 				".tflint.hcl": tc.Config,
 			})
 
@@ -494,6 +567,11 @@ resource "google_compute_instance" "foo" {
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, runner.Runner.(*helper.Runner).Changes())
 		})
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	tfaddr "github.com/hashicorp/terraform-registry-address"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	tfsdk "github.com/terraform-linters/tflint-plugin-sdk/terraform"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
@@ -186,10 +187,20 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 		}
 
 		if val.Type() == cty.String {
-			if err := runner.EmitIssue(
+			if err := runner.EmitIssueWithFix(
 				r,
 				fmt.Sprintf("Legacy version constraint for provider %q in `required_providers`", name),
 				requiredProvider.Expr.Range(),
+				func(f tflint.Fixer) error {
+					if tfsdk.IsJSONFilename(requiredProvider.Expr.Range().Filename) {
+						return tflint.ErrFixNotSupported
+					}
+
+					return f.ReplaceText(requiredProvider.Expr.Range(), fmt.Sprintf(`{
+						source  = "hashicorp/%s" 
+						version = %s
+					}`, name, f.TextAt(requiredProvider.Expr.Range()).Bytes))
+				},
 			); err != nil {
 				return err
 			}
@@ -209,10 +220,26 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 				continue
 			}
 		} else if *config.Source {
-			if err := runner.EmitIssue(
+			if err := runner.EmitIssueWithFix(
 				r,
 				fmt.Sprintf("Missing `source` for provider %q in `required_providers`", name),
 				requiredProvider.Expr.Range(),
+				func(f tflint.Fixer) error {
+					if tfsdk.IsJSONFilename(requiredProvider.Expr.Range().Filename) {
+						return tflint.ErrFixNotSupported
+					}
+
+					kvs, diags := hcl.ExprMap(requiredProvider.Expr)
+					if diags.HasErrors() {
+						return diags
+					}
+					if len(kvs) == 0 {
+						return f.ReplaceText(requiredProvider.Expr.Range(), fmt.Sprintf(`{
+							source = "hashicorp/%s"
+						}`, name))
+					}
+					return f.InsertTextBefore(kvs[0].Key.StartRange(), fmt.Sprintf(`source = "hashicorp/%s"`+"\n", name))
+				},
 			); err != nil {
 				return err
 			}

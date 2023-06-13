@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/hcl/v2 v2.17.0
 	github.com/hashicorp/terraform-registry-address v0.2.0
-	github.com/terraform-linters/tflint-plugin-sdk v0.16.1
+	github.com/terraform-linters/tflint-plugin-sdk v0.16.2-0.20230605170513-64de942491dc
 	github.com/zclconf/go-cty v1.13.2
 )
 

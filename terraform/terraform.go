@@ -59,8 +59,9 @@ func decodeModuleCall(block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 
 // Local represents a single entry from a "locals" block.
 type Local struct {
-	Name     string
-	DefRange hcl.Range
+	Name      string
+	Attribute *hcl.Attribute
+	DefRange  hcl.Range
 }
 
 // ProviderRef represents a reference to a provider like `provider = google.europe` in a resource or module.

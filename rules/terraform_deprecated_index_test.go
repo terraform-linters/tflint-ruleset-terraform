@@ -13,12 +13,13 @@ func Test_TerraformDeprecatedIndexRule(t *testing.T) {
 		Content  string
 		JSON     bool
 		Expected helper.Issues
+		Fixed    string
 	}{
 		{
 			Name: "deprecated dot index style",
 			Content: `
 locals {
-  list = ["a"]
+  list  = ["a"]
   value = list.0
 }
 `,
@@ -39,13 +40,19 @@ locals {
 					},
 				},
 			},
+			Fixed: `
+locals {
+  list  = ["a"]
+  value = list[0]
+}
+`,
 		},
 		{
 			Name: "deprecated dot splat index style",
 			Content: `
 locals {
-  maplist = [{a = "b"}]
-  values = maplist.*.a
+  maplist = [{ a = "b" }]
+  values  = maplist.*.a
 }
 `,
 			Expected: helper.Issues{
@@ -56,21 +63,27 @@ locals {
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 19,
+							Column: 20,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 21,
+							Column: 22,
 						},
 					},
 				},
 			},
+			Fixed: `
+locals {
+  maplist = [{ a = "b" }]
+  values  = maplist[*].a
+}
+`,
 		},
 		{
 			Name: "attribute access",
 			Content: `
 locals {
-  map = {a = "b"}
+  map   = { a = "b" }
   value = map.a
 }
 `,
@@ -90,9 +103,9 @@ locals {
 			Content: `
 locals {
   servers = <<EOF
-%{ for ip in aws_instance.example[*].private_ip }
+%{for ip in aws_instance.example[*].private_ip}
 server ${ip}
-%{ endfor }
+%{endfor}
 EOF
 }
 `,
@@ -101,38 +114,12 @@ EOF
 		{
 			Name: "directive: invalid",
 			Content: `
-		locals {
-		  servers = <<EOF
-		%{ for ip in aws_instance.example.*.private_ip }
-		server ${ip}
-		%{ endfor }
-		EOF
-		}
-		`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
-					Message: "List items should be accessed using square brackets",
-					Range: hcl.Range{
-						Filename: "config.tf",
-						Start: hcl.Pos{
-							Line:   4,
-							Column: 36,
-						},
-						End: hcl.Pos{
-							Line:   4,
-							Column: 38,
-						},
-					},
-				},
-			},
-		},
-		{
-			Name: "legacy splat and legacy index",
-			Content: `
 locals {
-  nested_list = [["a"]]
-  value = nested_list.*.0
+  servers = <<EOF
+%{for ip in aws_instance.example.*.private_ip}
+server ${ip}
+%{endfor}
+EOF
 }
 `,
 			Expected: helper.Issues{
@@ -143,11 +130,46 @@ locals {
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 22,
+							Column: 33,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 24,
+							Column: 35,
+						},
+					},
+				},
+			},
+			Fixed: `
+locals {
+  servers = <<EOF
+%{for ip in aws_instance.example[*].private_ip}
+server ${ip}
+%{endfor}
+EOF
+}
+`,
+		},
+		{
+			Name: "legacy splat and legacy index",
+			Content: `
+locals {
+  nested_list = [["a"]]
+  value       = nested_list.*.0
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedIndexRule(),
+					Message: "List items should be accessed using square brackets",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 28,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 30,
 						},
 					},
 				},
@@ -158,21 +180,27 @@ locals {
 						Filename: "config.tf",
 						Start: hcl.Pos{
 							Line:   4,
-							Column: 24,
+							Column: 30,
 						},
 						End: hcl.Pos{
 							Line:   4,
-							Column: 26,
+							Column: 32,
 						},
 					},
 				},
 			},
+			Fixed: `
+locals {
+  nested_list = [["a"]]
+  value       = nested_list[*][0]
+}
+`,
 		},
 		{
 			Name: "complex expression",
 			Content: `
 locals {
-  create_namespace = true
+  create_namespace     = true
   kubernetes_namespace = local.create_namespace ? join("", kubernetes_namespace.default.*.id) : var.kubernetes_namespace
 }
 `,
@@ -193,6 +221,12 @@ locals {
 					},
 				},
 			},
+			Fixed: `
+locals {
+  create_namespace     = true
+  kubernetes_namespace = local.create_namespace ? join("", kubernetes_namespace.default[*].id) : var.kubernetes_namespace
+}
+`,
 		},
 		{
 			Name: "json invalid",
@@ -221,6 +255,13 @@ locals {
 					},
 				},
 			},
+			Fixed: `
+			{
+				"locals": {
+					"list": ["a"],
+					"value": "${list[0]}"
+				}
+			}`,
 		},
 		{
 			Name: "json valid",
@@ -264,6 +305,11 @@ locals {
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, runner.Changes())
 		})
 	}
 }

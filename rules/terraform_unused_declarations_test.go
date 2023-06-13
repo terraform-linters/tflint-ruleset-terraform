@@ -13,6 +13,7 @@ func Test_TerraformUnusedDeclarationsRule(t *testing.T) {
 		Content  string
 		JSON     bool
 		Expected helper.Issues
+		Fixed    string
 	}{
 		{
 			Name: "unused variable",
@@ -32,6 +33,10 @@ output "u" { value = var.used }
 					},
 				},
 			},
+			Fixed: `
+variable "used" {}
+output "u" { value = var.used }
+`,
 		},
 		{
 			Name: "unused data source",
@@ -51,13 +56,17 @@ output "u" { value = data.null_data_source.used }
 					},
 				},
 			},
+			Fixed: `
+data "null_data_source" "used" {}
+output "u" { value = data.null_data_source.used }
+`,
 		},
 		{
 			Name: "unused local source",
 			Content: `
 locals {
-	not_used = ""
-	used = ""
+  not_used = ""
+  used = ""
 }
 output "u" { value = local.used }
 `,
@@ -67,20 +76,26 @@ output "u" { value = local.used }
 					Message: `local.not_used is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 3, Column: 2},
-						End:      hcl.Pos{Line: 3, Column: 15},
+						Start:    hcl.Pos{Line: 3, Column: 3},
+						End:      hcl.Pos{Line: 3, Column: 16},
 					},
 				},
 			},
+			Fixed: `
+locals {
+  used = ""
+}
+output "u" { value = local.used }
+`,
 		},
 		{
 			Name: "variable used in resource",
 			Content: `
 variable "used" {}
 resource "null_resource" "n" {
-	triggers = {
-		u = var.used
-	}
+  triggers = {
+    u = var.used
+  }
 }
 `,
 			Expected: helper.Issues{},
@@ -90,8 +105,8 @@ resource "null_resource" "n" {
 			Content: `
 variable "used" {}
 module "m" {
-	source = "./module"
-	u = var.used
+  source = "./module"
+  u = var.used
 }
 `,
 			Expected: helper.Issues{},
@@ -101,8 +116,8 @@ module "m" {
 			Content: `
 variable "used" {}
 module "m" {
-	source = "./module"
-	u = var.used
+  source = "./module"
+  u = var.used
 }
 `,
 			Expected: helper.Issues{},
@@ -112,8 +127,8 @@ module "m" {
 			Content: `
 locals { used = "used" }
 module "m" {
-	source = "./module"
-	u = local.used
+  source = "./module"
+  u = local.used
 }
 `,
 			Expected: helper.Issues{},
@@ -123,7 +138,7 @@ module "m" {
 			Content: `
 variable "aws_region" {}
 provider "aws" {
-	region = var.aws_region
+  region = var.aws_region
 }
 `,
 			Expected: helper.Issues{},
@@ -135,8 +150,8 @@ variable "used" {}
 resource "null_resource" "n" {
   triggers = {
     u = var.used
-	}
-  
+  }
+
   lifecycle {
     ignore_changes = [triggers]
   }
@@ -152,14 +167,14 @@ resource "null_resource" "n" {
 			Name: "additional traversal",
 			Content: `
 variable "v" {
-	type = object({ foo = string })
+  type = object({ foo = string })
 }
 output "v" {
-	value = var.v.foo
+  value = var.v.foo
 }
 data "terraform_remote_state" "d" {}
 output "d" {
-	value = data.terraform_remote_state.d.outputs.foo
+  value = data.terraform_remote_state.d.outputs.foo
 }
 `,
 			Expected: helper.Issues{},
@@ -177,12 +192,33 @@ output "d" {
         }]
       }
     }
-	},
+  },
   "variable": {
     "again": {}
   }
 }`,
 			Expected: helper.Issues{},
+		},
+		{
+			Name: "json with unused variable",
+			JSON: true,
+			Content: `
+{
+  "variable": {
+    "again": {}
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `variable "again" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf.json",
+						Start:    hcl.Pos{Line: 4, Column: 14},
+						End:      hcl.Pos{Line: 4, Column: 15},
+					},
+				},
+			},
 		},
 	}
 
@@ -201,7 +237,14 @@ output "d" {
 				t.Fatalf("Unexpected error occurred: %s", err)
 			}
 
-			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+			helperRunner := runner.Runner.(*helper.Runner)
+
+			helper.AssertIssues(t, tc.Expected, helperRunner.Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, helperRunner.Changes())
 		})
 	}
 }

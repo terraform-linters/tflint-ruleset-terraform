@@ -60,20 +60,24 @@ func (r *TerraformDeprecatedInterpolationRule) Check(runner tflint.Runner) error
 }
 
 func (r *TerraformDeprecatedInterpolationRule) checkForDeprecatedInterpolationsInExpr(runner tflint.Runner, expr hcl.Expression) hcl.Diagnostics {
-	if _, ok := expr.(*hclsyntax.TemplateWrapExpr); !ok {
+	wrapExpr, ok := expr.(*hclsyntax.TemplateWrapExpr)
+	if !ok {
 		return nil
 	}
 
-	err := runner.EmitIssue(
+	err := runner.EmitIssueWithFix(
 		r,
 		"Interpolation-only expressions are deprecated in Terraform v0.12.14",
 		expr.Range(),
+		func(f tflint.Fixer) error {
+			return f.ReplaceText(expr.Range(), f.TextAt(wrapExpr.Wrapped.Range()))
+		},
 	)
 	if err != nil {
 		return hcl.Diagnostics{
 			{
 				Severity: hcl.DiagError,
-				Summary:  "failed to call EmitIssue()",
+				Summary:  "failed to call EmitIssueWithFix()",
 				Detail:   err.Error(),
 			},
 		}
