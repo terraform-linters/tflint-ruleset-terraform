@@ -11,6 +11,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		Fixed    string
 		Expected helper.Issues
 	}{
 		{
@@ -140,8 +141,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 							source = "hashicorp/null"
 						}
 					}
-				}
-			`,
+				}`,
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformUnusedRequiredProvidersRule(),
@@ -159,6 +159,11 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+  }
+}`,
 		},
 		{
 			Name: "unused - override",
@@ -175,8 +180,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 				}
 				resource "null_resource" "foo" {
 					provider = custom-null
-				}
-			`,
+				}`,
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformUnusedRequiredProvidersRule(),
@@ -194,6 +198,17 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+    custom-null = {
+      source = "custom/null"
+    }
+  }
+}
+resource "null_resource" "foo" {
+  provider = custom-null
+}`,
 		},
 		{
 			Name: "unused - module",
@@ -207,8 +222,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 				}
 				module "m" {
 					source = "./m"
-				}
-			`,
+				}`,
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformUnusedRequiredProvidersRule(),
@@ -226,6 +240,14 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 					},
 				},
 			},
+			Fixed: `
+terraform {
+  required_providers {
+  }
+}
+module "m" {
+  source = "./m"
+}`,
 		},
 		{
 			Name: "used - unevaluated resource",
@@ -250,13 +272,22 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := testRunner(t, map[string]string{"module.tf": tc.Content})
+			filename := "module.tf"
+			runner := testRunner(t, map[string]string{filename: tc.Content})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)
 			}
 
+			helperRunner := runner.Runner.(*helper.Runner)
+
 			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, helperRunner.Changes())
 		})
 	}
 }

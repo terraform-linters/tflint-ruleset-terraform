@@ -97,10 +97,13 @@ func (r *TerraformUnusedRequiredProvidersRule) Check(rr tflint.Runner) error {
 
 	for _, required := range requiredProviders {
 		if _, exists := providerRefs[required.Name]; !exists {
-			if err := runner.EmitIssue(
+			if err := runner.EmitIssueWithFix(
 				r,
 				fmt.Sprintf("provider '%s' is declared in required_providers but not used by the module", required.Name),
 				required.Range,
+				func(f tflint.Fixer) error {
+					return f.RemoveAttribute(required)
+				},
 			); err != nil {
 				return err
 			}
