@@ -1,3 +1,32 @@
+## 0.4.0 (2023-06-18)
+
+### Breaking Changes
+
+- [#104](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/104): Bump tflint-plugin-sdk to v0.17.0
+  - This change drops support for TFLint v0.40/v0.41
+
+### Enhancements
+
+- [#93](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/93): Add autofix support
+  - `terraform_comment_syntax`
+  - `terraform_deprecated_index`
+  - `terraform_deprecated_interpolation`
+  - `terraform_empty_list_equality`
+  - `terraform_required_provider`
+    - However, only issues with missing `source` can be fixed
+  - `terraform_unused_declarations`
+    - HCL native syntax only
+
+### BugFixes
+
+- [#101](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/101): deprecated_index: restore evaluation of JSON expressions
+
+### Chores
+
+- [#96](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/96): terraform_deprecated_index: add example of fix
+- [#99](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/99): Bump github.com/zclconf/go-cty from 1.13.1 to 1.13.2
+- [#102](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/102): Bump github.com/hashicorp/hcl/v2 from 2.16.2 to 2.17.0
+
 ## 0.3.0 (2023-04-22)
 
 ### Breaking Changes
