@@ -1,6 +1,6 @@
 # Rules
 
-Terraform Language rules implement recommendations from the [Terraform Language documentation](https://www.terraform.io/language). This ruleset _does not_ provide configurable rules for personal/team stylistic preferences (e.g., block/attribute order). If you'd like to enforce stylistic rules beyond the official Terraform Language recommendations, you should [author your own ruleset plugin](https://github.com/terraform-linters/tflint/blob/master/docs/developer-guide/plugins.md).
+Terraform Language rules implement recommendations from the [Terraform Language documentation](https://www.terraform.io/language). This ruleset _does not_ provide configurable rules for personal/team style or usage preferences. If you'd like to enforce stylistic rules beyond the official Terraform Language recommendations, you should [author your own ruleset plugin](https://github.com/terraform-linters/tflint/blob/master/docs/developer-guide/plugins.md).
 
 All rules are enabled by default, but by setting `preset = "recommended"`, you can enable only the rules marked "Recommended" among the following rules. See [Configuration](../configuration.md) for details.
 
