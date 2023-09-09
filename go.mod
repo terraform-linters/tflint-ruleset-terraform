@@ -1,6 +1,6 @@
 module github.com/terraform-linters/tflint-ruleset-terraform
 
-go 1.20
+go 1.21.1
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
@@ -20,7 +20,6 @@ require (
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/storage v1.28.1 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.122 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
