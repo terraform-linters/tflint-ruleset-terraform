@@ -1,6 +1,6 @@
 # terraform_deprecated_lookup
 
-Disallow deprecated `lookup()` function with only 2 arguments.
+Disallow deprecated [`lookup` function](https://developer.hashicorp.com/terraform/language/functions/lookup) usage without a default.
 
 ## Example
 
@@ -25,13 +25,11 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 
-Calling `lookup()` with 2 arguments is deprecated since Terraform v0.7. `lookup(map, key)` is equivalent to the native index syntax `map[key]`
-
-* [lookup() documentation](https://developer.hashicorp.com/terraform/language/functions/lookup)
+Calling [`lookup`](https://developer.hashicorp.com/terraform/language/functions/lookup) with 2 arguments has been deprecated since Terraform v0.7. `lookup(map, key)` is equivalent to the native index syntax `map[key]`. `lookup` should only be used with the third `default` argument, even though it is optional for backward compatiblity. 
 
 ## How To Fix
 
-Use the natice index syntax:
+Use the native index syntax:
 
 Example:
 
