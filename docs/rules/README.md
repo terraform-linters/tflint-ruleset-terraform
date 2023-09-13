@@ -9,6 +9,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_comment_syntax](terraform_comment_syntax.md)|Disallow `//` comments in favor of `#`||
 |[terraform_deprecated_index](terraform_deprecated_index.md)|Disallow legacy dot index syntax|✔|
 |[terraform_deprecated_interpolation](terraform_deprecated_interpolation.md)|Disallow deprecated (0.11-style) interpolation|✔|
+|[terraform_deprecated_lookup](terraform_deprecated_lookup.md)|Disallow deprecated `lookup()` function with only 2 arguments.||
 |[terraform_documented_outputs](terraform_documented_outputs.md)|Disallow `output` declarations without description||
 |[terraform_documented_variables](terraform_documented_variables.md)|Disallow `variable` declarations without description||
 |[terraform_empty_list_equality](terraform_empty_list_equality.md)|Disallow comparisons with `[]` when checking if a collection is empty|✔|

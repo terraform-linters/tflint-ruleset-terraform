@@ -20,6 +20,7 @@ var PresetRules = map[string][]tflint.Rule{
 		NewTerraformUnusedDeclarationsRule(),
 		NewTerraformUnusedRequiredProvidersRule(),
 		NewTerraformWorkspaceRemoteRule(),
+		NewTerraformDeprecatedLookupRule(),
 	},
 	"recommended": {
 		NewTerraformDeprecatedIndexRule(),
