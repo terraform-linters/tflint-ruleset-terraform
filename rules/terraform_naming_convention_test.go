@@ -299,6 +299,36 @@ data "aws_eip" "foo" {
 			Config:   config,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: fmt.Sprintf("data: %s - Invalid snake_case in a check block", testType),
+			Content: `
+check "ip_check" {
+  data "aws_eip" "dash-name" {
+  }
+}`,
+			Config: config,
+			Expected: helper.Issues{
+				{
+					Rule:    rule,
+					Message: fmt.Sprintf("data name `dash-name` must match the following %s", formatName),
+					Range: hcl.Range{
+						Filename: "tests.tf",
+						Start:    hcl.Pos{Line: 3, Column: 3},
+						End:      hcl.Pos{Line: 3, Column: 29},
+					},
+				},
+			},
+		},
+		{
+			Name: fmt.Sprintf("data: %s - Valid snake_case in a check block", testType),
+			Content: `
+check "ip_check" {
+  data "aws_eip" "foo_bar" {
+  }
+}`,
+			Config:   config,
+			Expected: helper.Issues{},
+		},
 	}
 
 	for _, tc := range cases {

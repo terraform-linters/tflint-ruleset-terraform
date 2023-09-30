@@ -128,6 +128,19 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 				LabelNames: []string{"name"},
 				Body:       &hclext.BodySchema{},
 			},
+			{
+				Type:       "check",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type:       "data",
+							LabelNames: []string{"type", "name"},
+							Body:       &hclext.BodySchema{},
+						},
+					},
+				},
+			},
 		},
 	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
 	if err != nil {
@@ -144,6 +157,14 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 	for _, block := range blocks[dataBlockName] {
 		if err := nameValidator.checkBlock(runner, r, dataBlockName, block.Labels[1], &block.DefRange); err != nil {
 			return err
+		}
+	}
+	checkBlockName := "check"
+	for _, checkBlock := range blocks[checkBlockName] {
+		for _, block := range checkBlock.Body.Blocks {
+			if err := nameValidator.checkBlock(runner, r, dataBlockName, block.Labels[1], &block.DefRange); err != nil {
+				return err
+			}
 		}
 	}
 
