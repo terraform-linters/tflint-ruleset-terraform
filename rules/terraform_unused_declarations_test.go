@@ -180,6 +180,30 @@ output "d" {
 			Expected: helper.Issues{},
 		},
 		{
+			Name: "variable used in validation block",
+			Content: `
+variable "unused" {
+  validation {
+    condition     = var.unused != ""
+    error_message = "variable should be empty string. got: ${var.unused}"
+  }
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `variable "unused" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 2, Column: 1},
+						End:      hcl.Pos{Line: 2, Column: 18},
+					},
+				},
+			},
+			Fixed: `
+`,
+		},
+		{
 			Name: "json",
 			JSON: true,
 			Content: `
