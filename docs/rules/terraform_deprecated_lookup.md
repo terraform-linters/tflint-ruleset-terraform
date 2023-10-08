@@ -2,6 +2,8 @@
 
 Disallow deprecated [`lookup` function](https://developer.hashicorp.com/terraform/language/functions/lookup) usage without a default.
 
+> This rule is enabled by "recommended" preset.
+
 ## Example
 
 ```hcl
@@ -25,7 +27,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 
-Calling [`lookup`](https://developer.hashicorp.com/terraform/language/functions/lookup) with 2 arguments has been deprecated since Terraform v0.7. `lookup(map, key)` is equivalent to the native index syntax `map[key]`. `lookup` should only be used with the third `default` argument, even though it is optional for backward compatiblity. 
+Calling [`lookup`](https://developer.hashicorp.com/terraform/language/functions/lookup) with 2 arguments has been deprecated since Terraform v0.7. `lookup(map, key)` is equivalent to the native index syntax `map[key]`. `lookup` should only be used with the third `default` argument, even though it is optional for backward compatibility. 
 
 ## How To Fix
 
