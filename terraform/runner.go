@@ -142,6 +142,23 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 					},
 				},
 			},
+			{
+				Type:       "check",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type:       "data",
+							LabelNames: []string{"type", "name"},
+							Body: &hclext.BodySchema{
+								Attributes: []hclext.AttributeSchema{
+									{Name: "provider"},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
 	if err != nil {
@@ -199,6 +216,28 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 					providerRefs[ref.Name] = ref
 				}
 			}
+		case "check":
+			for _, data := range block.Body.Blocks {
+				if attr, exists := data.Body.Attributes["provider"]; exists {
+					ref, decodeDiags := decodeProviderRef(attr.Expr, data.DefRange)
+					diags = diags.Extend(decodeDiags)
+					if decodeDiags.HasErrors() {
+						continue
+					}
+					providerRefs[ref.Name] = ref
+				} else {
+					providerName := data.Labels[0]
+					if under := strings.Index(providerName, "_"); under != -1 {
+						providerName = providerName[:under]
+					}
+					providerRefs[providerName] = &ProviderRef{
+						Name:     providerName,
+						DefRange: data.DefRange,
+					}
+				}
+			}
+		default:
+			panic("unreachable")
 		}
 	}
 

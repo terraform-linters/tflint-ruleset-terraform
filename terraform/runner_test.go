@@ -183,6 +183,14 @@ func TestGetProviderRefs(t *testing.T) {
 		{
 			name: "resource",
 			content: `
+resource "google_compute_instance" "main" {}`,
+			want: map[string]*ProviderRef{
+				"google": {Name: "google", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 2, Column: 1}, End: hcl.Pos{Line: 2, Column: 42}}},
+			},
+		},
+		{
+			name: "resource with provider",
+			content: `
 resource "google_compute_instance" "main" {
   provider = google.europe
 }`,
@@ -192,6 +200,14 @@ resource "google_compute_instance" "main" {
 		},
 		{
 			name: "data",
+			content: `
+data "aws_ami" "main" {}`,
+			want: map[string]*ProviderRef{
+				"aws": {Name: "aws", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 2, Column: 1}, End: hcl.Pos{Line: 2, Column: 22}}},
+			},
+		},
+		{
+			name: "data with provider",
 			content: `
 data "aws_ami" "main" {
   provider = aws.west
@@ -220,6 +236,28 @@ module "server" {
 }`,
 			want: map[string]*ProviderRef{
 				"aws": {Name: "aws", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 2, Column: 1}, End: hcl.Pos{Line: 2, Column: 16}}},
+			},
+		},
+		{
+			name: "scoped data",
+			content: `
+check "my_check" {
+  data "aws_ami" "main" {}
+}`,
+			want: map[string]*ProviderRef{
+				"aws": {Name: "aws", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 3, Column: 3}, End: hcl.Pos{Line: 3, Column: 24}}},
+			},
+		},
+		{
+			name: "scoped data with provider",
+			content: `
+check "my_check" {
+  data "aws_ami" "main" {
+    provider = aws.west
+  }
+}`,
+			want: map[string]*ProviderRef{
+				"aws": {Name: "aws", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 3, Column: 3}, End: hcl.Pos{Line: 3, Column: 24}}},
 			},
 		},
 	}
