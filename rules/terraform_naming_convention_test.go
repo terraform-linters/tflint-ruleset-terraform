@@ -299,6 +299,36 @@ data "aws_eip" "foo" {
 			Config:   config,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: fmt.Sprintf("data: %s - Invalid snake_case in a check block", testType),
+			Content: `
+check "ignored" {
+  data "aws_eip" "dash-name" {
+  }
+}`,
+			Config: config,
+			Expected: helper.Issues{
+				{
+					Rule:    rule,
+					Message: fmt.Sprintf("data name `dash-name` must match the following %s", formatName),
+					Range: hcl.Range{
+						Filename: "tests.tf",
+						Start:    hcl.Pos{Line: 3, Column: 3},
+						End:      hcl.Pos{Line: 3, Column: 29},
+					},
+				},
+			},
+		},
+		{
+			Name: fmt.Sprintf("data: %s - Valid snake_case in a check block", testType),
+			Content: `
+check "ignored" {
+  data "aws_eip" "foo_bar" {
+  }
+}`,
+			Config:   config,
+			Expected: helper.Issues{},
+		},
 	}
 
 	for _, tc := range cases {
@@ -2923,6 +2953,62 @@ variable "camelCase" {
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+		})
+	}
+}
+
+func Test_TerraformNamingConventionRule_Check(t *testing.T) {
+	rule := NewTerraformNamingConventionRule()
+
+	config := `
+rule "terraform_naming_convention" {
+  enabled = true
+
+  check {
+    format = "snake_case"
+  }
+}`
+
+	tests := []struct {
+		name    string
+		content string
+		want    helper.Issues
+	}{
+		{
+			name: "Invalid snake_case",
+			content: `
+check "dash-name" {
+}`,
+			want: helper.Issues{
+				{
+					Rule:    rule,
+					Message: "check name `dash-name` must match the following format: snake_case",
+					Range: hcl.Range{
+						Filename: "tests.tf",
+						Start:    hcl.Pos{Line: 2, Column: 1},
+						End:      hcl.Pos{Line: 2, Column: 18},
+					},
+				},
+			},
+		},
+		{
+			name: "Valid snake_case",
+			content: `
+check "foo_bar" {
+}`,
+			want: helper.Issues{},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			runner := testRunner(t, map[string]string{"tests.tf": test.content, ".tflint.hcl": config})
+
+			if err := rule.Check(runner); err != nil {
+				t.Fatalf("Unexpected error occurred: %s", err)
+			}
+
+			helper.AssertIssues(t, test.want, runner.Runner.(*helper.Runner).Issues)
 		})
 	}
 }

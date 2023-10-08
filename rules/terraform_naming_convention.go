@@ -29,6 +29,7 @@ type terraformNamingConventionRuleConfig struct {
 	Output   *BlockFormatConfig `hclext:"output,block"`
 	Resource *BlockFormatConfig `hclext:"resource,block"`
 	Variable *BlockFormatConfig `hclext:"variable,block"`
+	Check    *BlockFormatConfig `hclext:"check,block"`
 }
 
 // CustomFormatConfig defines a custom format that can be used instead of the predefined formats
@@ -128,6 +129,19 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 				LabelNames: []string{"name"},
 				Body:       &hclext.BodySchema{},
 			},
+			{
+				Type:       "check",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type:       "data",
+							LabelNames: []string{"type", "name"},
+							Body:       &hclext.BodySchema{},
+						},
+					},
+				},
+			},
 		},
 	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
 	if err != nil {
@@ -144,6 +158,14 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 	for _, block := range blocks[dataBlockName] {
 		if err := nameValidator.checkBlock(runner, r, dataBlockName, block.Labels[1], &block.DefRange); err != nil {
 			return err
+		}
+	}
+	checkBlockName := "check"
+	for _, checkBlock := range blocks[checkBlockName] {
+		for _, block := range checkBlock.Body.Blocks {
+			if err := nameValidator.checkBlock(runner, r, dataBlockName, block.Labels[1], &block.DefRange); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -191,6 +213,17 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 	}
 	for _, block := range blocks[variableBlockName] {
 		if err := nameValidator.checkBlock(runner, r, variableBlockName, block.Labels[0], &block.DefRange); err != nil {
+			return err
+		}
+	}
+
+	// checks
+	nameValidator, err = config.Check.getNameValidator(defaultNameValidator, &config, checkBlockName)
+	if err != nil {
+		return err
+	}
+	for _, block := range blocks[checkBlockName] {
+		if err := nameValidator.checkBlock(runner, r, checkBlockName, block.Labels[0], &block.DefRange); err != nil {
 			return err
 		}
 	}

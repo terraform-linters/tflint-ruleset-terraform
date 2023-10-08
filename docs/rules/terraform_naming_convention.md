@@ -8,6 +8,7 @@ Enforces naming conventions for the following blocks:
 * Local values
 * Modules
 * Data sources
+* Checks
 
 ## Configuration
 
@@ -23,6 +24,7 @@ module | | Block settings to override naming convention for modules
 output | | Block settings to override naming convention for output values
 resource | | Block settings to override naming convention for resources
 variable | | Block settings to override naming convention for input variables
+check | | Block settings to override naming convention for checks
 
 
 #### `format`
