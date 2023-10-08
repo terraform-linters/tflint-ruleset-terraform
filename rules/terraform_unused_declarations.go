@@ -119,7 +119,19 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 			{
 				Type:       "variable",
 				LabelNames: []string{"name"},
-				Body:       &hclext.BodySchema{},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type: "validation",
+							Body: &hclext.BodySchema{
+								Attributes: []hclext.AttributeSchema{
+									{Name: "condition"},
+									{Name: "error_message"},
+								},
+							},
+						},
+					},
+				},
 			},
 			{
 				Type:       "data",
@@ -150,9 +162,21 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 }
 
 func (r *TerraformUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
+ReferenceLoop:
 	for _, ref := range lang.ReferencesInExpr(expr) {
 		switch sub := ref.Subject.(type) {
 		case addrs.InputVariable:
+			// Input variables can refer to themselves as var.NAME inside validation blocks.
+			// Do not mark such expressions as used, skip to next reference.
+			if varBlock, exists := decl.Variables[sub.Name]; exists {
+				for _, validationBlock := range varBlock.Body.Blocks {
+					for _, attr := range validationBlock.Body.Attributes {
+						if attr.Expr.Range().Overlaps(expr.Range()) {
+							continue ReferenceLoop
+						}
+					}
+				}
+			}
 			delete(decl.Variables, sub.Name)
 		case addrs.LocalValue:
 			delete(decl.Locals, sub.Name)
