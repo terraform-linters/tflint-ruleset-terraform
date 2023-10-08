@@ -138,6 +138,19 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 				LabelNames: []string{"type", "name"},
 				Body:       &hclext.BodySchema{},
 			},
+			{
+				Type:       "check",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type:       "data",
+							LabelNames: []string{"type", "name"},
+							Body:       &hclext.BodySchema{},
+						},
+					},
+				},
+			},
 		},
 	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
 	if err != nil {
@@ -145,10 +158,18 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 	}
 
 	for _, block := range body.Blocks {
-		if block.Type == "variable" {
+		switch block.Type {
+		case "variable":
 			decl.Variables[block.Labels[0]] = block
-		} else {
+		case "data":
 			decl.DataResources[fmt.Sprintf("data.%s.%s", block.Labels[0], block.Labels[1])] = block
+		case "check":
+			for _, data := range block.Body.Blocks {
+				// Scoped data source addresses are unique in the module
+				decl.DataResources[fmt.Sprintf("data.%s.%s", data.Labels[0], data.Labels[1])] = data
+			}
+		default:
+			panic("unreachable")
 		}
 	}
 

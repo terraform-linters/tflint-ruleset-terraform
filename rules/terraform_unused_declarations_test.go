@@ -204,6 +204,29 @@ variable "unused" {
 `,
 		},
 		{
+			Name: "unused scoped data source",
+			Content: `
+check "unused" {
+  data "null_data_source" "unused" {}
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `data "null_data_source" "unused" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 3, Column: 3},
+						End:      hcl.Pos{Line: 3, Column: 35},
+					},
+				},
+			},
+			Fixed: `
+check "unused" {
+}
+`,
+		},
+		{
 			Name: "json",
 			JSON: true,
 			Content: `
