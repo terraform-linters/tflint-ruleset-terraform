@@ -18,7 +18,7 @@ This ruleset is built into TFLint, so you usually don't need to worry about how 
 
 ```
 $ tflint -v
-TFLint version 0.47.0
+TFLint version 0.48.0
 + ruleset.terraform (0.4.0-bundled)
 ```
 
@@ -27,7 +27,7 @@ If you want to use a version different from the built-in version, you can declar
 ```hcl
 plugin "terraform" {
     enabled = true
-    version = "0.4.0"
+    version = "0.5.0"
     source  = "github.com/terraform-linters/tflint-ruleset-terraform"
 }
 ```

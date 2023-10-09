@@ -1,3 +1,29 @@
+## 0.5.0 (2023-10-09)
+
+### Enhancements
+
+- [#128](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/128) [#132](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/132): new rule: `terraform_deprecated_lookup`
+- [#131](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/131): `terraform_naming_convention`: Add support for checks and scoped data sources
+- [#135](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/135): `terraform_unused_declarations`: Add support for scoped data sources
+- [#136](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/136): Add support for provider refs in scoped data sources
+
+## BugFixes
+
+- [#133](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/133): `terraform_unused_declarations`: Make unused variable checks aware of validation blocks
+
+### Chores
+
+- [#106](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/106) [#117](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/117): Bump github.com/hashicorp/terraform-registry-address from 0.2.0 to 0.2.2
+- [#108](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/108): Bump github.com/hashicorp/go-getter from 1.7.1 to 1.7.2
+- [#109](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/109): Bump github.com/terraform-linters/tflint-plugin-sdk from 0.17.0 to 0.18.0
+- [#114](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/114): Add raw binary entries to checksums.txt
+- [#115](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/115): Fix typo in rule documentation
+- [#122](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/122) [#123](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/123) [#137](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/137): Bump github.com/zclconf/go-cty from 1.13.2 to 1.14.1
+- [#124](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/124) [#138](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/138): Bump github.com/hashicorp/hcl/v2 from 2.17.0 to 2.18.1
+- [#126](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/126): deps: Go 1.21
+- [#127](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/127): Bump actions/checkout from 3 to 4
+- [#129](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/129): Bump goreleaser/goreleaser-action from 4 to 5
+
 ## 0.4.0 (2023-06-18)
 
 ### Breaking Changes
