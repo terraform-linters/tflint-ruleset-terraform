@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/google/go-cmp v0.6.0
-	github.com/hashicorp/go-getter v1.7.2
+	github.com/hashicorp/go-getter v1.7.3
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/hashicorp/terraform-registry-address v0.2.2
