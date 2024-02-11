@@ -1,6 +1,6 @@
 module github.com/terraform-linters/tflint-ruleset-terraform
 
-go 1.21.1
+go 1.22.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
