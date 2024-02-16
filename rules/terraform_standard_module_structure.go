@@ -21,6 +21,11 @@ type TerraformStandardModuleStructureRule struct {
 	tflint.DefaultRule
 }
 
+type TerraformStandardModuleStructureRuleConfig struct {
+	// Outputs specifies whether outputs.tf is required to exist
+	Outputs *bool `hclext:"outputs,optional"`
+}
+
 // NewTerraformStandardModuleStructureRule returns a new rule
 func NewTerraformStandardModuleStructureRule() *TerraformStandardModuleStructureRule {
 	return &TerraformStandardModuleStructureRule{}
@@ -46,6 +51,21 @@ func (r *TerraformStandardModuleStructureRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
+func (r *TerraformStandardModuleStructureRule) config(runner tflint.Runner) (*TerraformStandardModuleStructureRuleConfig, error) {
+	config := &TerraformStandardModuleStructureRuleConfig{}
+
+	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
+		return nil, err
+	}
+
+	dv := true
+	if config.Outputs == nil {
+		config.Outputs = &dv
+	}
+
+	return config, nil
+}
+
 // Check emits errors for any missing files and any block types that are included in the wrong file
 func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
@@ -64,6 +84,11 @@ func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error
 	if len(files) == 0 {
 		// This rule does not run on non-Terraform directory.
 		return nil
+	}
+
+	config, err := r.config(runner)
+	if err != nil {
+		return fmt.Errorf("failed to parse rule config: %w", err)
 	}
 
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
@@ -86,7 +111,7 @@ func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error
 
 	blocks := body.Blocks.ByType()
 
-	if err := r.checkFiles(runner, body.Blocks); err != nil {
+	if err := r.checkFiles(runner, body.Blocks, config); err != nil {
 		return err
 	}
 	if err := r.checkVariables(runner, blocks["variable"]); err != nil {
@@ -99,7 +124,11 @@ func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error
 	return nil
 }
 
-func (r *TerraformStandardModuleStructureRule) checkFiles(runner tflint.Runner, blocks hclext.Blocks) error {
+func (r *TerraformStandardModuleStructureRule) checkFiles(
+	runner tflint.Runner,
+	blocks hclext.Blocks,
+	config *TerraformStandardModuleStructureRuleConfig,
+) error {
 	onlyJSON, err := r.onlyJSON(runner)
 	if err != nil {
 		return err
@@ -146,7 +175,7 @@ func (r *TerraformStandardModuleStructureRule) checkFiles(runner tflint.Runner, 
 		}
 	}
 
-	if files[filenameOutputs] == nil && len(blocks.ByType()["output"]) == 0 {
+	if *config.Outputs && files[filenameOutputs] == nil && len(blocks.ByType()["output"]) == 0 {
 		if err := runner.EmitIssue(
 			r,
 			fmt.Sprintf("Module should include an empty %s file", filenameOutputs),

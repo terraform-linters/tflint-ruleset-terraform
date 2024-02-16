@@ -12,6 +12,7 @@ func Test_TerraformStandardModuleStructureRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  map[string]string
+		Config   string
 		Expected helper.Issues
 	}{
 		{
@@ -56,7 +57,7 @@ func Test_TerraformStandardModuleStructureRule(t *testing.T) {
 			Content: map[string]string{
 				"foo/main.tf": "",
 				"foo/variables.tf": `
-variable "v" {}				
+variable "v" {}
 				`,
 			},
 			Expected: helper.Issues{
@@ -69,6 +70,23 @@ variable "v" {}
 					},
 				},
 			},
+		},
+		{
+			Name: "allow no outputs.tf",
+			Content: map[string]string{
+				"foo/main.tf": "",
+				"foo/variables.tf": `
+variable "v" {}
+				`,
+				".tflint.hcl": `
+rule "terraform_standard_module_structure" {
+  enabled = true
+
+  outputs = false
+}
+`,
+			},
+			Expected: helper.Issues{},
 		},
 		{
 			Name: "move variable",

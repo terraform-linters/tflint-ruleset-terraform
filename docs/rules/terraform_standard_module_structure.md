@@ -2,6 +2,17 @@
 
 Ensure that a module complies with the Terraform [Standard Module Structure](https://www.terraform.io/docs/modules/index.html#standard-module-structure)
 
+## Configuration
+
+```hcl
+rule "terraform_standard_module_structure" {
+  enabled = true
+
+  # defaults
+  outputs = true
+}
+```
+
 ## Example
 
 _main.tf_
@@ -29,3 +40,5 @@ Terraform's documentation outlines a [Standard Module Structure](https://www.ter
 
 * Move blocks to their conventional files as needed
 * Create empty files even if no `variable` or `output` blocks are defined
+
+Optionally, you can disable enforcement of an `outputs.tf` file by setting the `outputs` rule to `false`.
