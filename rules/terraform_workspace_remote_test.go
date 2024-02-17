@@ -18,6 +18,7 @@ func Test_TerraformWorkspaceRemoteRule(t *testing.T) {
 			Name: "terraform.workspace in resource with remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 resource "null_resource" "a" {
@@ -31,8 +32,8 @@ resource "null_resource" "a" {
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 7, Column: 7},
-						End:      hcl.Pos{Line: 7, Column: 26},
+						Start:    hcl.Pos{Line: 8, Column: 7},
+						End:      hcl.Pos{Line: 8, Column: 26},
 					},
 				},
 			},
@@ -40,6 +41,9 @@ resource "null_resource" "a" {
 		{
 			Name: "terraform.workspace with no backend",
 			Content: `
+terraform {
+	required_version = ">= 1.0"
+}
 resource "null_resource" "a" {
 	triggers = {
 		w = terraform.workspace
@@ -51,8 +55,46 @@ resource "null_resource" "a" {
 			Name: "terraform.workspace with non-remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "local" {}
 }
+resource "null_resource" "a" {
+	triggers = {
+		w = terraform.workspace
+	}
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "terraform.workspace with remote backend, but required_version does not support 1.0.x",
+			Content: `
+terraform {
+	required_version = ">= 1.1"
+	backend "remote" {}
+}
+resource "null_resource" "a" {
+	triggers = {
+		w = terraform.workspace
+	}
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "terraform.workspace with remote backend, but required_version is not declared",
+			Content: `
+terraform {
+	backend "remote" {}
+}
+resource "null_resource" "a" {
+	triggers = {
+		w = terraform.workspace
+	}
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "terraform.workspace without terraform setting",
+			Content: `
 resource "null_resource" "a" {
 	triggers = {
 		w = terraform.workspace
@@ -64,6 +106,7 @@ resource "null_resource" "a" {
 			Name: "terraform.workspace in data source with remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 data "null_data_source" "a" {
@@ -77,8 +120,8 @@ data "null_data_source" "a" {
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 7, Column: 7},
-						End:      hcl.Pos{Line: 7, Column: 26},
+						Start:    hcl.Pos{Line: 8, Column: 7},
+						End:      hcl.Pos{Line: 8, Column: 26},
 					},
 				},
 			},
@@ -87,10 +130,57 @@ data "null_data_source" "a" {
 			Name: "terraform.workspace in module call with remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 module "a" {
 	source = "./module"
+	w = terraform.workspace
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Message: "terraform.workspace should not be used with a 'remote' backend",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 8, Column: 6},
+						End:      hcl.Pos{Line: 8, Column: 25},
+					},
+				},
+			},
+		},
+		{
+			Name: "terraform.workspace in provider config with remote backend",
+			Content: `
+terraform {
+	required_version = ">= 1.0"
+	backend "remote" {}
+}
+provider "aws" {
+	assume_role	{
+		role_arn = terraform.workspace
+	}
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Message: "terraform.workspace should not be used with a 'remote' backend",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 8, Column: 14},
+						End:      hcl.Pos{Line: 8, Column: 33},
+					},
+				},
+			},
+		},
+		{
+			Name: "terraform.workspace in locals with remote backend",
+			Content: `
+terraform {
+	required_version = ">= 1.0"
+	backend "remote" {}
+}
+locals {
 	w = terraform.workspace
 }`,
 			Expected: helper.Issues{
@@ -106,53 +196,10 @@ module "a" {
 			},
 		},
 		{
-			Name: "terraform.workspace in provider config with remote backend",
-			Content: `
-terraform {
-	backend "remote" {}
-}
-provider "aws" {
-	assume_role	{
-		role_arn = terraform.workspace
-	}
-}`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
-					Message: "terraform.workspace should not be used with a 'remote' backend",
-					Range: hcl.Range{
-						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 7, Column: 14},
-						End:      hcl.Pos{Line: 7, Column: 33},
-					},
-				},
-			},
-		},
-		{
-			Name: "terraform.workspace in locals with remote backend",
-			Content: `
-terraform {
-	backend "remote" {}
-}
-locals {
-	w = terraform.workspace
-}`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
-					Message: "terraform.workspace should not be used with a 'remote' backend",
-					Range: hcl.Range{
-						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 6, Column: 6},
-						End:      hcl.Pos{Line: 6, Column: 25},
-					},
-				},
-			},
-		},
-		{
 			Name: "terraform.workspace in output with remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 output "o" {
@@ -164,8 +211,8 @@ output "o" {
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
-						Start:    hcl.Pos{Line: 6, Column: 10},
-						End:      hcl.Pos{Line: 6, Column: 29},
+						Start:    hcl.Pos{Line: 7, Column: 10},
+						End:      hcl.Pos{Line: 7, Column: 29},
 					},
 				},
 			},
@@ -174,6 +221,7 @@ output "o" {
 			Name: "nonmatching expressions with remote backend",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 locals {
@@ -186,6 +234,7 @@ locals {
 			Name: "meta-arguments",
 			Content: `
 terraform {
+	required_version = ">= 1.0"
 	backend "remote" {}
 }
 resource "aws_instance" "foo" {
@@ -206,6 +255,7 @@ resource "aws_instance" "foo" {
 			Content: `
 {
   "terraform": {
+	"required_version": ">= 1.0",
     "backend": {
       "remote": {}
 	}
@@ -226,8 +276,8 @@ resource "aws_instance" "foo" {
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf.json",
-						Start:    hcl.Pos{Line: 8, Column: 15},
-						End:      hcl.Pos{Line: 16, Column: 4},
+						Start:    hcl.Pos{Line: 9, Column: 15},
+						End:      hcl.Pos{Line: 17, Column: 4},
 					},
 				},
 			},
@@ -236,6 +286,7 @@ resource "aws_instance" "foo" {
 			Name: "with ignore_changes",
 			Content: `
 terraform {
+  required_version = ">= 1.0"
   backend "remote" {}
 }
 resource "kubernetes_secret" "my_secret" {
