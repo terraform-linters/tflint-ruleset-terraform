@@ -2,6 +2,8 @@
 
 Check that all `required_providers` are used in the module.
 
+Note: Because TFLint cannot traverse the complete module tree, it may issue warnings for `required_providers` declared to specify constraints on the provider versions used by a module. If this false positive is unacceptable, you can disable the rule. See also https://github.com/terraform-linters/tflint-ruleset-terraform/issues/21.
+
 ## Configuration
 
 ```hcl

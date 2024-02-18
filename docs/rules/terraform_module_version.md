@@ -1,6 +1,6 @@
 # terraform_module_version
 
-Ensure that all modules sourced from a [Terraform Registry](https://www.terraform.io/docs/language/modules/sources.html#terraform-registry) specify a `version`.
+Ensure that all modules sourced from a [Terraform Registry](https://developer.hashicorp.com/terraform/language/modules/sources#terraform-registry) specify a `version`.
 
 > This rule is enabled by "recommended" preset.
 
@@ -82,7 +82,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/v0.1.0/
 
 ## Why
 
-Terraform's [module version documentation](https://www.terraform.io/docs/language/modules/syntax.html#version) states:
+Terraform's [module version documentation](https://developer.hashicorp.com/terraform/language/modules/syntax#version) states:
 
 > When using modules installed from a module registry, we recommend explicitly constraining the acceptable version numbers to avoid unexpected or unwanted changes.
 
@@ -90,9 +90,9 @@ When no `version` is specified, Terraform will download the latest version avail
 
 ### Exact Versions
 
-Depending on your workflow, you may want to enforce that modules specify an _exact_ version by settings `exact = true` for this rule. This will disallow any module that includes multiple comma-separated version constraints, or any [constraint operator](https://www.terraform.io/docs/language/expressions/version-constraints.html#version-constraint-syntax) other than `=`. Exact versions are often used with automated dependency managers like [Dependabot](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/about-dependabot-version-updates) and [Renovate](https://docs.renovatebot.com), which will automatically propose a pull request to update the module when a new version is released.
+Depending on your workflow, you may want to enforce that modules specify an _exact_ version by settings `exact = true` for this rule. This will disallow any module that includes multiple comma-separated version constraints, or any [constraint operator](https://developer.hashicorp.com/terraform/language/expressions/version-constraints#version-constraint-syntax) other than `=`. Exact versions are often used with automated dependency managers like [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/about-dependabot-version-updates) and [Renovate](https://docs.renovatebot.com), which will automatically propose a pull request to update the module when a new version is released.
 
-Keep in mind that the module may include further child modules, which have their own version constraints. TFLint _does not_ check version constraints set in child modules. **Enabling this rule cannot guarantee that `terraform init` will be deterministic**. Use [Terraform dependency lock files](https://www.terraform.io/docs/language/dependency-lock.html) to ensure that Terraform will always use the same version of all modules (and providers) until you explicitly update them.
+Keep in mind that the module may include further child modules, which have their own version constraints. TFLint _does not_ check version constraints set in child modules. **Enabling this rule cannot guarantee that `terraform init` will be deterministic**. Use [Terraform dependency lock files](https://developer.hashicorp.com/terraform/language/files/dependency-lock) to ensure that Terraform will always use the same version of all modules (and providers) until you explicitly update them.
 
 ## How To Fix
 

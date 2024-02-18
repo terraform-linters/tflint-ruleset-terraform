@@ -1,6 +1,6 @@
 # terraform_standard_module_structure
 
-Ensure that a module complies with the Terraform [Standard Module Structure](https://www.terraform.io/docs/modules/index.html#standard-module-structure)
+Ensure that a module complies with the Terraform [Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure)
 
 ## Example
 
@@ -23,7 +23,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 
-Terraform's documentation outlines a [Standard Module Structure](https://www.terraform.io/docs/modules/structure.html). A minimal module should have a `main.tf`, `variables.tf`, and `outputs.tf` file. Variable and output blocks should be included in the corresponding file.
+Terraform's documentation outlines a [Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure). A minimal module should have a `main.tf`, `variables.tf`, and `outputs.tf` file. Variable and output blocks should be included in the corresponding file.
 
 ## How To Fix
 

@@ -136,6 +136,6 @@ terraform {
 }
 ```
 
-Provider version constraints can be specified using a [version argument within a provider block](https://www.terraform.io/docs/configuration/providers.html#provider-versions) for backwards compatibility. This approach is now discouraged, particularly for child modules.
+Provider version constraints can be specified using a [version argument within a provider block](https://developer.hashicorp.com/terraform/language/providers/configuration#provider-versions) for backwards compatibility. This approach is now discouraged, particularly for child modules.
 
 Optionally, you can disable enforcement of either `source` or `version` by setting the corresponding attribute in the rule configuration to `false`.
