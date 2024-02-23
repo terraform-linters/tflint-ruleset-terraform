@@ -46,7 +46,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 
-Terraform v0.12 supports traditional square brackets for accessing list items by index or using the splat operator (`*`). However, for backward compatibility with v0.11, Terraform continues to support accessing list items with the dot syntax normally used for attributes. While Terraform does not print warnings for this syntax, it is no longer documented and its use is discouraged.
+Terraform supports traditional square brackets for accessing list items by index or using the splat operator (`*`). However, for backward compatibility, Terraform continues to support accessing list items with the dot syntax normally used for attributes. While Terraform does not print warnings for this syntax, it is no longer documented and its use is discouraged.
 
 * [Legacy Splat Expressions](https://developer.hashicorp.com/terraform/language/expressions/splat#legacy-attribute-only-splat-expressions)
 

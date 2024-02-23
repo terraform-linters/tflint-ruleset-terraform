@@ -25,7 +25,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 The Terraform language supports two different syntaxes for single-line comments: `#` and `//`. However, `#` is the default comment style and should be used in most cases.
 
-* [Configuration Syntax: Comments](https://www.terraform.io/docs/configuration/syntax.html#comments)
+* [Configuration Syntax: Comments](https://developer.hashicorp.com/terraform/language/syntax/configuration#comments)
 
 ## How To Fix
 

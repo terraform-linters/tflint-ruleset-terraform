@@ -33,7 +33,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 Terraform v0.12 introduces a new interpolation syntax, but continues to support the old 0.11-style interpolation syntax for compatibility.
 
-Terraform will currently print diagnostic warnings when deprecated interpolations are used. Consistent with its deprecation policy, they will raise errors in the next major release (v0.13). TFLint emits an issue instead of a warning with the same logic.
+`terraform fmt` can replace this redundant interpolation, so although it is not deprecated in the latest Terraform version, this rule allows you to issue a warning similar to Terraform v0.12.14.
 
 ## How To Fix
 

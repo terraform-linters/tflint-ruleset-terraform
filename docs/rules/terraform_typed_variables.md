@@ -36,4 +36,4 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 Since `type` is optional value, it is not always necessary to declare it. But this rule is useful if you want to force declaration of a type.
 
 ## How To Fix
-Add a type to the variable. See https://www.terraform.io/docs/configuration/variables.html#type-constraints for more details about types
+Add a type to the variable. See https://developer.hashicorp.com/terraform/language/values/variables#type-constraints for more details about types
