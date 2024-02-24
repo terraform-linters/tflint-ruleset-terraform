@@ -1,3 +1,22 @@
+## 0.6.0 (2024-02-24)
+
+### Enhancements
+
+- [#156](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/156): workspace_remote: Suppress issues in Terraform v1.1+
+
+### Chores
+
+- [#140](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/140): Bump golang.org/x/net from 0.13.0 to 0.17.0
+- [#141](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/141): Bump github.com/hashicorp/go-getter from 1.7.2 to 1.7.3
+- [#142](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/142): Bump github.com/google/go-cmp from 0.5.9 to 0.6.0
+- [#143](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/143): Bump github.com/hashicorp/hcl/v2 from 2.18.1 to 2.19.1
+- [#144](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/144): Bump google.golang.org/grpc from 1.57.0 to 1.57.1
+- [#147](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/147): Bump github.com/hashicorp/terraform-registry-address from 0.2.2 to 0.2.3
+- [#152](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/152): Bump actions/setup-go from 4 to 5
+- [#153](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/153): Bump github.com/zclconf/go-cty from 1.14.1 to 1.14.2
+- [#155](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/155): deps: Go 1.22
+- [#158](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/158): Revise rules documentation
+
 ## 0.5.0 (2023-10-09)
 
 ### Enhancements
