@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-getter v1.7.3
 	github.com/hashicorp/go-version v1.6.0
-	github.com/hashicorp/hcl/v2 v2.20.0
+	github.com/hashicorp/hcl/v2 v2.20.1
 	github.com/hashicorp/terraform-registry-address v0.2.3
 	github.com/terraform-linters/tflint-plugin-sdk v0.19.0
 	github.com/zclconf/go-cty v1.14.4
