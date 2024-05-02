@@ -1,3 +1,19 @@
+## 0.7.0 (2024-05-02)
+
+### Enhancements
+
+- [#161](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/161) [#167](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/167): Bump github.com/hashicorp/hcl/v2 from 2.19.1 to 2.20.1
+  - This is required for provider-defined functions support
+
+### Chores
+
+- [#160](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/160) [#171](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/171): Bump github.com/terraform-linters/tflint-plugin-sdk from 0.18.0 to 0.20.0
+- [#162](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/162) [#166](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/166): Bump github.com/zclconf/go-cty from 1.14.2 to 1.14.4
+- [#165](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/165): Bump google.golang.org/protobuf from 1.31.0 to 1.33.0
+- [#168](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/168): Bump golang.org/x/net from 0.21.0 to 0.23.0
+- [#169](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/169): Bump github.com/hashicorp/go-getter from 1.7.3 to 1.7.4
+- [#170](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/170): deps: Go 1.22.2
+
 ## 0.6.0 (2024-02-24)
 
 ### Enhancements
