@@ -77,5 +77,3 @@ func (r *TerraformDeprecatedLookupRule) Check(runner tflint.Runner) error {
 
 	return nil
 }
-
-
