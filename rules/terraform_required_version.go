@@ -1,6 +1,8 @@
 package rules
 
 import (
+	"path/filepath"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
@@ -78,13 +80,55 @@ func (r *TerraformRequiredVersionRule) Check(runner tflint.Runner) error {
 		exists = exists || ok
 	}
 
-	if !exists {
-		return runner.EmitIssue(
-			r,
-			`terraform "required_version" attribute is required`,
-			hcl.Range{},
-		)
+	if exists {
+		return nil
 	}
 
-	return nil
+	if len(body.Blocks) > 0 {
+		return r.emitIssue(body.Blocks[0].DefRange, runner)
+	}
+
+	// If there are no "terraform" blocks, create a hcl.Range from the files
+	var file string
+	for k := range files {
+		file = k
+		break
+	}
+
+	// If there is only one file, use that
+	if len(files) == 1 {
+		return r.emitIssue(hcl.Range{
+			Filename: file,
+			Start:    hcl.InitialPos,
+			End:      hcl.InitialPos,
+		}, runner)
+	}
+
+	moduleDirectory := filepath.Dir(file)
+
+	// If there are multiple files, look for terraform.tf or main.tf (in that order)
+	for _, basename := range []string{"terraform.tf", "main.tf"} {
+		filename := filepath.Join(moduleDirectory, basename)
+		if _, ok := files[filename]; ok {
+			return r.emitIssue(hcl.Range{
+				Filename: filename,
+				Start:    hcl.InitialPos,
+				End:      hcl.InitialPos,
+			}, runner)
+		}
+	}
+
+	// If none of those are found, point to a nonexistent terraform.tf per the style guide
+	return r.emitIssue(hcl.Range{
+		Filename: filepath.Join(moduleDirectory, "terraform.tf"),
+	}, runner)
+}
+
+// emitIssue emits issue for missing terraform require version
+func (r *TerraformRequiredVersionRule) emitIssue(missingRange hcl.Range, runner tflint.Runner) error {
+	return runner.EmitIssue(
+		r,
+		`terraform "required_version" attribute is required`,
+		missingRange,
+	)
 }
