@@ -175,6 +175,58 @@ resource "null_resource" "a" {
   triggers = var.triggers
 }`,
 		},
+		{
+			Name: "interpolation as an object key",
+			Content: `
+resource "null_resource" "a" {
+  triggers = {
+    "${var.triggers}" = "foo"
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 4, Column: 5},
+						End:      hcl.Pos{Line: 4, Column: 22},
+					},
+				},
+			},
+			Fixed: `
+resource "null_resource" "a" {
+  triggers = {
+    (var.triggers) = "foo"
+  }
+}`,
+		},
+		{
+			Name: "interpolation in an object key",
+			Content: `
+resource "null_resource" "a" {
+  triggers = {
+    upper("${var.triggers}") = "foo"
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 4, Column: 11},
+						End:      hcl.Pos{Line: 4, Column: 28},
+					},
+				},
+			},
+			Fixed: `
+resource "null_resource" "a" {
+  triggers = {
+    upper(var.triggers) = "foo"
+  }
+}`,
+		},
 	}
 
 	rule := NewTerraformDeprecatedInterpolationRule()
