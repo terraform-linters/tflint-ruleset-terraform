@@ -39,7 +39,7 @@ func (r *TerraformDeprecatedInterpolationRule) Link() string {
 
 // Check emits issues on the deprecated interpolation syntax.
 // This logic is equivalent to the warning logic implemented in Terraform.
-// See https://github.com/hashicorp/terraform/pull/23348
+// See https://github.com/hashicorp/terraform/blob/2ce03abe480c3f40d04bd0f289762721ea280848/configs/compat_shim.go#L144-L156
 func (r *TerraformDeprecatedInterpolationRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -50,29 +50,76 @@ func (r *TerraformDeprecatedInterpolationRule) Check(runner tflint.Runner) error
 		return nil
 	}
 
-	diags := runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
-		return r.checkForDeprecatedInterpolationsInExpr(runner, expr)
-	}))
+	diags := runner.WalkExpressions(&terraformDeprecatedInterpolationWalker{
+		runner: runner,
+		rule:   r,
+		// create some capacity so that we can deal with simple expressions
+		// without any further allocation during our walk.
+		contextStack: make([]terraformDeprecatedInterpolationContext, 0, 16),
+	})
 	if diags.HasErrors() {
 		return diags
 	}
 	return nil
 }
 
-func (r *TerraformDeprecatedInterpolationRule) checkForDeprecatedInterpolationsInExpr(runner tflint.Runner, expr hcl.Expression) hcl.Diagnostics {
-	wrapExpr, ok := expr.(*hclsyntax.TemplateWrapExpr)
-	if !ok {
-		return nil
+type terraformDeprecatedInterpolationWalker struct {
+	runner       tflint.Runner
+	rule         *TerraformDeprecatedInterpolationRule
+	contextStack []terraformDeprecatedInterpolationContext
+}
+
+var _ tflint.ExprWalker = (*terraformDeprecatedInterpolationWalker)(nil)
+
+type terraformDeprecatedInterpolationContext int
+
+const (
+	terraformDeprecatedInterpolationContextNormal terraformDeprecatedInterpolationContext = 0
+	terraformDeprecatedInterpolationContextObjKey terraformDeprecatedInterpolationContext = 1
+)
+
+func (w *terraformDeprecatedInterpolationWalker) Enter(expr hcl.Expression) hcl.Diagnostics {
+	var err error
+
+	context := terraformDeprecatedInterpolationContextNormal
+	switch expr := expr.(type) {
+	case *hclsyntax.ObjectConsKeyExpr:
+		context = terraformDeprecatedInterpolationContextObjKey
+	case *hclsyntax.TemplateWrapExpr:
+		// hclsyntax.TemplateWrapExpr is a special node type used by HCL only
+		// for the situation where a template is just a single interpolation,
+		// so we don't need to do anything further to distinguish that
+		// situation. ("normal" templates are *hclsyntax.TemplateExpr.)
+
+		const message = "Interpolation-only expressions are deprecated in Terraform v0.12.14"
+		switch w.currentContext() {
+		case terraformDeprecatedInterpolationContextObjKey:
+			// This case requires a different autofix strategy is needed
+			// to avoid ambiguous attribute keys.
+			err = w.runner.EmitIssueWithFix(
+				w.rule,
+				message,
+				expr.Range(),
+				func(f tflint.Fixer) error {
+					return f.ReplaceText(expr.Range(), "(", f.TextAt(expr.Wrapped.Range()), ")")
+				},
+			)
+		default:
+			err = w.runner.EmitIssueWithFix(
+				w.rule,
+				message,
+				expr.Range(),
+				func(f tflint.Fixer) error {
+					return f.ReplaceText(expr.Range(), f.TextAt(expr.Wrapped.Range()))
+				},
+			)
+		}
 	}
 
-	err := runner.EmitIssueWithFix(
-		r,
-		"Interpolation-only expressions are deprecated in Terraform v0.12.14",
-		expr.Range(),
-		func(f tflint.Fixer) error {
-			return f.ReplaceText(expr.Range(), f.TextAt(wrapExpr.Wrapped.Range()))
-		},
-	)
+	// Note the context of the current node for when we potentially visit
+	// child nodes.
+	w.contextStack = append(w.contextStack, context)
+
 	if err != nil {
 		return hcl.Diagnostics{
 			{
@@ -83,4 +130,16 @@ func (r *TerraformDeprecatedInterpolationRule) checkForDeprecatedInterpolationsI
 		}
 	}
 	return nil
+}
+
+func (w *terraformDeprecatedInterpolationWalker) Exit(expr hcl.Expression) hcl.Diagnostics {
+	w.contextStack = w.contextStack[:len(w.contextStack)-1]
+	return nil
+}
+
+func (w *terraformDeprecatedInterpolationWalker) currentContext() terraformDeprecatedInterpolationContext {
+	if len(w.contextStack) == 0 {
+		return terraformDeprecatedInterpolationContextNormal
+	}
+	return w.contextStack[len(w.contextStack)-1]
 }
