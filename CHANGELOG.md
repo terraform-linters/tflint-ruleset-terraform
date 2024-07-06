@@ -1,3 +1,23 @@
+## 0.8.0 (2024-07-06)
+
+### Enhancements
+
+- [#178](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/178): Add range to terraform_required_version errors
+
+### Bug Fixes
+
+- [#189](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/189): deprecated_interpolation: Prevent autofix from producing ambiguous attribute keys
+
+### Chores
+
+- [#176](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/176): release: Introduce Artifact Attestations
+- [#179](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/179): gofmt rules/terraform_deprecated_lookup.go
+- [#180](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/180): Bump github.com/hashicorp/go-version from 1.6.0 to 1.7.0
+- [#183](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/183): Bump goreleaser/goreleaser-action from 5 to 6
+- [#186](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/186): Bump github.com/hashicorp/hcl/v2 from 2.20.1 to 2.21.0
+- [#187](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/187): Bump github.com/hashicorp/go-getter from 1.7.4 to 1.7.5
+- [#192](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/192): deps: Go 1.22.5
+
 ## 0.7.0 (2024-05-02)
 
 ### Enhancements
