@@ -48,6 +48,27 @@ resource "null_resource" "test" {
 			},
 		},
 		{
+			Name: "duplicate keys with quoting",
+			Content: `
+resource "null_resource" "test" {
+    triggers = {
+        a = "b"
+        "a" = "c"
+    }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Message: `Duplicate key: "a", first defined at module.tf:4,9-10`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 5, Column: 9},
+						End:      hcl.Pos{Line: 5, Column: 12},
+					},
+				},
+			},
+		},
+		{
 			Name: "Using variables as keys",
 			Content: `
 variable "a" {
