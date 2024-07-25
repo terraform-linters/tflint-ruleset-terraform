@@ -38,7 +38,7 @@ resource "null_resource" "test" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMapDuplicateKeysRule(),
-					Message: `Duplicate key: "a", previously defined at module.tf:4,9-10`,
+					Message: `Duplicate key: "a", first defined at module.tf:4,9-10`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 5, Column: 9},
@@ -64,7 +64,7 @@ resource "null_resource" "test" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMapDuplicateKeysRule(),
-					Message: `Duplicate key: "b", previously defined at module.tf:9,4-11`,
+					Message: `Duplicate key: "b", first defined at module.tf:9,4-11`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 10, Column: 4},
@@ -101,7 +101,7 @@ resource "null_resource" "test" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMapDuplicateKeysRule(),
-					Message: `Duplicate key: "a", previously defined at module.tf:4,4-5`,
+					Message: `Duplicate key: "a", first defined at module.tf:4,4-5`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 5, Column: 4},
@@ -110,7 +110,7 @@ resource "null_resource" "test" {
 				},
 				{
 					Rule:    NewTerraformMapDuplicateKeysRule(),
-					Message: `Duplicate key: "a", previously defined at module.tf:4,4-5`,
+					Message: `Duplicate key: "a", first defined at module.tf:4,4-5`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 6, Column: 4},

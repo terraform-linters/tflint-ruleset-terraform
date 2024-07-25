@@ -90,10 +90,10 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 			continue
 		}
 
-		if previous, exists := keys[val.AsString()]; exists {
+		if declRange, exists := keys[val.AsString()]; exists {
 			if err := runner.EmitIssue(
 				r,
-				fmt.Sprintf("Duplicate key: %q, previously defined at %s", val.AsString(), previous),
+				fmt.Sprintf("Duplicate key: %q, first defined at %s", val.AsString(), declRange),
 				expr.Range(),
 			); err != nil {
 				diags = append(diags, &hcl.Diagnostic{
