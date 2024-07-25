@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 	"github.com/zclconf/go-cty/cty"
@@ -56,51 +57,59 @@ func (r *TerraformMapDuplicateKeysRule) Check(runner tflint.Runner) error {
 }
 
 func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, runner tflint.Runner) hcl.Diagnostics {
-	exprMap, ok := e.(*hclsyntax.ObjectConsExpr)
+	objExpr, ok := e.(*hclsyntax.ObjectConsExpr)
 	if !ok {
-		// Ignore everything that isn't an ObjectConsExpr
 		return nil
 	}
-	diags := hcl.Diagnostics{}
-	foundKeys := make(map[string]hcl.Range)
-	for _, item := range exprMap.Items {
+
+	var diags hcl.Diagnostics
+	keys := make(map[string]hcl.Range)
+
+	for _, item := range objExpr.Items {
 		expr := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
-		val := cty.Value{}
-		err := runner.EvaluateExpr(expr, &val, &tflint.EvaluateExprOption{})
+		var val cty.Value
+
+		err := runner.EvaluateExpr(expr, &val, nil)
 		if err != nil {
-			fmt.Printf("Failed to evaluate an expression, continuing\n")
-			diags.Append(
-				&hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "failed to evaluate expression",
-					Detail:   err.Error(),
-				},
-			)
-			continue
-		}
-		if !val.IsKnown() || val.IsNull() {
-			// When trying to evaluate an expression
-			// with a variable without a default,
-			// runner.evaluateExpr() returns a null value.
-			// Ignore this case since there's nothing we can do.
-			fmt.Printf("Unknown key, continuing\n")
+			logger.Debug("Failed to evaluate an expression, continuing", "error", err)
+
+			diags = append(diags, &hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  "failed to evaluate expression",
+				Detail:   err.Error(),
+			})
 			continue
 		}
 
-		if previousRange, exists := foundKeys[val.AsString()]; exists {
-			msg := fmt.Sprintf("Duplicate key: '%s'\nThe previous definition was at %s", val.AsString(), previousRange)
-			if err := runner.EmitIssue(r, msg, expr.Range()); err != nil {
-				diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
-						Summary:  "failed to call EmitIssue()",
-						Detail:   err.Error(),
-					},
-				)
-			}
-		} else {
-			foundKeys[val.AsString()] = expr.Range()
+		if !val.IsKnown() || val.IsNull() {
+			// When trying to evaluate an expression
+			// with a variable without a value,
+			// runner.evaluateExpr() returns a null value.
+			// Ignore this case since there's nothing we can do.
+			logger.Debug("Unknown key, continuing", "range", expr.Range())
+			continue
 		}
+
+		if previous, exists := keys[val.AsString()]; exists {
+			if err := runner.EmitIssue(
+				r,
+				fmt.Sprintf("Duplicate key: %q, previously defined at %s", val.AsString(), previous),
+				expr.Range(),
+			); err != nil {
+				diags = append(diags, &hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "failed to call EmitIssue()",
+					Detail:   err.Error(),
+				})
+
+				return diags
+			}
+
+			continue
+		}
+
+		keys[val.AsString()] = expr.Range()
 	}
+
 	return diags
 }
