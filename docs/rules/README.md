@@ -13,6 +13,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_documented_outputs](terraform_documented_outputs.md)|Disallow `output` declarations without description||
 |[terraform_documented_variables](terraform_documented_variables.md)|Disallow `variable` declarations without description||
 |[terraform_empty_list_equality](terraform_empty_list_equality.md)|Disallow comparisons with `[]` when checking if a collection is empty|✔|
+|[terraform_map_duplicate_keys](terraform_map_duplicate_keys.md)|Disallow duplicate keys in a map object|✔|
 |[terraform_module_pinned_source](terraform_module_pinned_source.md)|Disallow specifying a git or mercurial repository as a module source without pinning to a version|✔|
 |[terraform_module_version](terraform_module_version.md)|Checks that Terraform modules sourced from a registry specify a version|✔|
 |[terraform_naming_convention](terraform_naming_convention.md)|Enforces naming conventions for resources, data sources, etc||
