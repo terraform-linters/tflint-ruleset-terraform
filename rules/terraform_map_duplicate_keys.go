@@ -69,16 +69,23 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 		expr := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
 		var val cty.Value
 
-		err := runner.EvaluateExpr(expr, &val, nil)
-		if err != nil {
-			logger.Debug("Failed to evaluate an expression, continuing", "error", err)
-
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "failed to evaluate expression",
-				Detail:   err.Error(),
-			})
-			continue
+		// There is an issue with the SDK's EvaluateExpr not being able to evaluate naked identifiers of map keys, so we will handle this here.
+		// @see https://github.com/terraform-linters/tflint-plugin-sdk/issues/338
+		//
+		// Checks whether the key expression can be extracted as a keyword and retrieves its value in the same way as ObjectConsKeyExpr.Value.
+		// @see https://github.com/hashicorp/hcl/blob/v2.21.0/hclsyntax/expression.go#L1311
+		if keyword := hcl.ExprAsKeyword(expr.Wrapped); !expr.ForceNonLiteral && keyword != "" {
+			val = cty.StringVal(keyword)
+		} else {
+			err := runner.EvaluateExpr(expr, &val, nil)
+			if err != nil {
+				diags = append(diags, &hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "failed to evaluate expression",
+					Detail:   err.Error(),
+				})
+				continue
+			}
 		}
 
 		if !val.IsKnown() || val.IsNull() {
