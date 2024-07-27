@@ -9,6 +9,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 )
 
 // This rule checks for map literals with duplicate keys
@@ -88,12 +89,17 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 			}
 		}
 
-		if !val.IsKnown() || val.IsNull() {
-			// When trying to evaluate an expression
-			// with a variable without a value,
-			// runner.evaluateExpr() returns a null value.
-			// Ignore this case since there's nothing we can do.
-			logger.Debug("Unknown key, continuing", "range", expr.Range())
+		if !val.IsKnown() || val.IsNull() || val.IsMarked() {
+			logger.Debug("Unprocessable key, continuing", "range", expr.Range())
+			continue
+		}
+		// Map keys must be strings, but some values ​​can be converted to strings and become valid keys,
+		// so try to convert them here.
+		if converted, err := convert.Convert(val, cty.String); err == nil {
+			val = converted
+		}
+		if val.Type() != cty.String {
+			logger.Debug("Unprocessable key, continuing", "range", expr.Range())
 			continue
 		}
 
