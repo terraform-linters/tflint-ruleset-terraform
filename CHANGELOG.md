@@ -1,3 +1,13 @@
+## 0.9.0 (2024-07-30)
+
+### Enhancements
+
+- [#194](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/194) [#196](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/196): Add `terraform_map_duplicate_keys` rule
+
+### Chores
+
+- [#195](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/195): Bump github.com/zclconf/go-cty from 1.14.4 to 1.15.0
+
 ## 0.8.0 (2024-07-06)
 
 ### Enhancements
