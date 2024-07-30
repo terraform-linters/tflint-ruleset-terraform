@@ -154,6 +154,45 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "Using sensitive variable keys",
+			Content: `
+variable "sensitive" {
+  default = "secret"
+  sensitive = true
+}
+
+resource "null_resource" "test" {
+  map = {
+    (var.sensitive) = 1
+    "secret" = 2
+  }
+}`,
+			// Do not report duplicate keys to prevent unintentional exposure of sensitive values
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "Using non-string keys",
+			Content: `
+resource "null_resource" "test" {
+  map = {
+    1 = 1
+    1 = 2
+    {} = 3
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Message: `Duplicate key: "1", first defined at module.tf:4,5-6`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 5, Column: 5},
+						End:      hcl.Pos{Line: 5, Column: 6},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformMapDuplicateKeysRule()
