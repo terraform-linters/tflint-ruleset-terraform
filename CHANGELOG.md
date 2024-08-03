@@ -1,3 +1,9 @@
+## 0.9.1 (2024-08-03)
+
+### Bug Fixes
+
+- [#200](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/200): terraform_map_duplicate_keys: Temporarily ignore key evaluation errors
+
 ## 0.9.0 (2024-07-30)
 
 ### Enhancements
