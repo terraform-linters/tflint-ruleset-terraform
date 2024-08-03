@@ -193,6 +193,18 @@ resource "null_resource" "test" {
 				},
 			},
 		},
+		{
+			Name: "keys in for expressions",
+			Content: `
+resource "null_resource" "test" {
+  list = [for a in ["foo", "bar"] : {
+    "${a}_baz" = 1
+	"foo_baz" = 2
+  }]
+}`,
+			// The current implementation cannot find duplicate keys in for expressions.
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformMapDuplicateKeysRule()

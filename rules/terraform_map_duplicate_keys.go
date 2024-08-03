@@ -80,11 +80,10 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 		} else {
 			err := runner.EvaluateExpr(expr, &val, nil)
 			if err != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "failed to evaluate expression",
-					Detail:   err.Error(),
-				})
+				// When a key fails to evaluate, ignore the key and continue processing rather than terminating with an error.
+				// This is due to a limitation that expressions with different scopes, such as for expressions, cannot be evaluated.
+				// @see https://github.com/terraform-linters/tflint-ruleset-terraform/issues/199
+				logger.Debug("Failed to evaluate key. The key will be ignored", "range", expr.Range(), "error", err.Error())
 				continue
 			}
 		}
