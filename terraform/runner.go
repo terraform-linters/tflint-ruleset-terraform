@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
@@ -104,7 +105,7 @@ func (r *Runner) GetLocals() (map[string]*Local, hcl.Diagnostics) {
 	return locals, diags
 }
 
-// GetProviderRefs returns all references to providers in resources, data, provider declarations, and module calls.
+// GetProviderRefs returns all references to providers in resources, data, provider declarations, module calls, and provider-defined functinos.
 func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 	providerRefs := map[string]*ProviderRef{}
 
@@ -241,5 +242,23 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 		}
 	}
 
-	return providerRefs, nil
+	walkDiags := r.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
+		if fce, ok := expr.(*hclsyntax.FunctionCallExpr); ok {
+			parts := strings.Split(fce.Name, "::")
+			if len(parts) < 2 || parts[0] != "provider" || parts[1] == "" {
+				return nil
+			}
+			providerRefs[parts[1]] = &ProviderRef{
+				Name:     parts[1],
+				DefRange: expr.Range(),
+			}
+		}
+		return nil
+	}))
+	diags = diags.Extend(walkDiags)
+	if walkDiags.HasErrors() {
+		return providerRefs, diags
+	}
+
+	return providerRefs, diags
 }

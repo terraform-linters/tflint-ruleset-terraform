@@ -244,6 +244,22 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "used - provider-defined function",
+			Content: `
+				terraform {
+					required_providers {
+						time = {
+							source = "hashicorp/time"
+						}
+					}
+				}
+				output "foo" {
+					value = provider::time::rfc3339_parse("2023-07-25T23:43:16Z")
+				}
+			`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformUnusedRequiredProvidersRule()

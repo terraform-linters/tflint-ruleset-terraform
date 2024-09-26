@@ -546,6 +546,30 @@ resource "google_compute_instance" "foo" {
 				},
 			},
 		},
+		{
+			Name: "provider-defined function",
+			Content: `
+output "foo" {
+	value = provider::time::rfc3339_parse("2023-07-25T23:43:16Z")
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing version constraint for provider \"time\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   3,
+							Column: 10,
+						},
+						End: hcl.Pos{
+							Line:   3,
+							Column: 63,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformRequiredProvidersRule()
