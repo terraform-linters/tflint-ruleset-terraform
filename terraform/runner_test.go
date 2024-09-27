@@ -260,6 +260,16 @@ check "my_check" {
 				"aws": {Name: "aws", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 3, Column: 3}, End: hcl.Pos{Line: 3, Column: 24}}},
 			},
 		},
+		{
+			name: "provider-defined function",
+			content: `
+output "foo" {
+  value = provider::time::rfc3339_parse("2023-07-25T23:43:16Z")
+}`,
+			want: map[string]*ProviderRef{
+				"time": {Name: "time", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 3, Column: 11}, End: hcl.Pos{Line: 3, Column: 64}}},
+			},
+		},
 	}
 
 	for _, test := range tests {
