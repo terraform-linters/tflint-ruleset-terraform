@@ -3,7 +3,7 @@ module github.com/terraform-linters/tflint-ruleset-terraform
 go 1.22.5
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.1
+	github.com/Masterminds/semver/v3 v3.3.0
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-getter v1.7.5
 	github.com/hashicorp/go-version v1.7.0
