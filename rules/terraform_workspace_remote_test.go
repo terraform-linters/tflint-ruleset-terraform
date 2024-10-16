@@ -299,6 +299,23 @@ resource "kubernetes_secret" "my_secret" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "required_version does not support 1.0.x by multiple setting",
+			Content: `
+terraform {
+	required_version = "< 1.9"
+	backend "remote" {}
+}
+terraform {
+	required_version = ">= 1.1"
+}
+resource "null_resource" "a" {
+	triggers = {
+		w = terraform.workspace
+	}
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformWorkspaceRemoteRule()
