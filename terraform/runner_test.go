@@ -177,6 +177,7 @@ locals {
 func TestGetProviderRefs(t *testing.T) {
 	tests := []struct {
 		name    string
+		json    bool
 		content string
 		want    map[string]*ProviderRef
 	}{
@@ -270,11 +271,30 @@ output "foo" {
 				"time": {Name: "time", DefRange: hcl.Range{Filename: "main.tf", Start: hcl.Pos{Line: 3, Column: 11}, End: hcl.Pos{Line: 3, Column: 64}}},
 			},
 		},
+		{
+			name: "provider-defined function in JSON",
+			json: true,
+			content: `
+{
+  "output": {
+    "foo": {
+      "value": "${provider::time::rfc3339_parse(\"2023-07-25T23:43:16Z\")}"
+	}
+  }
+}`,
+			want: map[string]*ProviderRef{
+				"time": {Name: "time", DefRange: hcl.Range{Filename: "main.tf.json", Start: hcl.Pos{Line: 3, Column: 15}, End: hcl.Pos{Line: 3, Column: 68}}},
+			},
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			runner := NewRunner(helper.TestRunner(t, map[string]string{"main.tf": test.content}))
+			filename := "main.tf"
+			if test.json {
+				filename += ".json"
+			}
+			runner := NewRunner(helper.TestRunner(t, map[string]string{filename: test.content}))
 
 			got, diags := runner.GetProviderRefs()
 			if diags.HasErrors() {
