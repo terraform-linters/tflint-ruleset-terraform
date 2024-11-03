@@ -5,8 +5,10 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/hashicorp/hcl/v2/json"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+	"github.com/zclconf/go-cty/cty"
 )
 
 // Runner is a custom runner that provides helper functions for this ruleset.
@@ -243,17 +245,28 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 	}
 
 	walkDiags := r.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
-		if fce, ok := expr.(*hclsyntax.FunctionCallExpr); ok {
-			parts := strings.Split(fce.Name, "::")
-			if len(parts) < 2 || parts[0] != "provider" || parts[1] == "" {
+		// For JSON syntax, walker is not implemented,
+		// so extract the hclsyntax.Node that we can walk on.
+		// See https://github.com/hashicorp/hcl/issues/543
+		nodes, diags := r.walkableNodesInExpr(expr)
+
+		for _, node := range nodes {
+			visitDiags := hclsyntax.VisitAll(node, func(n hclsyntax.Node) hcl.Diagnostics {
+				if funcCallExpr, ok := n.(*hclsyntax.FunctionCallExpr); ok {
+					parts := strings.Split(funcCallExpr.Name, "::")
+					if len(parts) < 2 || parts[0] != "provider" || parts[1] == "" {
+						return nil
+					}
+					providerRefs[parts[1]] = &ProviderRef{
+						Name:     parts[1],
+						DefRange: funcCallExpr.Range(),
+					}
+				}
 				return nil
-			}
-			providerRefs[parts[1]] = &ProviderRef{
-				Name:     parts[1],
-				DefRange: expr.Range(),
-			}
+			})
+			diags = diags.Extend(visitDiags)
 		}
-		return nil
+		return diags
 	}))
 	diags = diags.Extend(walkDiags)
 	if walkDiags.HasErrors() {
@@ -261,4 +274,63 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 	}
 
 	return providerRefs, diags
+}
+
+// walkableNodesInExpr returns hclsyntax.Node from the given expression.
+// If the expression is an hclsyntax expression, it is returned as is.
+// If the expression is a JSON expression, it is parsed and
+// hclsyntax.Node it contains is returned.
+func (r *Runner) walkableNodesInExpr(expr hcl.Expression) ([]hclsyntax.Node, hcl.Diagnostics) {
+	nodes := []hclsyntax.Node{}
+
+	expr = hcl.UnwrapExpressionUntil(expr, func(expr hcl.Expression) bool {
+		_, native := expr.(hclsyntax.Expression)
+		return native || json.IsJSONExpression(expr)
+	})
+	if expr == nil {
+		return nil, nil
+	}
+
+	if json.IsJSONExpression(expr) {
+		// HACK: For JSON expressions, we can get the JSON value as a literal
+		//       without any prior HCL parsing by evaluating it in a nil context.
+		//       We can take advantage of this property to walk through cty.Value
+		//       that may contain HCL expressions instead of walking through
+		//       expression nodes directly.
+		//       See https://github.com/hashicorp/hcl/issues/642
+		val, diags := expr.Value(nil)
+		if diags.HasErrors() {
+			return nodes, diags
+		}
+
+		err := cty.Walk(val, func(path cty.Path, v cty.Value) (bool, error) {
+			if v.Type() != cty.String || v.IsNull() || !v.IsKnown() {
+				return true, nil
+			}
+
+			node, parseDiags := hclsyntax.ParseTemplate([]byte(v.AsString()), expr.Range().Filename, expr.Range().Start)
+			if diags.HasErrors() {
+				diags = diags.Extend(parseDiags)
+				return true, nil
+			}
+
+			nodes = append(nodes, node)
+			return true, nil
+		})
+		if err != nil {
+			return nodes, hcl.Diagnostics{{
+				Severity: hcl.DiagError,
+				Summary:  "Failed to walk the expression value",
+				Detail:   err.Error(),
+				Subject:  expr.Range().Ptr(),
+			}}
+		}
+
+		return nodes, diags
+	}
+
+	// The JSON syntax is already processed, so it's guaranteed to be native syntax.
+	nodes = append(nodes, expr.(hclsyntax.Expression))
+
+	return nodes, nil
 }
