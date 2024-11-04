@@ -1,3 +1,28 @@
+## 0.10.0 (2024-11-04)
+
+### Enhancements
+
+- [#214](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/214) [#215](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/215): Support provider-defined functions
+  - The following rules now take provider-defined functions into account:
+    - `terraform_required_providers`
+    - `terraform_unused_required_providers`
+
+### Bug Fixes
+
+- [#216](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/216): Fix issues caused by multiple terraform blocks
+  - The following rule has been fixed to cause inconsistent results when multiple `terraform` blocks are declared:
+    - `terraform_required_providers`
+    - `terraform_unused_required_providers`
+    - `terraform_workspace_remote`
+
+### Chores
+
+- [#202](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/202): Bump github.com/hashicorp/go-getter from 1.7.5 to 1.7.6
+- [#206](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/206): Bump github.com/Masterminds/semver/v3 from 3.2.1 to 3.3.0
+- [#207](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/207): Bump github.com/hashicorp/hcl/v2 from 2.21.0 to 2.22.0
+- [#217](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/217): deps: Go 1.23
+- [#218](https://github.com/terraform-linters/tflint-ruleset-terraform/pull/218): Bump GoReleaser to v2
+
 ## 0.9.1 (2024-08-03)
 
 ### Bug Fixes
