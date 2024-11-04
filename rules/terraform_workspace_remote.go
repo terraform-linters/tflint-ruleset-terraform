@@ -94,20 +94,15 @@ func (r *TerraformWorkspaceRemoteRule) Check(runner tflint.Runner) error {
 	}
 
 	var remoteBackend bool
-	var tf10Support bool
+	constraints := version.Constraints{}
 	for _, terraform := range body.Blocks {
 		for _, requiredVersion := range terraform.Body.Attributes {
 			err := runner.EvaluateExpr(requiredVersion.Expr, func(v string) error {
-				constraints, err := version.NewConstraint(v)
+				c, err := version.NewConstraint(v)
 				if err != nil {
 					return err
 				}
-
-				for _, tf10Version := range tf10Versions {
-					if constraints.Check(tf10Version) {
-						tf10Support = true
-					}
-				}
+				constraints = append(constraints, c...)
 				return nil
 			}, nil)
 			if err != nil {
@@ -118,6 +113,14 @@ func (r *TerraformWorkspaceRemoteRule) Check(runner tflint.Runner) error {
 		for _, backend := range terraform.Body.Blocks {
 			if backend.Labels[0] == "remote" {
 				remoteBackend = true
+			}
+		}
+	}
+	var tf10Support bool
+	if constraints.Len() > 0 {
+		for _, tf10Version := range tf10Versions {
+			if constraints.Check(tf10Version) {
+				tf10Support = true
 			}
 		}
 	}

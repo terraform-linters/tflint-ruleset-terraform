@@ -82,8 +82,10 @@ func (r *TerraformUnusedRequiredProvidersRule) Check(rr tflint.Runner) error {
 			}
 
 			for _, block := range content.Blocks {
-				var attrDiags hcl.Diagnostics
-				requiredProviders, attrDiags = block.Body.JustAttributes()
+				attributes, attrDiags := block.Body.JustAttributes()
+				for k, v := range attributes {
+					requiredProviders[k] = v
+				}
 				diags = diags.Extend(attrDiags)
 				if diags.HasErrors() {
 					continue

@@ -151,7 +151,9 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 	requiredProviders := hclext.Attributes{}
 	for _, terraform := range body.Blocks {
 		for _, requiredProvidersBlock := range terraform.Body.Blocks {
-			requiredProviders = requiredProvidersBlock.Body.Attributes
+			for name, attr := range requiredProvidersBlock.Body.Attributes {
+				requiredProviders[name] = attr
+			}
 		}
 	}
 

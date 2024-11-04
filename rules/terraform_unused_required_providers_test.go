@@ -260,6 +260,43 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "unused - in multiple terraform blocks",
+			Content: `
+				terraform {
+					required_providers {
+						aws = {
+							source = "hashicorp/aws"
+						}
+					}
+				}
+				terraform {
+					required_providers {
+						null = {
+							source = "hashicorp/null"
+						}
+					}
+				}
+				resource "null_resource" "foo" {}
+			`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedRequiredProvidersRule(),
+					Message: "provider 'aws' is declared in required_providers but not used by the module",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 7,
+						},
+						End: hcl.Pos{
+							Line:   6,
+							Column: 8,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformUnusedRequiredProvidersRule()
