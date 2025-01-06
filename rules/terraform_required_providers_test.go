@@ -1,14 +1,10 @@
 package rules
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
-	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func Test_TerraformRequiredProvidersRule(t *testing.T) {
@@ -695,35 +691,7 @@ terraform {
 				t.Fatalf("Unexpected error occurred: %s", err)
 			}
 
-			// TODO: replace the following assertions without ordering by AssertIssues
-			// helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
-			opts := []cmp.Option{
-				cmpopts.IgnoreFields(hcl.Pos{}, "Byte"),
-				cmp.Comparer(func(x, y tflint.Rule) bool {
-					return reflect.TypeOf(x) == reflect.TypeOf(y)
-				}),
-				cmpopts.SortSlices(func(i, j *helper.Issue) bool {
-					if i.Range.Filename != j.Range.Filename {
-						return i.Range.Filename < j.Range.Filename
-					}
-					if i.Range.Start.Line != j.Range.Start.Line {
-						return i.Range.Start.Line < j.Range.Start.Line
-					}
-					if i.Range.Start.Column != j.Range.Start.Column {
-						return i.Range.Start.Column < j.Range.Start.Column
-					}
-					if i.Range.End.Line != j.Range.End.Line {
-						return i.Range.End.Line > j.Range.End.Line
-					}
-					if i.Range.End.Column != j.Range.End.Column {
-						return i.Range.End.Column > j.Range.End.Column
-					}
-					return i.Message < j.Message
-				}),
-			}
-			if diff := cmp.Diff(tc.Expected, runner.Runner.(*helper.Runner).Issues, opts...); diff != "" {
-				t.Fatalf("Expected issues are not matched:\n %s\n", diff)
-			}
+			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
 			want := map[string]string{}
 			if tc.Fixed != "" {
 				want[filename] = tc.Fixed
