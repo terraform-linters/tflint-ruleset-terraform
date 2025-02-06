@@ -12,6 +12,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_deprecated_lookup](terraform_deprecated_lookup.md)|Disallow deprecated `lookup()` function with only 2 arguments.|✔|
 |[terraform_documented_outputs](terraform_documented_outputs.md)|Disallow `output` declarations without description||
 |[terraform_documented_variables](terraform_documented_variables.md)|Disallow `variable` declarations without description||
+|[terraform_dynamic_attribute_notation](terraform_dynamic_attribute_notation.md)|Enforce bracket notation for dynamic attribute access|✔|
 |[terraform_empty_list_equality](terraform_empty_list_equality.md)|Disallow comparisons with `[]` when checking if a collection is empty|✔|
 |[terraform_map_duplicate_keys](terraform_map_duplicate_keys.md)|Disallow duplicate keys in a map object|✔|
 |[terraform_module_pinned_source](terraform_module_pinned_source.md)|Disallow specifying a git or mercurial repository as a module source without pinning to a version|✔|
@@ -20,6 +21,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_required_providers](terraform_required_providers.md)|Require that all providers have version constraints through required_providers|✔|
 |[terraform_required_version](terraform_required_version.md)|Disallow `terraform` declarations without require_version|✔|
 |[terraform_standard_module_structure](terraform_standard_module_structure.md)|Ensure that a module complies with the Terraform Standard Module Structure||
+|[terraform_static_attribute_notation](terraform_static_attribute_notation.md)|Enforce dot notation for static attribute access|✔|
 |[terraform_typed_variables](terraform_typed_variables.md)|Disallow `variable` declarations without type|✔|
 |[terraform_unused_declarations](terraform_unused_declarations.md)|Disallow variables, data sources, and locals that are declared but never used|✔|
 |[terraform_unused_required_providers](terraform_unused_required_providers.md)|Check that all `required_providers` are used in the module||
