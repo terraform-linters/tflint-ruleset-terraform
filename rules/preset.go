@@ -15,6 +15,7 @@ var PresetRules = map[string][]tflint.Rule{
 		NewTerraformModulePinnedSourceRule(),
 		NewTerraformModuleVersionRule(),
 		NewTerraformNamingConventionRule(),
+		NewTerraformNullableVariablesRule(),
 		NewTerraformRequiredProvidersRule(),
 		NewTerraformRequiredVersionRule(),
 		NewTerraformStandardModuleStructureRule(),

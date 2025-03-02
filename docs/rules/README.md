@@ -21,6 +21,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_required_version](terraform_required_version.md)|Disallow `terraform` declarations without require_version|✔|
 |[terraform_standard_module_structure](terraform_standard_module_structure.md)|Ensure that a module complies with the Terraform Standard Module Structure||
 |[terraform_typed_variables](terraform_typed_variables.md)|Disallow `variable` declarations without type|✔|
+|[terraform_nullable_variables](terraform_nullable_variables.md)|Disallow `variable` declarations without `nullable` field||
 |[terraform_unused_declarations](terraform_unused_declarations.md)|Disallow variables, data sources, and locals that are declared but never used|✔|
 |[terraform_unused_required_providers](terraform_unused_required_providers.md)|Check that all `required_providers` are used in the module||
 |[terraform_workspace_remote](terraform_workspace_remote.md)|`terraform.workspace` should not be used with a "remote" backend with remote execution in Terraform v1.0.x|✔|
