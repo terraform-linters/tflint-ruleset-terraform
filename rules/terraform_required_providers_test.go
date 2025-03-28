@@ -65,6 +65,31 @@ resource "random_string" "foo" {
 			},
 		},
 		{
+			Name: "implicit provider - resource",
+			Content: `
+ephemeral "random_string" "foo" {
+  length = 16
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing version constraint for provider \"random\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   2,
+							Column: 32,
+						},
+					},
+				},
+			},
+		},
+		{
 			Name: "implicit provider - data source",
 			Content: `
 data "template_file" "foo" {
@@ -96,11 +121,11 @@ terraform {
   required_providers {
     template = {
       source  = "hashicorp/template"
-      version = "~> 2" 
+      version = "~> 2"
     }
   }
 }
-provider "template" {} 
+provider "template" {}
 `,
 			Expected: helper.Issues{},
 		},
@@ -112,7 +137,7 @@ terraform {
     template = "~> 2"
   }
 }
-provider "template" {} 
+provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
@@ -154,7 +179,7 @@ terraform {
   }
 }
 
-provider "template" {} 
+provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
@@ -185,7 +210,7 @@ terraform {
   }
 }
 
-provider "template" {} 
+provider "template" {}
 `,
 			Config: `
 rule "terraform_required_providers" {
@@ -207,7 +232,7 @@ terraform {
   }
 }
 
-provider "template" {} 
+provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
@@ -250,7 +275,7 @@ terraform {
   }
 }
 
-provider "template" {} 
+provider "template" {}
 `,
 			Config: `
 rule "terraform_required_providers" {
@@ -270,7 +295,7 @@ terraform {
   }
 }
 
-provider "template" {} 
+provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
@@ -355,7 +380,7 @@ terraform {
 
 provider "template" {
   version = "~> 2"
-} 
+}
 `,
 			Expected: helper.Issues{
 				{
@@ -409,7 +434,7 @@ terraform {
 provider "template" {
   alias   = "foo"
   version = "~> 2"
-} 
+}
 `,
 			Expected: helper.Issues{
 				{

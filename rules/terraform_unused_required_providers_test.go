@@ -33,6 +33,21 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			Expected: helper.Issues{},
 		},
 		{
+			Name: "used - ephemeral resource",
+			Content: `
+        terraform {
+          required_providers {
+            null = {
+              source = "hashicorp/null"
+            }
+          }
+        }
+
+        ephemeral "null_resource" "foo" {}
+      `,
+			Expected: helper.Issues{},
+		},
+		{
 			Name: "used - data source",
 			Content: `
 				terraform {
@@ -42,7 +57,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 						}
 					}
 				}
-				resource "null_data_source" "foo" {}
+				data "null_data_source" "foo" {}
 			`,
 			Expected: helper.Issues{},
 		},
@@ -56,7 +71,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 						}
 					}
 				}
-				resource "null_resource" "foo" {
+				data "null_resource" "foo" {
 					provider = custom-null
 				}
 			`,
@@ -72,7 +87,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 						}
 					}
 				}
-				resource "null_data_source" "foo" {
+				data "null_data_source" "foo" {
 					provider = custom-null
 				}
 			`,
