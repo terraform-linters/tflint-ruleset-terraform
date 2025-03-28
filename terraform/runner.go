@@ -123,6 +123,15 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 				},
 			},
 			{
+				Type:       "ephemeral",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "provider"},
+					},
+				},
+			},
+			{
 				Type:       "data",
 				LabelNames: []string{"type", "name"},
 				Body: &hclext.BodySchema{
@@ -177,9 +186,7 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 	for _, block := range body.Blocks {
 		switch block.Type {
-		case "resource":
-			fallthrough
-		case "data":
+		case "resource", "ephemeral", "data":
 			if attr, exists := block.Body.Attributes["provider"]; exists {
 				ref, decodeDiags := decodeProviderRef(attr.Expr, block.DefRange)
 				diags = diags.Extend(decodeDiags)
