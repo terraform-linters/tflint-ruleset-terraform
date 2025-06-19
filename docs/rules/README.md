@@ -15,6 +15,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_empty_list_equality](terraform_empty_list_equality.md)|Disallow comparisons with `[]` when checking if a collection is empty|✔|
 |[terraform_map_duplicate_keys](terraform_map_duplicate_keys.md)|Disallow duplicate keys in a map object|✔|
 |[terraform_module_pinned_source](terraform_module_pinned_source.md)|Disallow specifying a git or mercurial repository as a module source without pinning to a version|✔|
+|[terraform_module_shallow_clone](terraform_module_shallow_clone.md)|Require pinned Git-hosted Terraform modules to use shallow cloning||
 |[terraform_module_version](terraform_module_version.md)|Checks that Terraform modules sourced from a registry specify a version|✔|
 |[terraform_naming_convention](terraform_naming_convention.md)|Enforces naming conventions for resources, data sources, etc||
 |[terraform_required_providers](terraform_required_providers.md)|Require that all providers have version constraints through required_providers|✔|
