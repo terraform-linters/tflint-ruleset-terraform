@@ -13,6 +13,8 @@ import (
 	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
+var gitCommitRegex = regexp.MustCompile("^[a-f0-9]{40}$")
+
 // TerraformModuleShallowCloneRule checks that Git-hosted Terraform modules use shallow cloning
 type TerraformModuleShallowCloneRule struct {
 	tflint.DefaultRule
@@ -123,31 +125,19 @@ func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, modu
 		return nil
 	}
 
-	// Skip if it's a raw git commit (40 character hex string)
-	if ref != "" && r.isGitCommit(ref) {
+	// Skip if it's a raw git commit ID (40 character hex string)
+	if gitCommitRegex.MatchString(ref) {
 		return nil
 	}
 
 	// Check if depth parameter is already set
-	if query.Get("depth") != "" {
+	if query.Get("depth") == "1" {
 		return nil
 	}
 
-	// Only warn for pinned modules that don't have shallow cloning enabled
-	if ref != "" {
-		return runner.EmitIssue(
-			r,
-			fmt.Sprintf(`Module source "%s" should enable shallow cloning by adding "depth=1" parameter`, module.Source),
-			module.SourceAttr.Expr.Range(),
-		)
-	}
-
-	return nil
-}
-
-// isGitCommit checks if the string looks like a git commit hash (40 character hex string)
-func (r *TerraformModuleShallowCloneRule) isGitCommit(s string) bool {
-	// Git commit hashes are 40 character hex strings
-	match, _ := regexp.MatchString("^[a-f0-9]{40}$", s)
-	return match
+	return runner.EmitIssue(
+		r,
+		fmt.Sprintf(`Module source %q should enable shallow cloning by adding "depth=1" parameter`, module.Source),
+		module.SourceAttr.Expr.Range(),
+	)
 }

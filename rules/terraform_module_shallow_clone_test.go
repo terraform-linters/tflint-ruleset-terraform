@@ -71,7 +71,7 @@ module "ssh_pinned" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformModuleShallowCloneRule(),
-					Message: "Module source \"git::ssh://git@github.com/hashicorp/consul.git?ref=v1.0.0\" should enable shallow cloning by adding \"depth=1\" parameter",
+					Message: `Module source "git::ssh://git@github.com/hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 3, Column: 12},
@@ -89,7 +89,7 @@ module "https_pinned" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformModuleShallowCloneRule(),
-					Message: "Module source \"git::https://github.com/hashicorp/consul.git?ref=v1.0.0\" should enable shallow cloning by adding \"depth=1\" parameter",
+					Message: `Module source "git::https://github.com/hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 3, Column: 12},
@@ -107,7 +107,7 @@ module "github_ssh" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformModuleShallowCloneRule(),
-					Message: "Module source \"git@github.com:hashicorp/consul.git?ref=v1.0.0\" should enable shallow cloning by adding \"depth=1\" parameter",
+					Message: `Module source "git@github.com:hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 3, Column: 12},
@@ -125,7 +125,7 @@ module "github_https" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformModuleShallowCloneRule(),
-					Message: "Module source \"github.com/hashicorp/consul?ref=v1.0.0\" should enable shallow cloning by adding \"depth=1\" parameter",
+					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 3, Column: 12},
@@ -143,7 +143,7 @@ module "bitbucket" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformModuleShallowCloneRule(),
-					Message: "Module source \"bitbucket.org/hashicorp/tf-test-git?ref=v1.0.0\" should enable shallow cloning by adding \"depth=1\" parameter",
+					Message: `Module source "bitbucket.org/hashicorp/tf-test-git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
 						Start:    hcl.Pos{Line: 3, Column: 12},
