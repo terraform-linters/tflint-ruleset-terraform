@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-getter"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
@@ -77,7 +78,8 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall) error {
-	source, err := getter.Detect(module.Source, filepath.Dir(module.DefRange.Filename), []getter.Detector{
+	filename := module.DefRange.Filename
+	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52
 		new(getter.GitHubDetector),
 		new(getter.GitDetector),
@@ -135,9 +137,42 @@ func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, modu
 		return nil
 	}
 
-	return runner.EmitIssue(
+	exprRange := module.SourceAttr.Expr.Range()
+
+	if err := runner.EmitIssueWithFix(
 		r,
 		fmt.Sprintf(`Module source %q should enable shallow cloning by adding "depth=1" parameter`, module.Source),
-		module.SourceAttr.Expr.Range(),
-	)
+		exprRange,
+		func(f tflint.Fixer) error {
+			// Find the position of "ref=" in the source string
+			refPos := strings.Index(module.Source, "ref=")
+			if refPos == -1 {
+				return fmt.Errorf(`could not find "ref=" string in module source`)
+			}
+
+			// Create a range that includes the opening quote + source up to "ref="
+			endPos := exprRange.Start
+			// +1 for opening quote, +refPos for chars before "ref="
+			endPos.Byte += 1 + refPos
+			endPos.Column += 1 + refPos
+
+			insertRange := hcl.Range{
+				Filename: filename,
+				Start:    exprRange.Start,
+				End:      endPos,
+			}
+
+			return f.InsertTextAfter(insertRange, "depth=1&")
+		},
+	); err != nil {
+		return hcl.Diagnostics{
+			{
+				Severity: hcl.DiagError,
+				Summary:  "failed to call EmitIssueWithFix()",
+				Detail:   err.Error(),
+			},
+		}
+	}
+
+	return nil
 }

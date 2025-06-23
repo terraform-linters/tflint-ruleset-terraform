@@ -12,6 +12,7 @@ func Test_TerraformModuleShallowClone(t *testing.T) {
 		Name     string
 		Content  string
 		Expected helper.Issues
+		Fixed    string
 	}{
 		{
 			Name: "terraform registry module",
@@ -79,6 +80,10 @@ module "ssh_pinned" {
 					},
 				},
 			},
+			Fixed: `
+module "ssh_pinned" {
+  source = "git::ssh://git@github.com/hashicorp/consul.git?depth=1&ref=v1.0.0"
+}`,
 		},
 		{
 			Name: "pinned git module with HTTPS protocol",
@@ -97,6 +102,10 @@ module "https_pinned" {
 					},
 				},
 			},
+			Fixed: `
+module "https_pinned" {
+  source = "git::https://github.com/hashicorp/consul.git?depth=1&ref=v1.0.0"
+}`,
 		},
 		{
 			Name: "pinned github module with SSH protocol",
@@ -115,6 +124,10 @@ module "github_ssh" {
 					},
 				},
 			},
+			Fixed: `
+module "github_ssh" {
+  source = "git@github.com:hashicorp/consul.git?depth=1&ref=v1.0.0"
+}`,
 		},
 		{
 			Name: "pinned github module with HTTPS protocol",
@@ -133,6 +146,10 @@ module "github_https" {
 					},
 				},
 			},
+			Fixed: `
+module "github_https" {
+  source = "github.com/hashicorp/consul?depth=1&ref=v1.0.0"
+}`,
 		},
 		{
 			Name: "pinned bitbucket module",
@@ -151,6 +168,10 @@ module "bitbucket" {
 					},
 				},
 			},
+			Fixed: `
+module "bitbucket" {
+  source = "bitbucket.org/hashicorp/tf-test-git?depth=1&ref=v1.0.0"
+}`,
 		},
 	}
 
@@ -158,13 +179,19 @@ module "bitbucket" {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := testRunner(t, map[string]string{"module.tf": tc.Content})
+			filename := "module.tf"
+			runner := testRunner(t, map[string]string{filename: tc.Content})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)
 			}
 
 			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, runner.Runner.(*helper.Runner).Changes())
 		})
 	}
 }
