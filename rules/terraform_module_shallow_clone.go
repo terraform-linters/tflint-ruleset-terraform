@@ -14,7 +14,7 @@ import (
 	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
-var gitCommitRegex = regexp.MustCompile("^[a-f0-9]{40}$")
+var gitCommitRegex = regexp.MustCompile("^[a-f0-9]{4,64}$")
 
 // TerraformModuleShallowCloneRule checks that Git-hosted Terraform modules use shallow cloning
 type TerraformModuleShallowCloneRule struct {

@@ -40,10 +40,26 @@ module "unpinned" {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "git module with raw commit",
+			Name: "git module with 4 char long commit ID",
 			Content: `
-module "commit_pinned" {
+module "short_commit_pinned" {
+  source = "git://github.com/hashicorp/consul.git?ref=babe"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "git module with 40 char long (SHA-1) commit ID",
+			Content: `
+module "sha1_commit_pinned" {
   source = "git://github.com/hashicorp/consul.git?ref=abc123def456789012345678901234567890abcd"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "git module with 64 char long (SHA-256) commit ID",
+			Content: `
+module "sha256_commit_pinned" {
+  source = "git://github.com/hashicorp/consul.git?ref=abc123def456789012345678901234567890abc123def4567890123456789012"
 }`,
 			Expected: helper.Issues{},
 		},
