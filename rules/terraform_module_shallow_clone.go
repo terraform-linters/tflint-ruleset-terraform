@@ -37,7 +37,7 @@ func (r *TerraformModuleShallowCloneRule) Name() string {
 
 // Enabled returns whether the rule is enabled by default
 func (r *TerraformModuleShallowCloneRule) Enabled() bool {
-	return true
+	return false
 }
 
 // Severity returns the rule severity
