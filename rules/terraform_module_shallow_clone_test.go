@@ -80,6 +80,14 @@ module "shallow_clone" {
 			Expected: helper.Issues{},
 		},
 		{
+			Name: "short commit ID (true negative) or short branch name with hex chars only (false negative)",
+			Content: `
+module "ambiguous" {
+  source = "github.com/hashicorp/consul?ref=feed"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
 			Name: "pinned git module with SSH protocol",
 			Content: `
 module "ssh_pinned" {
@@ -187,6 +195,28 @@ module "bitbucket" {
 			Fixed: `
 module "bitbucket" {
   source = "bitbucket.org/hashicorp/tf-test-git?depth=1&ref=v1.0.0"
+}`,
+		},
+		{
+			Name: "pinned github module with HTTPS protocol",
+			Content: `
+module "short_branch_name" {
+  source = "github.com/hashicorp/consul?ref=beta"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul?ref=beta" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 50},
+					},
+				},
+			},
+			Fixed: `
+module "short_branch_name" {
+  source = "github.com/hashicorp/consul?depth=1&ref=beta"
 }`,
 		},
 	}
