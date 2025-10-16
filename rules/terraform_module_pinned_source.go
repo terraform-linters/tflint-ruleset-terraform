@@ -87,6 +87,15 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
+	// Extract query parameters from the original source before calling getter.Detect()
+	// because go-getter may URL-encode them when there's a subdirectory path
+	originalQuery := url.Values{}
+	if idx := strings.Index(module.Source, "?"); idx != -1 {
+		if parsedQuery, err := url.ParseQuery(module.Source[idx+1:]); err == nil {
+			originalQuery = parsedQuery
+		}
+	}
+
 	source, err := getter.Detect(module.Source, filepath.Dir(module.DefRange.Filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52
 		new(getter.GitHubDetector),
@@ -130,7 +139,13 @@ func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, modu
 		)
 	}
 
+	// Merge query parameters from both the detected URL and the original source
 	query := u.Query()
+	for key, values := range originalQuery {
+		if len(query[key]) == 0 {
+			query[key] = values
+		}
+	}
 
 	if ref := query.Get("ref"); ref != "" {
 		return r.checkRevision(runner, module, config, "ref", ref)
