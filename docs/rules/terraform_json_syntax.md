@@ -1,14 +1,10 @@
 # terraform_json_syntax
 
-Enforce the official Terraform JSON syntax that uses a root object instead of a root array.
+Enforce the official Terraform JSON syntax that uses a root object with keys for each block type.
 
 ## Example
 
 ```json
-# Good
-{"resource": {"aws_instance": {"example": {"ami": "ami-12345678"}}}}
-
-# Bad
 [{"resource": {"aws_instance": {"example": {"ami": "ami-12345678"}}}}]
 ```
 
@@ -26,24 +22,28 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ## Why
 
-According to the official Terraform documentation, "At the root of any JSON-based Terraform configuration is a JSON object." While Terraform may parse array-based syntax in some cases, the documented and supported standard is to use a root object with top-level keys like `resource`, `variable`, `output`, etc.
+The [Terraform JSON syntax documentation](https://developer.hashicorp.com/terraform/language/syntax/json#json-file-structure) states:
 
-Using the official syntax ensures compatibility and consistency with Terraform's expected JSON structure.
+> At the root of any JSON-based Terraform configuration is a JSON object. The properties of this object correspond to the top-level block types of the Terraform language.
 
-* [JSON Configuration Syntax](https://developer.hashicorp.com/terraform/language/syntax/json)
+While Terraform's underlying HCL parser supports flattening arrays, the documented and supported standard is to use a root object with top-level keys for Terraform's block types: `resource`, `variable`, `output`, etc. Using the official syntax ensures compatibility with third party tools that implement the documented standard.
 
 ## How To Fix
 
-Convert your array-based JSON configuration to use a root object. Instead of wrapping configuration in an array, use an object with appropriate top-level keys:
+Convert your array-based JSON configuration to use a root object. Instead of wrapping configuration in an array, use an object with appropriate top-level keys.
+
+### Before
 
 ```json
-# Before
 [
   {"resource": {"aws_instance": {"example": {"ami": "ami-12345678"}}}},
   {"variable": {"region": {"type": "string"}}}
 ]
+```
 
-# After
+### After
+
+```json
 {
   "resource": {
     "aws_instance": {
