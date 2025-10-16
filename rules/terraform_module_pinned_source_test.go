@@ -67,6 +67,32 @@ module "pinned_git" {
 			Expected: helper.Issues{},
 		},
 		{
+			Name: "git module with subdirectory is not pinned",
+			Content: `
+module "unpinned" {
+  source = "git://hashicorp.com/consul.git/subdirectory"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"git://hashicorp.com/consul.git/subdirectory\" is not pinned",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 57},
+					},
+				},
+			},
+		},
+		{
+			Name: "git module with subdirectory reference is pinned",
+			Content: `
+module "pinned_git" {
+  source = "git://hashicorp.com/consul.git/subdirectory?ref=v1.2.3"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
 			Name: "invalid URL",
 			Content: `
 module "invalid" {
@@ -192,6 +218,76 @@ module "default_git" {
 			Content: `
 module "pinned_git" {
   source = "github.com/hashicorp/consul.git?ref=pinned"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "github module with subdirectory is not pinned",
+			Content: `
+module "unpinned" {
+  source = "github.com/hashicorp/consul.git/subdirectory"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"github.com/hashicorp/consul.git/subdirectory\" is not pinned",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 58},
+					},
+				},
+			},
+		},
+		{
+			Name: "github module with subdirectory reference is pinned",
+			Content: `
+module "pinned_git" {
+  source = "github.com/hashicorp/consul.git/subdirectory?ref=v1.2.3"
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "github module with subdirectory reference is default",
+			Content: `
+module "default_git" {
+  source = "github.com/hashicorp/consul.git/subdirectory?ref=master"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"github.com/hashicorp/consul.git/subdirectory?ref=master\" uses a default branch as ref (master)",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 69},
+					},
+				},
+			},
+		},
+		{
+			Name: "github module with multiple subdirectories is not pinned",
+			Content: `
+module "unpinned" {
+  source = "github.com/hashicorp/consul.git/directory/subdirectory"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"github.com/hashicorp/consul.git/directory/subdirectory\" is not pinned",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 68},
+					},
+				},
+			},
+		},
+		{
+			Name: "github module with multiple subdirectories reference is pinned",
+			Content: `
+module "pinned_git" {
+  source = "github.com/hashicorp/consul.git/directory/subdirectory?ref=v1.2.3"
 }`,
 			Expected: helper.Issues{},
 		},
