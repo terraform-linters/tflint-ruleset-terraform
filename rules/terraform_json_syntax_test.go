@@ -110,6 +110,38 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 }
 `,
 		},
+		{
+			name: "array with multiple resources of same type",
+			content: `[
+  {"resource": {"aws_instance": {"foo": {"ami": "ami-11111111"}}}},
+  {"resource": {"aws_instance": {"bar": {"ami": "ami-22222222"}}}}
+]`,
+			filename: "multi.tf.json",
+			expected: helper.Issues{
+				{
+					Rule:    NewTerraformJSONSyntaxRule(),
+					Message: "JSON configuration uses array syntax at root, expected object",
+					Range: hcl.Range{
+						Filename: "multi.tf.json",
+						Start:    hcl.Pos{Line: 1, Column: 1},
+						End:      hcl.Pos{Line: 1, Column: 2},
+					},
+				},
+			},
+			fixed: `{
+  "resource": {
+    "aws_instance": {
+      "bar": {
+        "ami": "ami-22222222"
+      },
+      "foo": {
+        "ami": "ami-11111111"
+      }
+    }
+  }
+}
+`,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			rule := NewTerraformJSONSyntaxRule()
