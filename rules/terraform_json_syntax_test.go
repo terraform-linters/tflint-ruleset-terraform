@@ -33,7 +33,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			expected: helper.Issues{
 				{
 					Rule:    NewTerraformJSONSyntaxRule(),
-					Message: "JSON configuration uses array syntax at root. The official Terraform JSON syntax uses a root object. See https://developer.hashicorp.com/terraform/language/syntax/json",
+					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "main.tf.json",
 						Start:    hcl.Pos{Line: 1, Column: 1},
@@ -75,7 +75,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			expected: helper.Issues{
 				{
 					Rule:    NewTerraformJSONSyntaxRule(),
-					Message: "JSON configuration uses array syntax at root. The official Terraform JSON syntax uses a root object. See https://developer.hashicorp.com/terraform/language/syntax/json",
+					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "config.tf.json",
 						Start:    hcl.Pos{Line: 1, Column: 1},
