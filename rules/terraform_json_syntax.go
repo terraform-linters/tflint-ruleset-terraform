@@ -10,6 +10,23 @@ import (
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
+// deepMerge recursively merges src into dst
+func deepMerge(dst, src map[string]any) {
+	for key, srcVal := range src {
+		if dstVal, exists := dst[key]; exists {
+			// If both are maps, merge recursively
+			srcMap, srcIsMap := srcVal.(map[string]any)
+			dstMap, dstIsMap := dstVal.(map[string]any)
+			if srcIsMap && dstIsMap {
+				deepMerge(dstMap, srcMap)
+				continue
+			}
+		}
+		// Otherwise, src overwrites dst
+		dst[key] = srcVal
+	}
+}
+
 // TerraformJSONSyntaxRule checks whether JSON configuration uses the official syntax
 type TerraformJSONSyntaxRule struct {
 	tflint.DefaultRule
@@ -82,11 +99,45 @@ func (r *TerraformJSONSyntaxRule) checkJSONSyntax(runner tflint.Runner, filename
 	}
 
 	// Check if root is an array
-	if _, isArray := root.([]any); isArray {
-		if err := runner.EmitIssue(
+	if arr, isArray := root.([]any); isArray {
+		// Calculate the range covering the entire file
+		lines := strings.Count(string(file.Bytes), "\n") + 1
+		lastLineLen := len(strings.TrimRight(string(file.Bytes), "\n"))
+		if idx := strings.LastIndex(string(file.Bytes), "\n"); idx >= 0 {
+			lastLineLen = len(file.Bytes) - idx - 1
+		}
+
+		fileRange := hcl.Range{
+			Filename: filename,
+			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      hcl.Pos{Line: lines, Column: lastLineLen + 1, Byte: len(file.Bytes)},
+		}
+
+		if err := runner.EmitIssueWithFix(
 			r,
 			"JSON configuration uses array syntax at root, expected object",
 			file.Body.MissingItemRange(),
+			func(f tflint.Fixer) error {
+				// Merge all objects in the array
+				merged := make(map[string]any)
+				for _, item := range arr {
+					if obj, ok := item.(map[string]any); ok {
+						deepMerge(merged, obj)
+					}
+				}
+
+				// Marshal back to JSON with indentation
+				fixed, err := stdjson.MarshalIndent(merged, "", "  ")
+				if err != nil {
+					return err
+				}
+
+				// Add trailing newline
+				fixedStr := string(fixed) + "\n"
+
+				// Replace entire file content
+				return f.ReplaceText(fileRange, fixedStr)
+			},
 		); err != nil {
 			return err
 		}

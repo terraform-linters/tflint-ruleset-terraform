@@ -13,6 +13,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 		content  string
 		filename string
 		expected helper.Issues
+		fixed    string
 	}{
 		{
 			name:     "object syntax valid",
@@ -41,6 +42,16 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 					},
 				},
 			},
+			fixed: `{
+  "resource": {
+    "aws_instance": {
+      "example": {
+        "ami": "ami-12345678"
+      }
+    }
+  }
+}
+`,
 		},
 		{
 			name:     "regular HCL file ignored",
@@ -83,6 +94,21 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 					},
 				},
 			},
+			fixed: `{
+  "resource": {
+    "aws_instance": {
+      "example": {
+        "ami": "ami-12345678"
+      }
+    }
+  },
+  "variable": {
+    "region": {
+      "type": "string"
+    }
+  }
+}
+`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -94,6 +120,11 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			}
 
 			helper.AssertIssues(t, tc.expected, runner.Issues)
+			want := map[string]string{}
+			if tc.fixed != "" {
+				want[tc.filename] = tc.fixed
+			}
+			helper.AssertChanges(t, want, runner.Changes())
 		})
 	}
 }
