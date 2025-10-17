@@ -12,7 +12,7 @@ Enforce the official Terraform JSON syntax that uses a root object with keys for
 $ tflint
 1 issue(s) found:
 
-Warning: JSON configuration uses array syntax at root. The official Terraform JSON syntax uses a root object. See https://developer.hashicorp.com/terraform/language/syntax/json (terraform_json_syntax)
+Warning: JSON configuration uses array syntax at root, expected object (terraform_json_syntax)
 
   on main.tf.json line 1:
    1: [{"resource": {"aws_instance": {"example": {"ami": "ami-12345678"}}}}]
