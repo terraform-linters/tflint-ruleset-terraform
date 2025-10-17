@@ -142,6 +142,38 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 }
 `,
 		},
+		{
+			name: "array with multiple unlabeled blocks",
+			content: `[
+  {"import": {"id": "i-abc123", "to": "aws_instance.foo"}},
+  {"import": {"id": "i-def456", "to": "aws_instance.bar"}}
+]`,
+			filename: "imports.tf.json",
+			expected: helper.Issues{
+				{
+					Rule:    NewTerraformJSONSyntaxRule(),
+					Message: "JSON configuration uses array syntax at root, expected object",
+					Range: hcl.Range{
+						Filename: "imports.tf.json",
+						Start:    hcl.Pos{Line: 1, Column: 1},
+						End:      hcl.Pos{Line: 1, Column: 2},
+					},
+				},
+			},
+			fixed: `{
+  "import": [
+    {
+      "id": "i-abc123",
+      "to": "aws_instance.foo"
+    },
+    {
+      "id": "i-def456",
+      "to": "aws_instance.bar"
+    }
+  ]
+}
+`,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			rule := NewTerraformJSONSyntaxRule()

@@ -27,6 +27,59 @@ func deepMerge(dst, src map[string]any) {
 	}
 }
 
+// canMergeValues checks if values can be safely merged without data loss.
+// Values can be merged if they are all maps and any overlapping keys can also be merged recursively.
+func canMergeValues(values []any) bool {
+	if len(values) == 0 {
+		return false
+	}
+
+	// All values must be maps
+	maps := make([]map[string]any, 0, len(values))
+	for _, val := range values {
+		m, ok := val.(map[string]any)
+		if !ok {
+			return false
+		}
+		maps = append(maps, m)
+	}
+
+	// Collect all values by key across all maps
+	keyValues := make(map[string][]any)
+	for _, m := range maps {
+		for key, val := range m {
+			keyValues[key] = append(keyValues[key], val)
+		}
+	}
+
+	// Check each key's values
+	for _, vals := range keyValues {
+		if len(vals) == 1 {
+			continue // Single value, no conflict
+		}
+
+		// Multiple values for this key - check if they're all maps
+		allMaps := true
+		for _, v := range vals {
+			if _, ok := v.(map[string]any); !ok {
+				allMaps = false
+				break
+			}
+		}
+
+		if !allMaps {
+			return false // Can't merge non-map values
+		}
+
+		// Recursively check if these nested maps can be merged
+		if !canMergeValues(vals) {
+			return false
+		}
+	}
+
+	return true
+}
+
 // TerraformJSONSyntaxRule checks whether JSON configuration uses the official syntax
 type TerraformJSONSyntaxRule struct {
 	tflint.DefaultRule
@@ -118,11 +171,34 @@ func (r *TerraformJSONSyntaxRule) checkJSONSyntax(runner tflint.Runner, filename
 			"JSON configuration uses array syntax at root, expected object",
 			file.Body.MissingItemRange(),
 			func(f tflint.Fixer) error {
-				// Merge all objects in the array
-				merged := make(map[string]any)
+				// First pass: collect all values by key
+				keyValues := make(map[string][]any)
 				for _, item := range arr {
 					if obj, ok := item.(map[string]any); ok {
-						deepMerge(merged, obj)
+						for key, val := range obj {
+							keyValues[key] = append(keyValues[key], val)
+						}
+					}
+				}
+
+				// Second pass: decide whether to merge or collect into array
+				merged := make(map[string]any)
+				for key, values := range keyValues {
+					if len(values) == 1 {
+						// Single value, just use it
+						merged[key] = values[0]
+					} else if canMergeValues(values) {
+						// Values can be merged without conflicts
+						result := make(map[string]any)
+						for _, val := range values {
+							if valMap, ok := val.(map[string]any); ok {
+								deepMerge(result, valMap)
+							}
+						}
+						merged[key] = result
+					} else {
+						// Values conflict, collect into array
+						merged[key] = values
 					}
 				}
 
