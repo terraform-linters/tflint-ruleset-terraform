@@ -85,7 +85,7 @@ func (r *TerraformJSONSyntaxRule) checkJSONSyntax(runner tflint.Runner, filename
 	if _, isArray := root.([]any); isArray {
 		if err := runner.EmitIssue(
 			r,
-			"JSON configuration uses array syntax at root. The official Terraform JSON syntax uses a root object. See https://developer.hashicorp.com/terraform/language/syntax/json",
+			"JSON configuration uses array syntax at root, expected object",
 			file.Body.MissingItemRange(),
 		); err != nil {
 			return err
