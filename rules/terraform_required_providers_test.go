@@ -725,3 +725,327 @@ terraform {
 		})
 	}
 }
+
+func Test_TerraformRequiredProvidersRule_ProviderConstraints(t *testing.T) {
+	cases := []struct {
+		Name     string
+		Content  string
+		Config   string
+		Expected helper.Issues
+		Fixed    string
+	}{
+		{
+			Name: "provider constraints - no configuration - no issues",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config:   ``,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "provider constraints - version match - exact match passes",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "provider constraints - version match - mismatch fails",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: `Provider "aws" version constraint does not match expected (expected: "~> 4.0", found: "~> 5.0")`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 4, Column: 11},
+						End:      hcl.Pos{Line: 7, Column: 6},
+					},
+				},
+			},
+			Fixed: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+		},
+		{
+			Name: "provider constraints - source match - exact match passes",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ""
+    }
+  }
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "provider constraints - source match - mismatch fails",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "custom/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ""
+    }
+  }
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: `Provider "aws" has incorrect source (expected: "hashicorp/aws", found: "custom/aws")`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 4, Column: 11},
+						End:      hcl.Pos{Line: 7, Column: 6},
+					},
+				},
+			},
+			Fixed: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+		},
+		{
+			Name: "provider whitelist - allowed provider passes",
+			Content: `
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  provider_whitelist = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "provider whitelist - disallowed provider fails",
+			Content: `
+terraform {
+  required_providers {
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+
+resource "random_string" "example" {
+  length = 16
+}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  provider_whitelist = true
+  providers = {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: `Provider "random" is not in the allowed provider list`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 11, Column: 1},
+						End:      hcl.Pos{Line: 11, Column: 35},
+					},
+				},
+			},
+		},
+		{
+			Name: "provider constraints - legacy format version constraint",
+			Content: `
+terraform {
+  required_providers {
+    aws = "~> 5.0"
+  }
+}
+
+provider "aws" {}
+`,
+			Config: `
+rule "terraform_required_providers" {
+  enabled = true
+  providers = {
+    aws = {
+      source  = ""
+      version = "~> 4.0"
+    }
+  }
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: `Legacy version constraint for provider "aws" in ` + "`required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 4, Column: 11},
+						End:      hcl.Pos{Line: 4, Column: 19},
+					},
+				},
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: `Provider "aws" version constraint does not match expected (expected: "~> 4.0", found: "~> 5.0")`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 4, Column: 11},
+						End:      hcl.Pos{Line: 4, Column: 19},
+					},
+				},
+			},
+			Fixed: `
+terraform {
+  required_providers {
+    aws = "~> 4.0"
+  }
+}
+
+provider "aws" {}
+`,
+		},
+	}
+
+	rule := NewTerraformRequiredProvidersRule()
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			filename := "module.tf"
+
+			runner := testRunner(t, map[string]string{
+				filename:      tc.Content,
+				".tflint.hcl": tc.Config,
+			})
+
+			if err := rule.Check(runner); err != nil {
+				t.Fatalf("Unexpected error occurred: %s", err)
+			}
+
+			helper.AssertIssues(t, tc.Expected, runner.Runner.(*helper.Runner).Issues)
+			want := map[string]string{}
+			if tc.Fixed != "" {
+				want[filename] = tc.Fixed
+			}
+			helper.AssertChanges(t, want, runner.Runner.(*helper.Runner).Changes())
+		})
+	}
+}
