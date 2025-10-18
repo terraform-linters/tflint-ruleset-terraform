@@ -11,6 +11,7 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
+		Config   string
 		JSON     bool
 		Expected helper.Issues
 		Fixed    string
@@ -21,13 +22,45 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "multi-line comment",
+			Name: "multi-line comment allowed",
 			Content: `
 /*
 	This comment spans multiple lines
 */			
 `,
+			Config: `
+rule "terraform_comment_syntax" {
+  enabled = true
+
+  allow_multiline = true
+}
+`,
 			Expected: helper.Issues{},
+		},
+		{
+			Name: "multi-line comment disallowed",
+			Content: `
+/*
+	This comment spans multiple lines
+*/			
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Multi-line comments are not allowed. Use single-line comments starting with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 3,
+						},
+					},
+				},
+			},
 		},
 		{
 			Name:    "double-slash comment",
@@ -77,7 +110,7 @@ variable "foo" {
 				filename += ".json"
 			}
 
-			runner := helper.TestRunner(t, map[string]string{filename: tc.Content})
+			runner := helper.TestRunner(t, map[string]string{filename: tc.Content, ".tflint.hcl": tc.Config})
 
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error occurred: %s", err)

@@ -14,6 +14,10 @@ type TerraformCommentSyntaxRule struct {
 	tflint.DefaultRule
 }
 
+type terraformCommentSyntaxRuleConfig struct {
+	AllowMultiline bool `hclext:"allow_multiline,optional"`
+}
+
 // NewTerraformCommentSyntaxRule returns a new rule
 func NewTerraformCommentSyntaxRule() *TerraformCommentSyntaxRule {
 	return &TerraformCommentSyntaxRule{}
@@ -50,12 +54,17 @@ func (r *TerraformCommentSyntaxRule) Check(runner tflint.Runner) error {
 		return nil
 	}
 
+	config := terraformCommentSyntaxRuleConfig{AllowMultiline: false}
+	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+		return err
+	}
+
 	files, err := runner.GetFiles()
 	if err != nil {
 		return err
 	}
 	for name, file := range files {
-		if err := r.checkComments(runner, name, file); err != nil {
+		if err := r.checkComments(runner, name, file, config.AllowMultiline); err != nil {
 			return err
 		}
 	}
@@ -63,7 +72,7 @@ func (r *TerraformCommentSyntaxRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filename string, file *hcl.File) error {
+func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filename string, file *hcl.File, allowMultiline bool) error {
 	if strings.HasSuffix(filename, ".json") {
 		return nil
 	}
@@ -74,11 +83,11 @@ func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filenam
 	}
 
 	for _, token := range tokens {
-		if token.Type != hclsyntax.TokenComment {
+		if token.Type != hclsyntax.TokenComment || token.Bytes[0] == '#' {
 			continue
 		}
 
-		if strings.HasPrefix(string(token.Bytes), "//") {
+		if token.Bytes[1] == '/' {
 			if err := runner.EmitIssueWithFix(
 				r,
 				"Single line comments should begin with #",
@@ -86,6 +95,14 @@ func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filenam
 				func(f tflint.Fixer) error {
 					return f.ReplaceText(f.RangeTo("//", filename, token.Range.Start), "#")
 				},
+			); err != nil {
+				return err
+			}
+		} else if !allowMultiline && token.Bytes[1] == '*' {
+			if err := runner.EmitIssue(
+				r,
+				"Multi-line comments are not allowed. Use single-line comments starting with #",
+				token.Range,
 			); err != nil {
 				return err
 			}
