@@ -21,21 +21,12 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "multi-line comment",
-			Content: `
-/*
-	This comment spans multiple lines
-*/			
-`,
-			Expected: helper.Issues{},
-		},
-		{
 			Name:    "double-slash comment",
 			Content: `// foo`,
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformCommentSyntaxRule(),
-					Message: "Single line comments should begin with #",
+					Message: "Comments should begin with #",
 					Range: hcl.Range{
 						Filename: "variables.tf",
 						Start: hcl.Pos{
@@ -59,6 +50,31 @@ variable "foo" {
 }
 `,
 			Expected: helper.Issues{},
+		},
+		{
+			Name: "multi-line comment",
+			Content: `
+/*
+	This comment spans multiple lines
+*/			
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 3,
+						},
+					},
+				},
+			},
 		},
 		{
 			Name:     "JSON",

@@ -14,6 +14,10 @@ type TerraformCommentSyntaxRule struct {
 	tflint.DefaultRule
 }
 
+type terraformCommentSyntaxRuleConfig struct {
+	AllowMultiline bool `hclext:"allow_multiline,optional"`
+}
+
 // NewTerraformCommentSyntaxRule returns a new rule
 func NewTerraformCommentSyntaxRule() *TerraformCommentSyntaxRule {
 	return &TerraformCommentSyntaxRule{}
@@ -74,18 +78,26 @@ func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filenam
 	}
 
 	for _, token := range tokens {
-		if token.Type != hclsyntax.TokenComment {
+		if token.Type != hclsyntax.TokenComment || token.Bytes[0] == '#' {
 			continue
 		}
 
-		if strings.HasPrefix(string(token.Bytes), "//") {
+		if token.Bytes[1] == '/' {
 			if err := runner.EmitIssueWithFix(
 				r,
-				"Single line comments should begin with #",
+				"Comments should begin with #",
 				token.Range,
 				func(f tflint.Fixer) error {
 					return f.ReplaceText(f.RangeTo("//", filename, token.Range.Start), "#")
 				},
+			); err != nil {
+				return err
+			}
+		} else {
+			if err := runner.EmitIssue(
+				r,
+				"Comments should begin with #",
+				token.Range,
 			); err != nil {
 				return err
 			}
