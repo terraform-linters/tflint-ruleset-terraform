@@ -9,7 +9,7 @@ This ruleset focus on possible errors and best practices about Terraform Languag
 
 ## Requirements
 
-- TFLint v0.42+
+- TFLint v0.46+
 - Go v1.24
 
 ## Installation
