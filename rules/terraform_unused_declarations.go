@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/addrs"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/lang"
@@ -18,9 +19,10 @@ type TerraformUnusedDeclarationsRule struct {
 }
 
 type declarations struct {
-	Variables     map[string]*hclext.Block
-	DataResources map[string]*hclext.Block
-	Locals        map[string]*terraform.Local
+	Variables       map[string]*hclext.Block
+	DataResources   map[string]*hclext.Block
+	Locals          map[string]*terraform.Local
+	ProviderAliases map[string]*hclext.Block
 }
 
 // NewTerraformUnusedDeclarationsRule returns a new rule
@@ -103,15 +105,31 @@ func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 			return err
 		}
 	}
+	for _, provider := range decl.ProviderAliases {
+		aliasAttr := provider.Body.Attributes["alias"]
+		var aliasName string
+		if diags := gohcl.DecodeExpression(aliasAttr.Expr, nil, &aliasName); diags.HasErrors() {
+			continue
+		}
+		if err := runner.EmitIssueWithFix(
+			r,
+			fmt.Sprintf(`provider "%s" with alias "%s" is declared but not used`, provider.Labels[0], aliasName),
+			provider.DefRange,
+			func(f tflint.Fixer) error { return f.RemoveExtBlock(provider) },
+		); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
 func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner) (*declarations, error) {
 	decl := &declarations{
-		Variables:     map[string]*hclext.Block{},
-		DataResources: map[string]*hclext.Block{},
-		Locals:        map[string]*terraform.Local{},
+		Variables:       map[string]*hclext.Block{},
+		DataResources:   map[string]*hclext.Block{},
+		Locals:          map[string]*terraform.Local{},
+		ProviderAliases: map[string]*hclext.Block{},
 	}
 
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
@@ -151,6 +169,15 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 					},
 				},
 			},
+			{
+				Type:       "provider",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "alias"},
+					},
+				},
+			},
 		},
 	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
 	if err != nil {
@@ -168,6 +195,14 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 				// Scoped data source addresses are unique in the module
 				decl.DataResources[fmt.Sprintf("data.%s.%s", data.Labels[0], data.Labels[1])] = data
 			}
+		case "provider":
+			// Only track providers with aliases
+			if aliasAttr, exists := block.Body.Attributes["alias"]; exists {
+				var aliasName string
+				if diags := gohcl.DecodeExpression(aliasAttr.Expr, nil, &aliasName); !diags.HasErrors() {
+					decl.ProviderAliases[fmt.Sprintf("%s.%s", block.Labels[0], aliasName)] = block
+				}
+			}
 		default:
 			panic("unreachable")
 		}
@@ -183,6 +218,13 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 }
 
 func (r *TerraformUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
+	// Check for provider alias references (e.g., aws.west in provider = aws.west)
+	if traversal, diags := hcl.AbsTraversalForExpr(expr); diags == nil && len(traversal) == 2 {
+		// Provider aliases are referenced as <provider>.<alias> (2 parts)
+		providerRef := fmt.Sprintf("%s.%s", traversal.RootName(), traversal[1].(hcl.TraverseAttr).Name)
+		delete(decl.ProviderAliases, providerRef)
+	}
+
 ReferenceLoop:
 	for _, ref := range lang.ReferencesInExpr(expr) {
 		switch sub := ref.Subject.(type) {
