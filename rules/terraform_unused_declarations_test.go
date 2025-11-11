@@ -267,6 +267,156 @@ check "unused" {
 				},
 			},
 		},
+		{
+			Name: "unused provider alias",
+			Content: `
+provider "azurerm" {
+  features {}
+  alias           = "test_123"
+  subscription_id = ""
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `provider "azurerm" with alias "test_123" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 2, Column: 1},
+						End:      hcl.Pos{Line: 2, Column: 19},
+					},
+				},
+			},
+			Fixed: `
+`,
+		},
+		{
+			Name: "used provider alias in resource",
+			Content: `
+provider "azurerm" {
+  features {}
+  alias           = "test_123"
+  subscription_id = ""
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+  provider = azurerm.test_123
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "used provider alias in data source",
+			Content: `
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+data "aws_ami" "example" {
+  provider    = aws.west
+  most_recent = true
+}
+
+output "ami" {
+  value = data.aws_ami.example.id
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "used provider alias in module",
+			Content: `
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+module "example" {
+  source = "./module"
+  providers = {
+    aws = aws.west
+  }
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "provider without alias is not checked",
+			Content: `
+provider "aws" {
+  region = "us-east-1"
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "multiple provider aliases used in module providers map",
+			Content: `
+provider "aws" {
+  alias  = "east"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+module "example" {
+  source = "./module"
+  providers = {
+    aws.primary   = aws.east
+    aws.secondary = aws.west
+  }
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "multiple provider aliases, one unused",
+			Content: `
+provider "aws" {
+  alias  = "east"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+resource "aws_instance" "example" {
+  provider = aws.west
+  ami      = "ami-12345"
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `provider "aws" with alias "east" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf",
+						Start:    hcl.Pos{Line: 2, Column: 1},
+						End:      hcl.Pos{Line: 2, Column: 15},
+					},
+				},
+			},
+			Fixed: `
+
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+resource "aws_instance" "example" {
+  provider = aws.west
+  ami      = "ami-12345"
+}
+`,
+		},
 	}
 
 	rule := NewTerraformUnusedDeclarationsRule()
