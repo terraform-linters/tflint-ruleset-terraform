@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformWorkspaceRemoteRule(t *testing.T) {
+func Test_OpentofuWorkspaceRemoteRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		JSON     bool
@@ -28,7 +28,7 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -116,7 +116,7 @@ data "null_data_source" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -139,7 +139,7 @@ module "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -163,7 +163,7 @@ provider "aws" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -185,7 +185,7 @@ locals {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -207,7 +207,7 @@ output "o" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -272,7 +272,7 @@ resource "aws_instance" "foo" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformWorkspaceRemoteRule(),
+					Rule:    NewOpentofuWorkspaceRemoteRule(),
 					Message: "terraform.workspace should not be used with a 'remote' backend",
 					Range: hcl.Range{
 						Filename: "config.tf.json",
@@ -318,7 +318,7 @@ resource "null_resource" "a" {
 		},
 	}
 
-	rule := NewTerraformWorkspaceRemoteRule()
+	rule := NewOpentofuWorkspaceRemoteRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

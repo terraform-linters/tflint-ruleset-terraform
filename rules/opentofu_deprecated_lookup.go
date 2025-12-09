@@ -7,38 +7,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformDeprecatedLookupRule warns about usage of the legacy dot syntax for indexes (foo.0)
-type TerraformDeprecatedLookupRule struct {
+// OpentofuDeprecatedLookupRule warns about usage of the legacy dot syntax for indexes (foo.0)
+type OpentofuDeprecatedLookupRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformDeprecatedIndexRule return a new rule
-func NewTerraformDeprecatedLookupRule() *TerraformDeprecatedLookupRule {
-	return &TerraformDeprecatedLookupRule{}
+// NewOpentofuDeprecatedIndexRule return a new rule
+func NewOpentofuDeprecatedLookupRule() *OpentofuDeprecatedLookupRule {
+	return &OpentofuDeprecatedLookupRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformDeprecatedLookupRule) Name() string {
+func (r *OpentofuDeprecatedLookupRule) Name() string {
 	return "opentofu_deprecated_lookup"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformDeprecatedLookupRule) Enabled() bool {
+func (r *OpentofuDeprecatedLookupRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformDeprecatedLookupRule) Severity() tflint.Severity {
+func (r *OpentofuDeprecatedLookupRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformDeprecatedLookupRule) Link() string {
+func (r *OpentofuDeprecatedLookupRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check walks all expressions and emit issues if deprecated index syntax is found
-func (r *TerraformDeprecatedLookupRule) Check(runner tflint.Runner) error {
+func (r *OpentofuDeprecatedLookupRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err

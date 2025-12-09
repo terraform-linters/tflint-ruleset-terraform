@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformTypedVariablesRule(t *testing.T) {
+func Test_OpentofuTypedVariablesRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -22,7 +22,7 @@ variable "no_type" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformTypedVariablesRule(),
+					Rule:    NewOpentofuTypedVariablesRule(),
 					Message: "`no_type` variable has no type",
 					Range: hcl.Range{
 						Filename: "variables.tf",
@@ -88,7 +88,7 @@ variable "any" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformTypedVariablesRule(),
+					Rule:    NewOpentofuTypedVariablesRule(),
 					Message: "`no_type` variable has no type",
 					Range: hcl.Range{
 						Filename: "variables.tf.json",
@@ -100,7 +100,7 @@ variable "any" {
 		},
 	}
 
-	rule := NewTerraformTypedVariablesRule()
+	rule := NewOpentofuTypedVariablesRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformDeprecatedIndexRule(t *testing.T) {
+func Test_OpentofuDeprecatedIndexRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -25,7 +25,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -57,7 +57,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -124,7 +124,7 @@ EOF
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -159,7 +159,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -174,7 +174,7 @@ locals {
 					},
 				},
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -206,7 +206,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -240,7 +240,7 @@ locals {
 			}`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedIndexRule(),
+					Rule:    NewOpentofuDeprecatedIndexRule(),
 					Message: "List items should be accessed using square brackets",
 					Range: hcl.Range{
 						Filename: "config.tf.json",
@@ -289,7 +289,7 @@ locals {
 		},
 	}
 
-	rule := NewTerraformDeprecatedIndexRule()
+	rule := NewOpentofuDeprecatedIndexRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

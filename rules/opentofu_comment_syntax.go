@@ -9,38 +9,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformCommentSyntaxRule checks whether comments use the preferred syntax
-type TerraformCommentSyntaxRule struct {
+// OpentofuCommentSyntaxRule checks whether comments use the preferred syntax
+type OpentofuCommentSyntaxRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformCommentSyntaxRule returns a new rule
-func NewTerraformCommentSyntaxRule() *TerraformCommentSyntaxRule {
-	return &TerraformCommentSyntaxRule{}
+// NewOpentofuCommentSyntaxRule returns a new rule
+func NewOpentofuCommentSyntaxRule() *OpentofuCommentSyntaxRule {
+	return &OpentofuCommentSyntaxRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformCommentSyntaxRule) Name() string {
+func (r *OpentofuCommentSyntaxRule) Name() string {
 	return "opentofu_comment_syntax"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformCommentSyntaxRule) Enabled() bool {
+func (r *OpentofuCommentSyntaxRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformCommentSyntaxRule) Severity() tflint.Severity {
+func (r *OpentofuCommentSyntaxRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformCommentSyntaxRule) Link() string {
+func (r *OpentofuCommentSyntaxRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether single line comments is used
-func (r *TerraformCommentSyntaxRule) Check(runner tflint.Runner) error {
+func (r *OpentofuCommentSyntaxRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func (r *TerraformCommentSyntaxRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filename string, file *hcl.File) error {
+func (r *OpentofuCommentSyntaxRule) checkComments(runner tflint.Runner, filename string, file *hcl.File) error {
 	if strings.HasSuffix(filename, ".json") {
 		return nil
 	}

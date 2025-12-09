@@ -13,8 +13,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-// TerraformRequiredProvidersRule checks whether Terraform sets version constraints for all configured providers
-type TerraformRequiredProvidersRule struct {
+// OpentofuRequiredProvidersRule checks whether Opentofu sets version constraints for all configured providers
+type OpentofuRequiredProvidersRule struct {
 	tflint.DefaultRule
 }
 
@@ -25,33 +25,33 @@ type terraformRequiredProvidersRuleConfig struct {
 	Version *bool `hclext:"version,optional"`
 }
 
-// NewTerraformRequiredProvidersRule returns new rule with default attributes
-func NewTerraformRequiredProvidersRule() *TerraformRequiredProvidersRule {
-	return &TerraformRequiredProvidersRule{}
+// NewOpentofuRequiredProvidersRule returns new rule with default attributes
+func NewOpentofuRequiredProvidersRule() *OpentofuRequiredProvidersRule {
+	return &OpentofuRequiredProvidersRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformRequiredProvidersRule) Name() string {
+func (r *OpentofuRequiredProvidersRule) Name() string {
 	return "opentofu_required_providers"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformRequiredProvidersRule) Enabled() bool {
+func (r *OpentofuRequiredProvidersRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformRequiredProvidersRule) Severity() tflint.Severity {
+func (r *OpentofuRequiredProvidersRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformRequiredProvidersRule) Link() string {
+func (r *OpentofuRequiredProvidersRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // config returns the rule config, with defaults
-func (r *TerraformRequiredProvidersRule) config(runner tflint.Runner) (*terraformRequiredProvidersRuleConfig, error) {
+func (r *OpentofuRequiredProvidersRule) config(runner tflint.Runner) (*terraformRequiredProvidersRuleConfig, error) {
 	config := &terraformRequiredProvidersRuleConfig{}
 
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
@@ -71,7 +71,7 @@ func (r *TerraformRequiredProvidersRule) config(runner tflint.Runner) (*terrafor
 }
 
 // Check Checks whether provider required version is set
-func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
+func (r *OpentofuRequiredProvidersRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()

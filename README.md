@@ -5,6 +5,8 @@
 
 TFLint ruleset plugin for OpenTofu Language
 
+This project is forked from https://github.com/terraform-linters/tflint-ruleset-terraform
+
 This ruleset focus on possible errors and best practices about OpenTofu Language.
 
 ## Requirements

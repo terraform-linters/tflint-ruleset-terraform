@@ -7,40 +7,40 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformDeprecatedInterpolationRule warns of deprecated interpolation in Terraform v0.11 or earlier.
-type TerraformDeprecatedInterpolationRule struct {
+// OpentofuDeprecatedInterpolationRule warns of deprecated interpolation in Opentofu v0.11 or earlier.
+type OpentofuDeprecatedInterpolationRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformDeprecatedInterpolationRule return a new rule
-func NewTerraformDeprecatedInterpolationRule() *TerraformDeprecatedInterpolationRule {
-	return &TerraformDeprecatedInterpolationRule{}
+// NewOpentofuDeprecatedInterpolationRule return a new rule
+func NewOpentofuDeprecatedInterpolationRule() *OpentofuDeprecatedInterpolationRule {
+	return &OpentofuDeprecatedInterpolationRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformDeprecatedInterpolationRule) Name() string {
+func (r *OpentofuDeprecatedInterpolationRule) Name() string {
 	return "opentofu_deprecated_interpolation"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformDeprecatedInterpolationRule) Enabled() bool {
+func (r *OpentofuDeprecatedInterpolationRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformDeprecatedInterpolationRule) Severity() tflint.Severity {
+func (r *OpentofuDeprecatedInterpolationRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformDeprecatedInterpolationRule) Link() string {
+func (r *OpentofuDeprecatedInterpolationRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check emits issues on the deprecated interpolation syntax.
-// This logic is equivalent to the warning logic implemented in Terraform.
+// This logic is equivalent to the warning logic implemented in Opentofu.
 // See https://github.com/hashicorp/terraform/blob/2ce03abe480c3f40d04bd0f289762721ea280848/configs/compat_shim.go#L144-L156
-func (r *TerraformDeprecatedInterpolationRule) Check(runner tflint.Runner) error {
+func (r *OpentofuDeprecatedInterpolationRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (r *TerraformDeprecatedInterpolationRule) Check(runner tflint.Runner) error
 
 type terraformDeprecatedInterpolationWalker struct {
 	runner       tflint.Runner
-	rule         *TerraformDeprecatedInterpolationRule
+	rule         *OpentofuDeprecatedInterpolationRule
 	contextStack []terraformDeprecatedInterpolationContext
 }
 
@@ -91,7 +91,7 @@ func (w *terraformDeprecatedInterpolationWalker) Enter(expr hcl.Expression) hcl.
 		// so we don't need to do anything further to distinguish that
 		// situation. ("normal" templates are *hclsyntax.TemplateExpr.)
 
-		const message = "Interpolation-only expressions are deprecated in Terraform v0.12.14"
+		const message = "Interpolation-only expressions are deprecated in Opentofu v0.12.14"
 		switch w.currentContext() {
 		case terraformDeprecatedInterpolationContextObjKey:
 			// This case requires a different autofix strategy is needed

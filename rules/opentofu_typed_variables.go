@@ -8,38 +8,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformTypedVariablesRule checks whether variables have a type declared
-type TerraformTypedVariablesRule struct {
+// OpentofuTypedVariablesRule checks whether variables have a type declared
+type OpentofuTypedVariablesRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformTypedVariablesRule returns a new rule
-func NewTerraformTypedVariablesRule() *TerraformTypedVariablesRule {
-	return &TerraformTypedVariablesRule{}
+// NewOpentofuTypedVariablesRule returns a new rule
+func NewOpentofuTypedVariablesRule() *OpentofuTypedVariablesRule {
+	return &OpentofuTypedVariablesRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformTypedVariablesRule) Name() string {
+func (r *OpentofuTypedVariablesRule) Name() string {
 	return "opentofu_typed_variables"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformTypedVariablesRule) Enabled() bool {
+func (r *OpentofuTypedVariablesRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformTypedVariablesRule) Severity() tflint.Severity {
+func (r *OpentofuTypedVariablesRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformTypedVariablesRule) Link() string {
+func (r *OpentofuTypedVariablesRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether variables have type
-func (r *TerraformTypedVariablesRule) Check(runner tflint.Runner) error {
+func (r *OpentofuTypedVariablesRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err

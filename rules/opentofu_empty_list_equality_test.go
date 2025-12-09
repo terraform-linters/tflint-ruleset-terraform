@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformEmptyListEqualityRule(t *testing.T) {
+func Test_OpentofuEmptyListEqualityRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -23,7 +23,7 @@ resource "aws_db_instance" "mysql" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -47,7 +47,7 @@ resource "aws_db_instance" "mysql" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -56,7 +56,7 @@ resource "aws_db_instance" "mysql" {
 					},
 				},
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -80,7 +80,7 @@ resource "aws_db_instance" "mysql" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -107,7 +107,7 @@ resource "aws_db_instance" "mysql" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -146,7 +146,7 @@ resource "aws_db_instance" "mysql" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -155,7 +155,7 @@ resource "aws_db_instance" "mysql" {
 					},
 				},
 				{
-					Rule:    NewTerraformEmptyListEqualityRule(),
+					Rule:    NewOpentofuEmptyListEqualityRule(),
 					Message: "Comparing a collection with an empty list is invalid. To detect an empty collection, check its length.",
 					Range: hcl.Range{
 						Filename: "resource.tf",
@@ -172,7 +172,7 @@ resource "aws_db_instance" "mysql" {
 		},
 	}
 
-	rule := NewTerraformEmptyListEqualityRule()
+	rule := NewOpentofuEmptyListEqualityRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

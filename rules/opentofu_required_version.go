@@ -9,38 +9,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformRequiredVersionRule checks whether a terraform version has required_version attribute
-type TerraformRequiredVersionRule struct {
+// OpentofuRequiredVersionRule checks whether a terraform version has required_version attribute
+type OpentofuRequiredVersionRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformRequiredVersionRule returns new rule with default attributes
-func NewTerraformRequiredVersionRule() *TerraformRequiredVersionRule {
-	return &TerraformRequiredVersionRule{}
+// NewOpentofuRequiredVersionRule returns new rule with default attributes
+func NewOpentofuRequiredVersionRule() *OpentofuRequiredVersionRule {
+	return &OpentofuRequiredVersionRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformRequiredVersionRule) Name() string {
+func (r *OpentofuRequiredVersionRule) Name() string {
 	return "opentofu_required_version"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformRequiredVersionRule) Enabled() bool {
+func (r *OpentofuRequiredVersionRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformRequiredVersionRule) Severity() tflint.Severity {
+func (r *OpentofuRequiredVersionRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformRequiredVersionRule) Link() string {
+func (r *OpentofuRequiredVersionRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check Checks whether required_version is set
-func (r *TerraformRequiredVersionRule) Check(runner tflint.Runner) error {
+func (r *OpentofuRequiredVersionRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (r *TerraformRequiredVersionRule) Check(runner tflint.Runner) error {
 		return err
 	}
 	if len(files) == 0 {
-		// This rule does not run on non-Terraform directory.
+		// This rule does not run on non-Opentofu directory.
 		return nil
 	}
 
@@ -125,7 +125,7 @@ func (r *TerraformRequiredVersionRule) Check(runner tflint.Runner) error {
 }
 
 // emitIssue emits issue for missing terraform require version
-func (r *TerraformRequiredVersionRule) emitIssue(missingRange hcl.Range, runner tflint.Runner) error {
+func (r *OpentofuRequiredVersionRule) emitIssue(missingRange hcl.Range, runner tflint.Runner) error {
 	return runner.EmitIssue(
 		r,
 		`terraform "required_version" attribute is required`,

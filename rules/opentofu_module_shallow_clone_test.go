@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformModuleShallowClone(t *testing.T) {
+func Test_OpentofuModuleShallowClone(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -95,7 +95,7 @@ module "ssh_pinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "git::ssh://git@github.com/hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -117,7 +117,7 @@ module "https_pinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "git::https://github.com/hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -139,7 +139,7 @@ module "github_ssh" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "git@github.com:hashicorp/consul.git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -161,7 +161,7 @@ module "github_https" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -183,7 +183,7 @@ module "bitbucket" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "bitbucket.org/hashicorp/tf-test-git?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -205,7 +205,7 @@ module "short_branch_name" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleShallowCloneRule(),
+					Rule:    NewOpentofuModuleShallowCloneRule(),
 					Message: `Module source "github.com/hashicorp/consul?ref=beta" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -221,7 +221,7 @@ module "short_branch_name" {
 		},
 	}
 
-	rule := NewTerraformModuleShallowCloneRule()
+	rule := NewOpentofuModuleShallowCloneRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

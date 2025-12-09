@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformRequiredProvidersRule(t *testing.T) {
+func Test_OpentofuRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -23,7 +23,7 @@ provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -48,7 +48,7 @@ resource "random_string" "foo" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"random\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -73,7 +73,7 @@ ephemeral "random_string" "foo" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"random\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -98,7 +98,7 @@ data "template_file" "foo" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -141,7 +141,7 @@ provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -183,7 +183,7 @@ provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -236,7 +236,7 @@ provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing `source` for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -299,7 +299,7 @@ provider "template" {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing `source` for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -314,7 +314,7 @@ provider "template" {}
 					},
 				},
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -350,7 +350,7 @@ provider "template" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -384,7 +384,7 @@ provider "template" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "provider version constraint should be specified via `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -438,7 +438,7 @@ provider "template" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "provider version constraint should be specified via `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -491,7 +491,7 @@ resource "google_compute_instance" "foo" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"google-beta\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -523,7 +523,7 @@ resource "google_compute_instance" "foo" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"google-beta\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -555,7 +555,7 @@ resource "google_compute_instance" "foo" {
 			JSON: true,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf.json",
@@ -579,7 +579,7 @@ output "foo" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Missing version constraint for provider \"time\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -620,7 +620,7 @@ terraform {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -635,7 +635,7 @@ terraform {
 					},
 				},
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Legacy version constraint for provider \"aws\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -650,7 +650,7 @@ terraform {
 					},
 				},
 				{
-					Rule:    NewTerraformRequiredProvidersRule(),
+					Rule:    NewOpentofuRequiredProvidersRule(),
 					Message: "Legacy version constraint for provider \"google\" in `required_providers`",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -698,7 +698,7 @@ terraform {
 		},
 	}
 
-	rule := NewTerraformRequiredProvidersRule()
+	rule := NewOpentofuRequiredProvidersRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

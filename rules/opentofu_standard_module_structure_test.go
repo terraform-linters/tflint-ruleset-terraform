@@ -8,7 +8,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformStandardModuleStructureRule(t *testing.T) {
+func Test_OpentofuStandardModuleStructureRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  map[string]string
@@ -26,7 +26,7 @@ func Test_TerraformStandardModuleStructureRule(t *testing.T) {
 			},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: "Module should include a main.tf file as the primary entrypoint",
 					Range: hcl.Range{
 						Filename: "main.tf",
@@ -34,7 +34,7 @@ func Test_TerraformStandardModuleStructureRule(t *testing.T) {
 					},
 				},
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: "Module should include an empty variables.tf file",
 					Range: hcl.Range{
 						Filename: "variables.tf",
@@ -42,7 +42,7 @@ func Test_TerraformStandardModuleStructureRule(t *testing.T) {
 					},
 				},
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: "Module should include an empty outputs.tf file",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
@@ -61,7 +61,7 @@ variable "v" {}
 			},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: "Module should include an empty outputs.tf file",
 					Range: hcl.Range{
 						Filename: filepath.Join("foo", "outputs.tf"),
@@ -81,7 +81,7 @@ variable "v" {}
 			},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: `variable "v" should be moved from main.tf to variables.tf`,
 					Range: hcl.Range{
 						Filename: "main.tf",
@@ -108,7 +108,7 @@ output "o" { value = null }
 			},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformStandardModuleStructureRule(),
+					Rule:    NewOpentofuStandardModuleStructureRule(),
 					Message: `output "o" should be moved from main.tf to outputs.tf`,
 					Range: hcl.Range{
 						Filename: "main.tf",
@@ -147,7 +147,7 @@ output "o" { value = null }
 		},
 	}
 
-	rule := NewTerraformStandardModuleStructureRule()
+	rule := NewOpentofuStandardModuleStructureRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformRequiredVersionRule(t *testing.T) {
+func Test_OpentofuRequiredVersionRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -25,7 +25,7 @@ terraform {}
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredVersionRule(),
+					Rule:    NewOpentofuRequiredVersionRule(),
 					Message: "terraform \"required_version\" attribute is required",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -75,7 +75,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredVersionRule(),
+					Rule:    NewOpentofuRequiredVersionRule(),
 					Message: "terraform \"required_version\" attribute is required",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -93,7 +93,7 @@ locals {
 		},
 	}
 
-	rule := NewTerraformRequiredVersionRule()
+	rule := NewOpentofuRequiredVersionRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -112,7 +112,7 @@ locals {
 	}
 }
 
-func Test_TerraformRequiredVersionRuleMultipleFiles(t *testing.T) {
+func Test_OpentofuRequiredVersionRuleMultipleFiles(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Files    []string
@@ -123,7 +123,7 @@ func Test_TerraformRequiredVersionRuleMultipleFiles(t *testing.T) {
 			Files: []string{"modules/foo/main.tf", "modules/foo/terraform.tf"},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredVersionRule(),
+					Rule:    NewOpentofuRequiredVersionRule(),
 					Message: "terraform \"required_version\" attribute is required",
 					Range: hcl.Range{
 						Filename: filepath.FromSlash("modules/foo/terraform.tf"),
@@ -144,7 +144,7 @@ func Test_TerraformRequiredVersionRuleMultipleFiles(t *testing.T) {
 			Files: []string{"modules/foo/outputs.tf", "modules/foo/main.tf", "modules/foo/variables.tf"},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredVersionRule(),
+					Rule:    NewOpentofuRequiredVersionRule(),
 					Message: "terraform \"required_version\" attribute is required",
 					Range: hcl.Range{
 						Filename: filepath.FromSlash("modules/foo/main.tf"),
@@ -165,7 +165,7 @@ func Test_TerraformRequiredVersionRuleMultipleFiles(t *testing.T) {
 			Files: []string{"modules/foo/variables.tf", "modules/foo/outputs.tf"},
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformRequiredVersionRule(),
+					Rule:    NewOpentofuRequiredVersionRule(),
 					Message: "terraform \"required_version\" attribute is required",
 					Range: hcl.Range{
 						Filename: filepath.FromSlash("modules/foo/terraform.tf"),
@@ -175,7 +175,7 @@ func Test_TerraformRequiredVersionRuleMultipleFiles(t *testing.T) {
 		},
 	}
 
-	rule := NewTerraformRequiredVersionRule()
+	rule := NewOpentofuRequiredVersionRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

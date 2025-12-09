@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformJSONSyntaxRule(t *testing.T) {
+func Test_OpentofuJSONSyntaxRule(t *testing.T) {
 	for _, tc := range []struct {
 		name     string
 		content  string
@@ -33,7 +33,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			filename: "main.tf.json",
 			expected: helper.Issues{
 				{
-					Rule:    NewTerraformJSONSyntaxRule(),
+					Rule:    NewOpentofuJSONSyntaxRule(),
 					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "main.tf.json",
@@ -85,7 +85,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			filename: "config.tf.json",
 			expected: helper.Issues{
 				{
-					Rule:    NewTerraformJSONSyntaxRule(),
+					Rule:    NewOpentofuJSONSyntaxRule(),
 					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "config.tf.json",
@@ -119,7 +119,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			filename: "multi.tf.json",
 			expected: helper.Issues{
 				{
-					Rule:    NewTerraformJSONSyntaxRule(),
+					Rule:    NewOpentofuJSONSyntaxRule(),
 					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "multi.tf.json",
@@ -151,7 +151,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 			filename: "imports.tf.json",
 			expected: helper.Issues{
 				{
-					Rule:    NewTerraformJSONSyntaxRule(),
+					Rule:    NewOpentofuJSONSyntaxRule(),
 					Message: "JSON configuration uses array syntax at root, expected object",
 					Range: hcl.Range{
 						Filename: "imports.tf.json",
@@ -176,7 +176,7 @@ func Test_TerraformJSONSyntaxRule(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			rule := NewTerraformJSONSyntaxRule()
+			rule := NewOpentofuJSONSyntaxRule()
 			runner := helper.TestRunner(t, map[string]string{tc.filename: tc.content})
 
 			if err := rule.Check(runner); err != nil {

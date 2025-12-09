@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformModulePinnedSource(t *testing.T) {
+func Test_OpentofuModulePinnedSource(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -30,7 +30,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git://hashicorp.com/consul.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -48,7 +48,7 @@ module "default_git" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git://hashicorp.com/consul.git?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -74,7 +74,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git://hashicorp.com/consul.git/subdirectory\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -100,7 +100,7 @@ module "invalid" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: `Module source "git://#{}.com" is not a valid URL`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -123,7 +123,7 @@ rule "opentofu_module_pinned_source" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git://hashicorp.com/consul.git?ref=pinned\" uses a ref which is not a semantic version string",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -167,7 +167,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -185,7 +185,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git@github.com:hashicorp/consul.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -203,7 +203,7 @@ module "default_git" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -229,7 +229,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git/subdirectory\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -255,7 +255,7 @@ module "default_git" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git/subdirectory?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -273,7 +273,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git/directory/subdirectory\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -312,7 +312,7 @@ rule "opentofu_module_pinned_source" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git?ref=pinned\" uses a ref which is not a semantic version string",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -343,7 +343,7 @@ module "unpinned" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"bitbucket.org/hashicorp/tf-test-git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -361,7 +361,7 @@ module "default_git" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"bitbucket.org/hashicorp/tf-test-git.git?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -392,7 +392,7 @@ rule "opentofu_module_pinned_source" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"bitbucket.org/hashicorp/tf-test-git.git?ref=pinned\" uses a ref which is not a semantic version string",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -424,7 +424,7 @@ module "unpinned_generic_git_https" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git::https://hashicorp.com/consul.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -443,7 +443,7 @@ module "unpinned_generic_git_ssh" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git::ssh://git@github.com/owner/repo.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -462,7 +462,7 @@ module "default_generic_git_https" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git::https://hashicorp.com/consul.git?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -481,7 +481,7 @@ module "default_generic_git_ssh" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git::ssh://git@github.com/owner/repo.git?ref=master\" uses a default branch as ref (master)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -522,7 +522,7 @@ rule "opentofu_module_pinned_source" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"github.com/hashicorp/consul.git?ref=foo\" uses a default branch as ref (foo)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -540,7 +540,7 @@ module "default_mercurial" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"hg::http://hashicorp.com/consul.hg\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -558,7 +558,7 @@ module "default_mercurial" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"hg::http://hashicorp.com/consul.hg?rev=default\" uses a default branch as rev (default)",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -589,7 +589,7 @@ rule "opentofu_module_pinned_source" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModulePinnedSourceRule(),
+					Rule:    NewOpentofuModulePinnedSourceRule(),
 					Message: "Module source \"git://hashicorp.com/consul.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -601,7 +601,7 @@ rule "opentofu_module_pinned_source" {
 		},
 	}
 
-	rule := NewTerraformModulePinnedSourceRule()
+	rule := NewOpentofuModulePinnedSourceRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

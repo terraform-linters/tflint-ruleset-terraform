@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformUnusedDeclarationsRule(t *testing.T) {
+func Test_OpentofuUnusedDeclarationsRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -24,7 +24,7 @@ output "u" { value = var.used }
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `variable "not_used" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -47,7 +47,7 @@ output "u" { value = data.null_data_source.used }
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `data "null_data_source" "not_used" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -72,7 +72,7 @@ output "u" { value = local.used }
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `local.not_used is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -191,7 +191,7 @@ variable "unused" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `variable "unused" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -212,7 +212,7 @@ check "unused" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `data "null_data_source" "unused" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -257,7 +257,7 @@ check "unused" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `variable "again" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf.json",
@@ -278,7 +278,7 @@ provider "azurerm" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `provider "azurerm" with alias "test_123" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -395,7 +395,7 @@ resource "aws_instance" "example" {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Rule:    NewOpentofuUnusedDeclarationsRule(),
 					Message: `provider "aws" with alias "east" is declared but not used`,
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -419,7 +419,7 @@ resource "aws_instance" "example" {
 		},
 	}
 
-	rule := NewTerraformUnusedDeclarationsRule()
+	rule := NewOpentofuUnusedDeclarationsRule()
 
 	for _, tc := range cases {
 		filename := "config.tf"

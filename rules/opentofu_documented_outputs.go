@@ -9,38 +9,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformDocumentedOutputsRule checks whether outputs have descriptions
-type TerraformDocumentedOutputsRule struct {
+// OpentofuDocumentedOutputsRule checks whether outputs have descriptions
+type OpentofuDocumentedOutputsRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformDocumentedOutputsRule returns a new rule
-func NewTerraformDocumentedOutputsRule() *TerraformDocumentedOutputsRule {
-	return &TerraformDocumentedOutputsRule{}
+// NewOpentofuDocumentedOutputsRule returns a new rule
+func NewOpentofuDocumentedOutputsRule() *OpentofuDocumentedOutputsRule {
+	return &OpentofuDocumentedOutputsRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformDocumentedOutputsRule) Name() string {
+func (r *OpentofuDocumentedOutputsRule) Name() string {
 	return "opentofu_documented_outputs"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformDocumentedOutputsRule) Enabled() bool {
+func (r *OpentofuDocumentedOutputsRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformDocumentedOutputsRule) Severity() tflint.Severity {
+func (r *OpentofuDocumentedOutputsRule) Severity() tflint.Severity {
 	return tflint.NOTICE
 }
 
 // Link returns the rule reference link
-func (r *TerraformDocumentedOutputsRule) Link() string {
+func (r *OpentofuDocumentedOutputsRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether outputs have descriptions
-func (r *TerraformDocumentedOutputsRule) Check(runner tflint.Runner) error {
+func (r *OpentofuDocumentedOutputsRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err

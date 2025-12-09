@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformDeprecatedLookupRule(t *testing.T) {
+func Test_OpentofuDeprecatedLookupRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -24,7 +24,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedLookupRule(),
+					Rule:    NewOpentofuDeprecatedLookupRule(),
 					Message: "Lookup with 2 arguments is deprecated",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -56,7 +56,7 @@ locals {
 `,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedLookupRule(),
+					Rule:    NewOpentofuDeprecatedLookupRule(),
 					Message: "Lookup with 2 arguments is deprecated",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -71,7 +71,7 @@ locals {
 					},
 				},
 				{
-					Rule:    NewTerraformDeprecatedLookupRule(),
+					Rule:    NewOpentofuDeprecatedLookupRule(),
 					Message: "Lookup with 2 arguments is deprecated",
 					Range: hcl.Range{
 						Filename: "config.tf",
@@ -95,7 +95,7 @@ locals {
 		},
 	}
 
-	rule := NewTerraformDeprecatedLookupRule()
+	rule := NewOpentofuDeprecatedLookupRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

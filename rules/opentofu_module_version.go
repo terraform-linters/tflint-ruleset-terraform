@@ -14,44 +14,44 @@ import (
 // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 var exactVersionRegexp = regexp.MustCompile(`^=?\s*` + `(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
 
-// TerraformModuleVersionRule checks that Terraform modules sourced from a registry specify a version
-type TerraformModuleVersionRule struct {
+// OpentofuModuleVersionRule checks that Opentofu modules sourced from a registry specify a version
+type OpentofuModuleVersionRule struct {
 	tflint.DefaultRule
 }
 
-// TerraformModuleVersionRuleConfig is the config structure for the TerraformModuleVersionRule rule
-type TerraformModuleVersionRuleConfig struct {
+// OpentofuModuleVersionRuleConfig is the config structure for the OpentofuModuleVersionRule rule
+type OpentofuModuleVersionRuleConfig struct {
 	Exact bool `hclext:"exact,optional"`
 }
 
-// NewTerraformModuleVersionRule returns a new rule
-func NewTerraformModuleVersionRule() *TerraformModuleVersionRule {
-	return &TerraformModuleVersionRule{}
+// NewOpentofuModuleVersionRule returns a new rule
+func NewOpentofuModuleVersionRule() *OpentofuModuleVersionRule {
+	return &OpentofuModuleVersionRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformModuleVersionRule) Name() string {
+func (r *OpentofuModuleVersionRule) Name() string {
 	return "opentofu_module_version"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformModuleVersionRule) Enabled() bool {
+func (r *OpentofuModuleVersionRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformModuleVersionRule) Severity() tflint.Severity {
+func (r *OpentofuModuleVersionRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformModuleVersionRule) Link() string {
+func (r *OpentofuModuleVersionRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
-// Check checks whether module source attributes resolve to a Terraform registry
+// Check checks whether module source attributes resolve to a Opentofu registry
 // If they do, it checks a version (or range) is set
-func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
+func (r *OpentofuModuleVersionRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
@@ -63,7 +63,7 @@ func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
 		return nil
 	}
 
-	config := TerraformModuleVersionRuleConfig{}
+	config := OpentofuModuleVersionRuleConfig{}
 	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+func (r *OpentofuModuleVersionRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config OpentofuModuleVersionRuleConfig) error {
 	_, err := tfaddr.ParseModuleSource(module.Source)
 	if err != nil {
 		// If parsing fails, the source does not expect to specify a version,
@@ -94,7 +94,7 @@ func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *o
 	return r.checkVersion(runner, module, config)
 }
 
-func (r *TerraformModuleVersionRule) checkVersion(runner tflint.Runner, module *opentofu.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+func (r *OpentofuModuleVersionRule) checkVersion(runner tflint.Runner, module *opentofu.ModuleCall, config OpentofuModuleVersionRuleConfig) error {
 	if module.Version == nil {
 		return runner.EmitIssue(
 			r,

@@ -13,31 +13,31 @@ import (
 )
 
 // This rule checks for map literals with duplicate keys
-type TerraformMapDuplicateKeysRule struct {
+type OpentofuMapDuplicateKeysRule struct {
 	tflint.DefaultRule
 }
 
-func NewTerraformMapDuplicateKeysRule() *TerraformMapDuplicateKeysRule {
-	return &TerraformMapDuplicateKeysRule{}
+func NewOpentofuMapDuplicateKeysRule() *OpentofuMapDuplicateKeysRule {
+	return &OpentofuMapDuplicateKeysRule{}
 }
 
-func (r *TerraformMapDuplicateKeysRule) Name() string {
+func (r *OpentofuMapDuplicateKeysRule) Name() string {
 	return "opentofu_map_duplicate_keys"
 }
 
-func (r *TerraformMapDuplicateKeysRule) Enabled() bool {
+func (r *OpentofuMapDuplicateKeysRule) Enabled() bool {
 	return true
 }
 
-func (r *TerraformMapDuplicateKeysRule) Severity() tflint.Severity {
+func (r *OpentofuMapDuplicateKeysRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
-func (r *TerraformMapDuplicateKeysRule) Link() string {
+func (r *OpentofuMapDuplicateKeysRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
-func (r *TerraformMapDuplicateKeysRule) Check(runner tflint.Runner) error {
+func (r *OpentofuMapDuplicateKeysRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (r *TerraformMapDuplicateKeysRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, runner tflint.Runner) hcl.Diagnostics {
+func (r *OpentofuMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, runner tflint.Runner) hcl.Diagnostics {
 	objExpr, ok := e.(*hclsyntax.ObjectConsExpr)
 	if !ok {
 		return nil

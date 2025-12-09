@@ -7,38 +7,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformEmptyListEqualityRule checks whether is there a comparison with an empty list
-type TerraformEmptyListEqualityRule struct {
+// OpentofuEmptyListEqualityRule checks whether is there a comparison with an empty list
+type OpentofuEmptyListEqualityRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformCommentSyntaxRule returns a new rule
-func NewTerraformEmptyListEqualityRule() *TerraformEmptyListEqualityRule {
-	return &TerraformEmptyListEqualityRule{}
+// NewOpentofuCommentSyntaxRule returns a new rule
+func NewOpentofuEmptyListEqualityRule() *OpentofuEmptyListEqualityRule {
+	return &OpentofuEmptyListEqualityRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformEmptyListEqualityRule) Name() string {
+func (r *OpentofuEmptyListEqualityRule) Name() string {
 	return "opentofu_empty_list_equality"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformEmptyListEqualityRule) Enabled() bool {
+func (r *OpentofuEmptyListEqualityRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformEmptyListEqualityRule) Severity() tflint.Severity {
+func (r *OpentofuEmptyListEqualityRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformEmptyListEqualityRule) Link() string {
+func (r *OpentofuEmptyListEqualityRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether the list is being compared with static empty list
-func (r *TerraformEmptyListEqualityRule) Check(runner tflint.Runner) error {
+func (r *OpentofuEmptyListEqualityRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (r *TerraformEmptyListEqualityRule) Check(runner tflint.Runner) error {
 }
 
 // checkEmptyList visits all blocks that can contain expressions and checks for comparisons with static empty list
-func (r *TerraformEmptyListEqualityRule) checkEmptyList(runner tflint.Runner) hcl.Diagnostics {
+func (r *OpentofuEmptyListEqualityRule) checkEmptyList(runner tflint.Runner) hcl.Diagnostics {
 	return runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
 		if binaryOpExpr, ok := expr.(*hclsyntax.BinaryOpExpr); ok && (binaryOpExpr.Op == hclsyntax.OpEqual || binaryOpExpr.Op == hclsyntax.OpNotEqual) {
 			if tupleConsExpr, ok := binaryOpExpr.LHS.(*hclsyntax.TupleConsExpr); ok && len(tupleConsExpr.Exprs) == 0 {
@@ -86,7 +86,7 @@ func (r *TerraformEmptyListEqualityRule) checkEmptyList(runner tflint.Runner) hc
 }
 
 // emitIssue emits issue for comparison with static empty list
-func (r *TerraformEmptyListEqualityRule) emitIssue(binaryOpExpr *hclsyntax.BinaryOpExpr, hs hcl.Expression, runner tflint.Runner) error {
+func (r *OpentofuEmptyListEqualityRule) emitIssue(binaryOpExpr *hclsyntax.BinaryOpExpr, hs hcl.Expression, runner tflint.Runner) error {
 	var opStr string
 	if binaryOpExpr.Op == hclsyntax.OpEqual {
 		opStr = "=="

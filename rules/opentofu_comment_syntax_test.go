@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformCommentSyntaxRule(t *testing.T) {
+func Test_OpentofuCommentSyntaxRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -34,7 +34,7 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 			Content: `// foo`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformCommentSyntaxRule(),
+					Rule:    NewOpentofuCommentSyntaxRule(),
 					Message: "Single line comments should begin with #",
 					Range: hcl.Range{
 						Filename: "variables.tf",
@@ -68,7 +68,7 @@ variable "foo" {
 		},
 	}
 
-	rule := NewTerraformCommentSyntaxRule()
+	rule := NewOpentofuCommentSyntaxRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

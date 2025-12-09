@@ -16,38 +16,38 @@ const (
 	filenameOutputs   = "outputs.tf"
 )
 
-// TerraformStandardModuleStructureRule checks whether modules adhere to Terraform's standard module structure
-type TerraformStandardModuleStructureRule struct {
+// OpentofuStandardModuleStructureRule checks whether modules adhere to Opentofu's standard module structure
+type OpentofuStandardModuleStructureRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformStandardModuleStructureRule returns a new rule
-func NewTerraformStandardModuleStructureRule() *TerraformStandardModuleStructureRule {
-	return &TerraformStandardModuleStructureRule{}
+// NewOpentofuStandardModuleStructureRule returns a new rule
+func NewOpentofuStandardModuleStructureRule() *OpentofuStandardModuleStructureRule {
+	return &OpentofuStandardModuleStructureRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformStandardModuleStructureRule) Name() string {
+func (r *OpentofuStandardModuleStructureRule) Name() string {
 	return "opentofu_standard_module_structure"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformStandardModuleStructureRule) Enabled() bool {
+func (r *OpentofuStandardModuleStructureRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformStandardModuleStructureRule) Severity() tflint.Severity {
+func (r *OpentofuStandardModuleStructureRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformStandardModuleStructureRule) Link() string {
+func (r *OpentofuStandardModuleStructureRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check emits errors for any missing files and any block types that are included in the wrong file
-func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error {
+func (r *OpentofuStandardModuleStructureRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error
 		return err
 	}
 	if len(files) == 0 {
-		// This rule does not run on non-Terraform directory.
+		// This rule does not run on non-Opentofu directory.
 		return nil
 	}
 
@@ -99,7 +99,7 @@ func (r *TerraformStandardModuleStructureRule) Check(runner tflint.Runner) error
 	return nil
 }
 
-func (r *TerraformStandardModuleStructureRule) checkFiles(runner tflint.Runner, blocks hclext.Blocks) error {
+func (r *OpentofuStandardModuleStructureRule) checkFiles(runner tflint.Runner, blocks hclext.Blocks) error {
 	onlyJSON, err := r.onlyJSON(runner)
 	if err != nil {
 		return err
@@ -161,7 +161,7 @@ func (r *TerraformStandardModuleStructureRule) checkFiles(runner tflint.Runner, 
 	return nil
 }
 
-func (r *TerraformStandardModuleStructureRule) checkVariables(runner tflint.Runner, variables hclext.Blocks) error {
+func (r *OpentofuStandardModuleStructureRule) checkVariables(runner tflint.Runner, variables hclext.Blocks) error {
 	for _, variable := range variables {
 		if filename := variable.DefRange.Filename; r.shouldMove(filename, filenameVariables) {
 			if err := runner.EmitIssue(
@@ -176,7 +176,7 @@ func (r *TerraformStandardModuleStructureRule) checkVariables(runner tflint.Runn
 	return nil
 }
 
-func (r *TerraformStandardModuleStructureRule) checkOutputs(runner tflint.Runner, outputs hclext.Blocks) error {
+func (r *OpentofuStandardModuleStructureRule) checkOutputs(runner tflint.Runner, outputs hclext.Blocks) error {
 	for _, output := range outputs {
 		if filename := output.DefRange.Filename; r.shouldMove(filename, filenameOutputs) {
 			if err := runner.EmitIssue(
@@ -191,7 +191,7 @@ func (r *TerraformStandardModuleStructureRule) checkOutputs(runner tflint.Runner
 	return nil
 }
 
-func (r *TerraformStandardModuleStructureRule) onlyJSON(runner tflint.Runner) (bool, error) {
+func (r *OpentofuStandardModuleStructureRule) onlyJSON(runner tflint.Runner) (bool, error) {
 	files, err := runner.GetFiles()
 	if err != nil {
 		return false, err
@@ -210,7 +210,7 @@ func (r *TerraformStandardModuleStructureRule) onlyJSON(runner tflint.Runner) (b
 	return true, nil
 }
 
-func (r *TerraformStandardModuleStructureRule) shouldMove(path string, expected string) bool {
+func (r *OpentofuStandardModuleStructureRule) shouldMove(path string, expected string) bool {
 	// json files are likely generated and conventional filenames do not apply
 	if filepath.Ext(path) == ".json" {
 		return false

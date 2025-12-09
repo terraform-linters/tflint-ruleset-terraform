@@ -8,7 +8,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func TestTerraformModuleVersion_Registry(t *testing.T) {
+func TestOpentofuModuleVersion_Registry(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -95,7 +95,7 @@ module "m" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleVersionRule(),
+					Rule:    NewOpentofuModuleVersionRule(),
 					Message: `module "m" should specify a version`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -112,7 +112,7 @@ module "m" {
   source = "ns/name/provider"
 	version = "1.0.0"
 }`,
-			Config:   testTerraformModuleVersionExactConfig,
+			Config:   testOpentofuModuleVersionExactConfig,
 			Expected: helper.Issues{},
 		},
 		{
@@ -122,10 +122,10 @@ module "m" {
   source = "ns/name/provider"
 	version = "1.0.0, 1.0.1"
 }`,
-			Config: testTerraformModuleVersionExactConfig,
+			Config: testOpentofuModuleVersionExactConfig,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleVersionRule(),
+					Rule:    NewOpentofuModuleVersionRule(),
 					Message: `module "m" should specify an exact version, but multiple constraints were found`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -142,10 +142,10 @@ module "m" {
   source = "ns/name/provider"
 	version = "~> 1.0.0"
 }`,
-			Config: testTerraformModuleVersionExactConfig,
+			Config: testOpentofuModuleVersionExactConfig,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleVersionRule(),
+					Rule:    NewOpentofuModuleVersionRule(),
 					Message: `module "m" should specify an exact version, but a range was found`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -162,10 +162,10 @@ module "m" {
   source = "ns/name/provider"
 	version = "1.0"
 }`,
-			Config: testTerraformModuleVersionExactConfig,
+			Config: testOpentofuModuleVersionExactConfig,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformModuleVersionRule(),
+					Rule:    NewOpentofuModuleVersionRule(),
 					Message: `module "m" should specify an exact version, but a range was found`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -177,7 +177,7 @@ module "m" {
 		},
 	}
 
-	rule := NewTerraformModuleVersionRule()
+	rule := NewOpentofuModuleVersionRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -192,7 +192,7 @@ module "m" {
 	}
 }
 
-func TestTerraformModuleVersion_NonRegistry(t *testing.T) {
+func TestOpentofuModuleVersion_NonRegistry(t *testing.T) {
 	cases := []struct {
 		Name   string
 		Source string
@@ -215,11 +215,11 @@ func TestTerraformModuleVersion_NonRegistry(t *testing.T) {
 		},
 	}
 
-	rule := NewTerraformModuleVersionRule()
+	rule := NewOpentofuModuleVersionRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			content := fmt.Sprintf(testTerraformModuleVersionNonRegistrySource, tc.Source)
+			content := fmt.Sprintf(testOpentofuModuleVersionNonRegistrySource, tc.Source)
 			runner := testRunner(t, map[string]string{"module.tf": content})
 
 			if err := rule.Check(runner); err != nil {
@@ -231,14 +231,14 @@ func TestTerraformModuleVersion_NonRegistry(t *testing.T) {
 	}
 }
 
-const testTerraformModuleVersionExactConfig = `
+const testOpentofuModuleVersionExactConfig = `
 rule "opentofu_module_version" {
 	enabled = true
 	exact = true
 }
 `
 
-const testTerraformModuleVersionNonRegistrySource = `
+const testOpentofuModuleVersionNonRegistrySource = `
 module "m" {
 	source = "%s"
 }

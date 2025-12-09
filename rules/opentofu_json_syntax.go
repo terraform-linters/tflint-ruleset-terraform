@@ -80,38 +80,38 @@ func canMergeValues(values []any) bool {
 	return true
 }
 
-// TerraformJSONSyntaxRule checks whether JSON configuration uses the official syntax
-type TerraformJSONSyntaxRule struct {
+// OpentofuJSONSyntaxRule checks whether JSON configuration uses the official syntax
+type OpentofuJSONSyntaxRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformJSONSyntaxRule returns a new rule
-func NewTerraformJSONSyntaxRule() *TerraformJSONSyntaxRule {
-	return &TerraformJSONSyntaxRule{}
+// NewOpentofuJSONSyntaxRule returns a new rule
+func NewOpentofuJSONSyntaxRule() *OpentofuJSONSyntaxRule {
+	return &OpentofuJSONSyntaxRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformJSONSyntaxRule) Name() string {
+func (r *OpentofuJSONSyntaxRule) Name() string {
 	return "opentofu_json_syntax"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformJSONSyntaxRule) Enabled() bool {
+func (r *OpentofuJSONSyntaxRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformJSONSyntaxRule) Severity() tflint.Severity {
+func (r *OpentofuJSONSyntaxRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformJSONSyntaxRule) Link() string {
+func (r *OpentofuJSONSyntaxRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether JSON configurations use object syntax at root
-func (r *TerraformJSONSyntaxRule) Check(runner tflint.Runner) error {
+func (r *OpentofuJSONSyntaxRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -134,7 +134,7 @@ func (r *TerraformJSONSyntaxRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformJSONSyntaxRule) checkJSONSyntax(runner tflint.Runner, filename string, file *hcl.File) error {
+func (r *OpentofuJSONSyntaxRule) checkJSONSyntax(runner tflint.Runner, filename string, file *hcl.File) error {
 	if !strings.HasSuffix(filename, ".tf.json") {
 		return nil
 	}

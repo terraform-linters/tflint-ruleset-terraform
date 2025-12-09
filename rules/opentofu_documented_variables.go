@@ -9,38 +9,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformDocumentedVariablesRule checks whether variables have descriptions
-type TerraformDocumentedVariablesRule struct {
+// OpentofuDocumentedVariablesRule checks whether variables have descriptions
+type OpentofuDocumentedVariablesRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformDocumentedVariablesRule returns a new rule
-func NewTerraformDocumentedVariablesRule() *TerraformDocumentedVariablesRule {
-	return &TerraformDocumentedVariablesRule{}
+// NewOpentofuDocumentedVariablesRule returns a new rule
+func NewOpentofuDocumentedVariablesRule() *OpentofuDocumentedVariablesRule {
+	return &OpentofuDocumentedVariablesRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformDocumentedVariablesRule) Name() string {
+func (r *OpentofuDocumentedVariablesRule) Name() string {
 	return "opentofu_documented_variables"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformDocumentedVariablesRule) Enabled() bool {
+func (r *OpentofuDocumentedVariablesRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformDocumentedVariablesRule) Severity() tflint.Severity {
+func (r *OpentofuDocumentedVariablesRule) Severity() tflint.Severity {
 	return tflint.NOTICE
 }
 
 // Link returns the rule reference link
-func (r *TerraformDocumentedVariablesRule) Link() string {
+func (r *OpentofuDocumentedVariablesRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether variables have descriptions
-func (r *TerraformDocumentedVariablesRule) Check(runner tflint.Runner) error {
+func (r *OpentofuDocumentedVariablesRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err

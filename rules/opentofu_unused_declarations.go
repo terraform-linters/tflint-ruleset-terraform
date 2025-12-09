@@ -13,8 +13,8 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformUnusedDeclarationsRule checks whether variables, data sources, or locals are declared but unused
-type TerraformUnusedDeclarationsRule struct {
+// OpentofuUnusedDeclarationsRule checks whether variables, data sources, or locals are declared but unused
+type OpentofuUnusedDeclarationsRule struct {
 	tflint.DefaultRule
 }
 
@@ -25,33 +25,33 @@ type declarations struct {
 	ProviderAliases map[string]*hclext.Block
 }
 
-// NewTerraformUnusedDeclarationsRule returns a new rule
-func NewTerraformUnusedDeclarationsRule() *TerraformUnusedDeclarationsRule {
-	return &TerraformUnusedDeclarationsRule{}
+// NewOpentofuUnusedDeclarationsRule returns a new rule
+func NewOpentofuUnusedDeclarationsRule() *OpentofuUnusedDeclarationsRule {
+	return &OpentofuUnusedDeclarationsRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformUnusedDeclarationsRule) Name() string {
+func (r *OpentofuUnusedDeclarationsRule) Name() string {
 	return "opentofu_unused_declarations"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformUnusedDeclarationsRule) Enabled() bool {
+func (r *OpentofuUnusedDeclarationsRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformUnusedDeclarationsRule) Severity() tflint.Severity {
+func (r *OpentofuUnusedDeclarationsRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformUnusedDeclarationsRule) Link() string {
+func (r *OpentofuUnusedDeclarationsRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check emits issues for any variables, locals, and data sources that are declared but not used
-func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
+func (r *OpentofuUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
@@ -124,7 +124,7 @@ func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformUnusedDeclarationsRule) declarations(runner *opentofu.Runner) (*declarations, error) {
+func (r *OpentofuUnusedDeclarationsRule) declarations(runner *opentofu.Runner) (*declarations, error) {
 	decl := &declarations{
 		Variables:       map[string]*hclext.Block{},
 		DataResources:   map[string]*hclext.Block{},
@@ -217,7 +217,7 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *opentofu.Runner) 
 	return decl, nil
 }
 
-func (r *TerraformUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
+func (r *OpentofuUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
 	// Check for provider alias references (e.g., aws.west in provider = aws.west)
 	if traversal, diags := hcl.AbsTraversalForExpr(expr); diags == nil && len(traversal) == 2 {
 		// Provider aliases are referenced as <provider>.<alias> (2 parts)

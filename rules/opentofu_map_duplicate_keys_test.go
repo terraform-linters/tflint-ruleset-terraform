@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformMapDuplicateKeys(t *testing.T) {
+func Test_OpentofuMapDuplicateKeys(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -37,7 +37,7 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "a", first defined at module.tf:4,9-10`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -58,7 +58,7 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "a", first defined at module.tf:4,9-10`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -84,7 +84,7 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "b", first defined at module.tf:9,4-11`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -121,7 +121,7 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "a", first defined at module.tf:4,4-5`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -130,7 +130,7 @@ resource "null_resource" "test" {
 					},
 				},
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "a", first defined at module.tf:4,4-5`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -183,7 +183,7 @@ resource "null_resource" "test" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformMapDuplicateKeysRule(),
+					Rule:    NewOpentofuMapDuplicateKeysRule(),
 					Message: `Duplicate key: "1", first defined at module.tf:4,5-6`,
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -207,7 +207,7 @@ resource "null_resource" "test" {
 		},
 	}
 
-	rule := NewTerraformMapDuplicateKeysRule()
+	rule := NewOpentofuMapDuplicateKeysRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformDocumentedOutputsRule(t *testing.T) {
+func Test_OpentofuDocumentedOutputsRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -21,7 +21,7 @@ output "endpoint" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDocumentedOutputsRule(),
+					Rule:    NewOpentofuDocumentedOutputsRule(),
 					Message: "`endpoint` output has no description",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
@@ -40,7 +40,7 @@ output "endpoint" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDocumentedOutputsRule(),
+					Rule:    NewOpentofuDocumentedOutputsRule(),
 					Message: "`endpoint` output has no description",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
@@ -61,7 +61,7 @@ output "endpoint" {
 		},
 	}
 
-	rule := NewTerraformDocumentedOutputsRule()
+	rule := NewOpentofuDocumentedOutputsRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

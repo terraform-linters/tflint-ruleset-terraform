@@ -13,8 +13,8 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformModulePinnedSourceRule checks unpinned or default version module source
-type TerraformModulePinnedSourceRule struct {
+// OpentofuModulePinnedSourceRule checks unpinned or default version module source
+type OpentofuModulePinnedSourceRule struct {
 	tflint.DefaultRule
 
 	attributeName string
@@ -25,36 +25,36 @@ type terraformModulePinnedSourceRuleConfig struct {
 	DefaultBranches []string `hclext:"default_branches,optional"`
 }
 
-// NewTerraformModulePinnedSourceRule returns new rule with default attributes
-func NewTerraformModulePinnedSourceRule() *TerraformModulePinnedSourceRule {
-	return &TerraformModulePinnedSourceRule{
+// NewOpentofuModulePinnedSourceRule returns new rule with default attributes
+func NewOpentofuModulePinnedSourceRule() *OpentofuModulePinnedSourceRule {
+	return &OpentofuModulePinnedSourceRule{
 		attributeName: "source",
 	}
 }
 
 // Name returns the rule name
-func (r *TerraformModulePinnedSourceRule) Name() string {
+func (r *OpentofuModulePinnedSourceRule) Name() string {
 	return "opentofu_module_pinned_source"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformModulePinnedSourceRule) Enabled() bool {
+func (r *OpentofuModulePinnedSourceRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformModulePinnedSourceRule) Severity() tflint.Severity {
+func (r *OpentofuModulePinnedSourceRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformModulePinnedSourceRule) Link() string {
+func (r *OpentofuModulePinnedSourceRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks if module source version is pinned
 // Note that this rule is valid only for Git or Mercurial source
-func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
+func (r *OpentofuModulePinnedSourceRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
@@ -86,7 +86,7 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
+func (r *OpentofuModulePinnedSourceRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
 	// Extract query parameters from the original source before calling getter.Detect()
 	// because go-getter may URL-encode them when there's a subdirectory path
 	originalQuery := url.Values{}
@@ -162,7 +162,7 @@ func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, modu
 	)
 }
 
-func (r *TerraformModulePinnedSourceRule) checkRevision(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig, key string, value string) error {
+func (r *OpentofuModulePinnedSourceRule) checkRevision(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig, key string, value string) error {
 	switch config.Style {
 	// The "flexible" style requires a revision that is not a default branch
 	case "flexible":

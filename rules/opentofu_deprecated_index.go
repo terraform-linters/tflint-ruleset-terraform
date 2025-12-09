@@ -10,38 +10,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformDeprecatedIndexRule warns about usage of the legacy dot syntax for indexes (foo.0)
-type TerraformDeprecatedIndexRule struct {
+// OpentofuDeprecatedIndexRule warns about usage of the legacy dot syntax for indexes (foo.0)
+type OpentofuDeprecatedIndexRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformDeprecatedIndexRule return a new rule
-func NewTerraformDeprecatedIndexRule() *TerraformDeprecatedIndexRule {
-	return &TerraformDeprecatedIndexRule{}
+// NewOpentofuDeprecatedIndexRule return a new rule
+func NewOpentofuDeprecatedIndexRule() *OpentofuDeprecatedIndexRule {
+	return &OpentofuDeprecatedIndexRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformDeprecatedIndexRule) Name() string {
+func (r *OpentofuDeprecatedIndexRule) Name() string {
 	return "opentofu_deprecated_index"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformDeprecatedIndexRule) Enabled() bool {
+func (r *OpentofuDeprecatedIndexRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformDeprecatedIndexRule) Severity() tflint.Severity {
+func (r *OpentofuDeprecatedIndexRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformDeprecatedIndexRule) Link() string {
+func (r *OpentofuDeprecatedIndexRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check walks all expressions and emit issues if deprecated index syntax is found
-func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
+func (r *OpentofuDeprecatedIndexRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (r *TerraformDeprecatedIndexRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.Runner, traversal hcl.Traversal, file []byte) hcl.Diagnostics {
+func (r *OpentofuDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.Runner, traversal hcl.Traversal, file []byte) hcl.Diagnostics {
 	for _, t := range traversal {
 		if tn, ok := t.(hcl.TraverseIndex); ok {
 			if strings.HasPrefix(string(t.SourceRange().SliceBytes(file)), ".") {
@@ -125,7 +125,7 @@ func (r *TerraformDeprecatedIndexRule) checkLegacyTraversalIndex(runner tflint.R
 	return nil
 }
 
-func (r *TerraformDeprecatedIndexRule) checkJSONExpression(runner tflint.Runner, e hcl.Expression, file []byte) hcl.Diagnostics {
+func (r *OpentofuDeprecatedIndexRule) checkJSONExpression(runner tflint.Runner, e hcl.Expression, file []byte) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
 	for _, v := range e.Variables() {

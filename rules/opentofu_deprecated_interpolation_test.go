@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformDeprecatedInterpolationRule(t *testing.T) {
+func Test_OpentofuDeprecatedInterpolationRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -22,8 +22,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 14},
@@ -44,8 +44,8 @@ provider "null" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 9},
@@ -66,8 +66,8 @@ locals {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 9},
@@ -90,8 +90,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 4, Column: 14},
@@ -122,8 +122,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 15},
@@ -152,8 +152,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 14},
@@ -161,8 +161,8 @@ resource "null_resource" "a" {
 					},
 				},
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 3, Column: 17},
@@ -185,8 +185,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 4, Column: 5},
@@ -211,8 +211,8 @@ resource "null_resource" "a" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDeprecatedInterpolationRule(),
-					Message: "Interpolation-only expressions are deprecated in Terraform v0.12.14",
+					Rule:    NewOpentofuDeprecatedInterpolationRule(),
+					Message: "Interpolation-only expressions are deprecated in Opentofu v0.12.14",
 					Range: hcl.Range{
 						Filename: "config.tf",
 						Start:    hcl.Pos{Line: 4, Column: 11},
@@ -229,7 +229,7 @@ resource "null_resource" "a" {
 		},
 	}
 
-	rule := NewTerraformDeprecatedInterpolationRule()
+	rule := NewOpentofuDeprecatedInterpolationRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

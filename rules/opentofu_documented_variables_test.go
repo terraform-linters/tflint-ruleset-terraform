@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformDocumentedVariablesRule(t *testing.T) {
+func Test_OpentofuDocumentedVariablesRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -21,7 +21,7 @@ variable "no_description" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDocumentedVariablesRule(),
+					Rule:    NewOpentofuDocumentedVariablesRule(),
 					Message: "`no_description` variable has no description",
 					Range: hcl.Range{
 						Filename: "variables.tf",
@@ -39,7 +39,7 @@ variable "empty_description" {
 }`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformDocumentedVariablesRule(),
+					Rule:    NewOpentofuDocumentedVariablesRule(),
 					Message: "`empty_description` variable has no description",
 					Range: hcl.Range{
 						Filename: "variables.tf",
@@ -59,7 +59,7 @@ variable "with_description" {
 		},
 	}
 
-	rule := NewTerraformDocumentedVariablesRule()
+	rule := NewOpentofuDocumentedVariablesRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

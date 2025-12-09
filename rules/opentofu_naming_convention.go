@@ -12,8 +12,8 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformNamingConventionRule checks whether blocks follow naming convention
-type TerraformNamingConventionRule struct {
+// OpentofuNamingConventionRule checks whether blocks follow naming convention
+type OpentofuNamingConventionRule struct {
 	tflint.DefaultRule
 }
 
@@ -51,33 +51,33 @@ type NameValidator struct {
 	Regexp        *regexp.Regexp
 }
 
-// NewTerraformNamingConventionRule returns new rule with default attributes
-func NewTerraformNamingConventionRule() *TerraformNamingConventionRule {
-	return &TerraformNamingConventionRule{}
+// NewOpentofuNamingConventionRule returns new rule with default attributes
+func NewOpentofuNamingConventionRule() *OpentofuNamingConventionRule {
+	return &OpentofuNamingConventionRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformNamingConventionRule) Name() string {
+func (r *OpentofuNamingConventionRule) Name() string {
 	return "opentofu_naming_convention"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformNamingConventionRule) Enabled() bool {
+func (r *OpentofuNamingConventionRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformNamingConventionRule) Severity() tflint.Severity {
+func (r *OpentofuNamingConventionRule) Severity() tflint.Severity {
 	return tflint.NOTICE
 }
 
 // Link returns the rule reference link
-func (r *TerraformNamingConventionRule) Link() string {
+func (r *OpentofuNamingConventionRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether blocks follow naming convention
-func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
+func (r *OpentofuNamingConventionRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
@@ -247,7 +247,7 @@ func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (validator *NameValidator) checkBlock(runner tflint.Runner, r *TerraformNamingConventionRule, blockTypeName string, blockName string, blockDeclRange *hcl.Range) error {
+func (validator *NameValidator) checkBlock(runner tflint.Runner, r *OpentofuNamingConventionRule, blockTypeName string, blockName string, blockDeclRange *hcl.Range) error {
 	if validator != nil && !validator.Regexp.MatchString(blockName) {
 		var formatType string
 		if validator.IsNamedFormat {

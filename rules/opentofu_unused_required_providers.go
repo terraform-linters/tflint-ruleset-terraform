@@ -9,38 +9,38 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformUnusedRequiredProvidersRule checks whether required providers are used in the module
-type TerraformUnusedRequiredProvidersRule struct {
+// OpentofuUnusedRequiredProvidersRule checks whether required providers are used in the module
+type OpentofuUnusedRequiredProvidersRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformUnusedRequiredProvidersRule returns new rule with default attributes
-func NewTerraformUnusedRequiredProvidersRule() *TerraformUnusedRequiredProvidersRule {
-	return &TerraformUnusedRequiredProvidersRule{}
+// NewOpentofuUnusedRequiredProvidersRule returns new rule with default attributes
+func NewOpentofuUnusedRequiredProvidersRule() *OpentofuUnusedRequiredProvidersRule {
+	return &OpentofuUnusedRequiredProvidersRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformUnusedRequiredProvidersRule) Name() string {
+func (r *OpentofuUnusedRequiredProvidersRule) Name() string {
 	return "opentofu_unused_required_providers"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformUnusedRequiredProvidersRule) Enabled() bool {
+func (r *OpentofuUnusedRequiredProvidersRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformUnusedRequiredProvidersRule) Severity() tflint.Severity {
+func (r *OpentofuUnusedRequiredProvidersRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformUnusedRequiredProvidersRule) Link() string {
+func (r *OpentofuUnusedRequiredProvidersRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
 // Check checks whether required providers are used
-func (r *TerraformUnusedRequiredProvidersRule) Check(rr tflint.Runner) error {
+func (r *OpentofuUnusedRequiredProvidersRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()

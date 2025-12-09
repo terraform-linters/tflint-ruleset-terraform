@@ -16,42 +16,42 @@ import (
 
 var gitCommitRegex = regexp.MustCompile("^[a-f0-9]{4,64}$")
 
-// TerraformModuleShallowCloneRule checks that Git-hosted Terraform modules use shallow cloning
-type TerraformModuleShallowCloneRule struct {
+// OpentofuModuleShallowCloneRule checks that Git-hosted Opentofu modules use shallow cloning
+type OpentofuModuleShallowCloneRule struct {
 	tflint.DefaultRule
 
 	attributeName string
 }
 
-// NewTerraformModuleShallowCloneRule returns new rule with default attributes
-func NewTerraformModuleShallowCloneRule() *TerraformModuleShallowCloneRule {
-	return &TerraformModuleShallowCloneRule{
+// NewOpentofuModuleShallowCloneRule returns new rule with default attributes
+func NewOpentofuModuleShallowCloneRule() *OpentofuModuleShallowCloneRule {
+	return &OpentofuModuleShallowCloneRule{
 		attributeName: "source",
 	}
 }
 
 // Name returns the rule name
-func (r *TerraformModuleShallowCloneRule) Name() string {
+func (r *OpentofuModuleShallowCloneRule) Name() string {
 	return "opentofu_module_shallow_clone"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformModuleShallowCloneRule) Enabled() bool {
+func (r *OpentofuModuleShallowCloneRule) Enabled() bool {
 	return false
 }
 
 // Severity returns the rule severity
-func (r *TerraformModuleShallowCloneRule) Severity() tflint.Severity {
+func (r *OpentofuModuleShallowCloneRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformModuleShallowCloneRule) Link() string {
+func (r *OpentofuModuleShallowCloneRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
-// Check checks if Git-hosted Terraform modules use shallow cloning
-func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
+// Check checks if Git-hosted Opentofu modules use shallow cloning
+func (r *OpentofuModuleShallowCloneRule) Check(rr tflint.Runner) error {
 	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
@@ -77,7 +77,7 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall) error {
+func (r *OpentofuModuleShallowCloneRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall) error {
 	filename := module.DefRange.Filename
 	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52

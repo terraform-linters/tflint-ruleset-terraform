@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
+func Test_OpentofuUnusedRequiredProvidersRule(t *testing.T) {
 	cases := []struct {
 		Name     string
 		Content  string
@@ -159,7 +159,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedRequiredProvidersRule(),
+					Rule:    NewOpentofuUnusedRequiredProvidersRule(),
 					Message: "provider 'null' is declared in required_providers but not used by the module",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -194,7 +194,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedRequiredProvidersRule(),
+					Rule:    NewOpentofuUnusedRequiredProvidersRule(),
 					Message: "provider 'null' is declared in required_providers but not used by the module",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -226,7 +226,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedRequiredProvidersRule(),
+					Rule:    NewOpentofuUnusedRequiredProvidersRule(),
 					Message: "provider 'null' is declared in required_providers but not used by the module",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -296,7 +296,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 			`,
 			Expected: helper.Issues{
 				{
-					Rule:    NewTerraformUnusedRequiredProvidersRule(),
+					Rule:    NewOpentofuUnusedRequiredProvidersRule(),
 					Message: "provider 'aws' is declared in required_providers but not used by the module",
 					Range: hcl.Range{
 						Filename: "module.tf",
@@ -314,7 +314,7 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 		},
 	}
 
-	rule := NewTerraformUnusedRequiredProvidersRule()
+	rule := NewOpentofuUnusedRequiredProvidersRule()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {

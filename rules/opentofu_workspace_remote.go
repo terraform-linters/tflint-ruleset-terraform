@@ -12,33 +12,33 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// TerraformWorkspaceRemoteRule warns of the use of terraform.workspace with a remote backend
-type TerraformWorkspaceRemoteRule struct {
+// OpentofuWorkspaceRemoteRule warns of the use of terraform.workspace with a remote backend
+type OpentofuWorkspaceRemoteRule struct {
 	tflint.DefaultRule
 }
 
-// NewTerraformWorkspaceRemoteRule return a new rule
-func NewTerraformWorkspaceRemoteRule() *TerraformWorkspaceRemoteRule {
-	return &TerraformWorkspaceRemoteRule{}
+// NewOpentofuWorkspaceRemoteRule return a new rule
+func NewOpentofuWorkspaceRemoteRule() *OpentofuWorkspaceRemoteRule {
+	return &OpentofuWorkspaceRemoteRule{}
 }
 
 // Name returns the rule name
-func (r *TerraformWorkspaceRemoteRule) Name() string {
+func (r *OpentofuWorkspaceRemoteRule) Name() string {
 	return "opentofu_workspace_remote"
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *TerraformWorkspaceRemoteRule) Enabled() bool {
+func (r *OpentofuWorkspaceRemoteRule) Enabled() bool {
 	return true
 }
 
 // Severity returns the rule severity
-func (r *TerraformWorkspaceRemoteRule) Severity() tflint.Severity {
+func (r *OpentofuWorkspaceRemoteRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // Link returns the rule reference link
-func (r *TerraformWorkspaceRemoteRule) Link() string {
+func (r *OpentofuWorkspaceRemoteRule) Link() string {
 	return project.ReferenceLink(r.Name())
 }
 
@@ -60,7 +60,7 @@ var tf10Versions = []*version.Version{
 
 // Check checks for a "remote" backend and if found emits issues for
 // each use of terraform.workspace in an expression.
-func (r *TerraformWorkspaceRemoteRule) Check(runner tflint.Runner) error {
+func (r *OpentofuWorkspaceRemoteRule) Check(runner tflint.Runner) error {
 	path, err := runner.GetModulePath()
 	if err != nil {
 		return err
@@ -129,7 +129,7 @@ func (r *TerraformWorkspaceRemoteRule) Check(runner tflint.Runner) error {
 	}
 
 	diags := runner.WalkExpressions(tflint.ExprWalkFunc(func(expr hcl.Expression) hcl.Diagnostics {
-		return r.checkForTerraformWorkspaceInExpr(runner, expr)
+		return r.checkForOpentofuWorkspaceInExpr(runner, expr)
 	}))
 	if diags.HasErrors() {
 		return diags
@@ -137,7 +137,7 @@ func (r *TerraformWorkspaceRemoteRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformWorkspaceRemoteRule) checkForTerraformWorkspaceInExpr(runner tflint.Runner, expr hcl.Expression) hcl.Diagnostics {
+func (r *OpentofuWorkspaceRemoteRule) checkForOpentofuWorkspaceInExpr(runner tflint.Runner, expr hcl.Expression) hcl.Diagnostics {
 	_, isScopeTraversalExpr := expr.(*hclsyntax.ScopeTraversalExpr)
 	if !isScopeTraversalExpr && !json.IsJSONExpression(expr) {
 		return nil
