@@ -28,7 +28,7 @@ func NewTerraformStandardModuleStructureRule() *TerraformStandardModuleStructure
 
 // Name returns the rule name
 func (r *TerraformStandardModuleStructureRule) Name() string {
-	return "terraform_standard_module_structure"
+	return "opentofu_standard_module_structure"
 }
 
 // Enabled returns whether the rule is enabled by default

@@ -21,7 +21,7 @@ func NewTerraformUnusedRequiredProvidersRule() *TerraformUnusedRequiredProviders
 
 // Name returns the rule name
 func (r *TerraformUnusedRequiredProvidersRule) Name() string {
-	return "terraform_unused_required_providers"
+	return "opentofu_unused_required_providers"
 }
 
 // Enabled returns whether the rule is enabled by default

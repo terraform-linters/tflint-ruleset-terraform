@@ -19,7 +19,7 @@ func NewTerraformDeprecatedLookupRule() *TerraformDeprecatedLookupRule {
 
 // Name returns the rule name
 func (r *TerraformDeprecatedLookupRule) Name() string {
-	return "terraform_deprecated_lookup"
+	return "opentofu_deprecated_lookup"
 }
 
 // Enabled returns whether the rule is enabled by default

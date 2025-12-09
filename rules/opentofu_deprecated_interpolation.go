@@ -19,7 +19,7 @@ func NewTerraformDeprecatedInterpolationRule() *TerraformDeprecatedInterpolation
 
 // Name returns the rule name
 func (r *TerraformDeprecatedInterpolationRule) Name() string {
-	return "terraform_deprecated_interpolation"
+	return "opentofu_deprecated_interpolation"
 }
 
 // Enabled returns whether the rule is enabled by default

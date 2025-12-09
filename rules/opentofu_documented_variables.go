@@ -21,7 +21,7 @@ func NewTerraformDocumentedVariablesRule() *TerraformDocumentedVariablesRule {
 
 // Name returns the rule name
 func (r *TerraformDocumentedVariablesRule) Name() string {
-	return "terraform_documented_variables"
+	return "opentofu_documented_variables"
 }
 
 // Enabled returns whether the rule is enabled by default

@@ -21,7 +21,7 @@ func NewTerraformCommentSyntaxRule() *TerraformCommentSyntaxRule {
 
 // Name returns the rule name
 func (r *TerraformCommentSyntaxRule) Name() string {
-	return "terraform_comment_syntax"
+	return "opentofu_comment_syntax"
 }
 
 // Enabled returns whether the rule is enabled by default

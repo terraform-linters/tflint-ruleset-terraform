@@ -58,7 +58,7 @@ func NewTerraformNamingConventionRule() *TerraformNamingConventionRule {
 
 // Name returns the rule name
 func (r *TerraformNamingConventionRule) Name() string {
-	return "terraform_naming_convention"
+	return "opentofu_naming_convention"
 }
 
 // Enabled returns whether the rule is enabled by default

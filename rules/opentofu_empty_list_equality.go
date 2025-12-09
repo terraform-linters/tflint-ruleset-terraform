@@ -19,7 +19,7 @@ func NewTerraformEmptyListEqualityRule() *TerraformEmptyListEqualityRule {
 
 // Name returns the rule name
 func (r *TerraformEmptyListEqualityRule) Name() string {
-	return "terraform_empty_list_equality"
+	return "opentofu_empty_list_equality"
 }
 
 // Enabled returns whether the rule is enabled by default

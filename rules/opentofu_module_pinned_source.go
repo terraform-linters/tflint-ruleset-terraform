@@ -34,7 +34,7 @@ func NewTerraformModulePinnedSourceRule() *TerraformModulePinnedSourceRule {
 
 // Name returns the rule name
 func (r *TerraformModulePinnedSourceRule) Name() string {
-	return "terraform_module_pinned_source"
+	return "opentofu_module_pinned_source"
 }
 
 // Enabled returns whether the rule is enabled by default

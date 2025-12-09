@@ -232,7 +232,7 @@ func TestTerraformModuleVersion_NonRegistry(t *testing.T) {
 }
 
 const testTerraformModuleVersionExactConfig = `
-rule "terraform_module_version" {
+rule "opentofu_module_version" {
 	enabled = true
 	exact = true
 }

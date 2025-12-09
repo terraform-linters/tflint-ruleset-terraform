@@ -32,7 +32,7 @@ func NewTerraformRequiredProvidersRule() *TerraformRequiredProvidersRule {
 
 // Name returns the rule name
 func (r *TerraformRequiredProvidersRule) Name() string {
-	return "terraform_required_providers"
+	return "opentofu_required_providers"
 }
 
 // Enabled returns whether the rule is enabled by default

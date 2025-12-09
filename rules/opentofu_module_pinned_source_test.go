@@ -117,7 +117,7 @@ module "pinned_git" {
   source = "git://hashicorp.com/consul.git?ref=pinned"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -140,7 +140,7 @@ module "pinned_git" {
   source = "git://hashicorp.com/consul.git?ref=v1.2.3"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -153,7 +153,7 @@ module "pinned_git" {
   source = "git://hashicorp.com/consul.git?ref=1.2.3"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -306,7 +306,7 @@ module "pinned_git" {
   source = "github.com/hashicorp/consul.git?ref=pinned"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -329,7 +329,7 @@ module "pinned_git" {
   source = "github.com/hashicorp/consul.git?ref=v1.2.3"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -386,7 +386,7 @@ module "pinned_git" {
   source = "bitbucket.org/hashicorp/tf-test-git.git?ref=pinned"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -409,7 +409,7 @@ module "pinned_git" {
   source = "bitbucket.org/hashicorp/tf-test-git.git?ref=v1.2.3"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "semver"
 }`,
@@ -516,7 +516,7 @@ module "pinned_git" {
   source = "github.com/hashicorp/consul.git?ref=foo"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   default_branches = ["foo"]
 }`,
@@ -583,7 +583,7 @@ module "unpinned" {
   source = "git://hashicorp.com/consul.git"
 }`,
 			Config: `
-rule "terraform_module_pinned_source" {
+rule "opentofu_module_pinned_source" {
   enabled = true
   style = "flexible"
 }`,

@@ -22,7 +22,7 @@ func NewTerraformDeprecatedIndexRule() *TerraformDeprecatedIndexRule {
 
 // Name returns the rule name
 func (r *TerraformDeprecatedIndexRule) Name() string {
-	return "terraform_deprecated_index"
+	return "opentofu_deprecated_index"
 }
 
 // Enabled returns whether the rule is enabled by default

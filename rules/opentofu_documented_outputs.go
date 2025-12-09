@@ -21,7 +21,7 @@ func NewTerraformDocumentedOutputsRule() *TerraformDocumentedOutputsRule {
 
 // Name returns the rule name
 func (r *TerraformDocumentedOutputsRule) Name() string {
-	return "terraform_documented_outputs"
+	return "opentofu_documented_outputs"
 }
 
 // Enabled returns whether the rule is enabled by default

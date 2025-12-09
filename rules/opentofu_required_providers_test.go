@@ -213,7 +213,7 @@ terraform {
 provider "template" {}
 `,
 			Config: `
-rule "terraform_required_providers" {
+rule "opentofu_required_providers" {
   enabled = true
 
   version = false
@@ -278,7 +278,7 @@ terraform {
 provider "template" {}
 `,
 			Config: `
-rule "terraform_required_providers" {
+rule "opentofu_required_providers" {
   enabled = true
 
   source = false

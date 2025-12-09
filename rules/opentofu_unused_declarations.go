@@ -32,7 +32,7 @@ func NewTerraformUnusedDeclarationsRule() *TerraformUnusedDeclarationsRule {
 
 // Name returns the rule name
 func (r *TerraformUnusedDeclarationsRule) Name() string {
-	return "terraform_unused_declarations"
+	return "opentofu_unused_declarations"
 }
 
 // Enabled returns whether the rule is enabled by default

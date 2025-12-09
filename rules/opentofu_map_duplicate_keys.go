@@ -22,7 +22,7 @@ func NewTerraformMapDuplicateKeysRule() *TerraformMapDuplicateKeysRule {
 }
 
 func (r *TerraformMapDuplicateKeysRule) Name() string {
-	return "terraform_map_duplicate_keys"
+	return "opentofu_map_duplicate_keys"
 }
 
 func (r *TerraformMapDuplicateKeysRule) Enabled() bool {

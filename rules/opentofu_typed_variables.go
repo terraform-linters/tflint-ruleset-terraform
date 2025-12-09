@@ -20,7 +20,7 @@ func NewTerraformTypedVariablesRule() *TerraformTypedVariablesRule {
 
 // Name returns the rule name
 func (r *TerraformTypedVariablesRule) Name() string {
-	return "terraform_typed_variables"
+	return "opentofu_typed_variables"
 }
 
 // Enabled returns whether the rule is enabled by default

@@ -11,14 +11,14 @@ import (
 // Data blocks
 func Test_TerraformNamingConventionRule_Data_DefaultEmpty(t *testing.T) {
 	testDataSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Data_DefaultFormat(t *testing.T) {
 	testDataMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -26,7 +26,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultCustom(t *testing.T) {
 	testDataSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -34,7 +34,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultDisabled(t *testing.T) {
 	testDataDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -42,7 +42,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultFormat_OverrideFormat(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -54,7 +54,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultFormat_OverrideCustom(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -66,7 +66,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultCustom_OverrideFormat(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -78,7 +78,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultCustom_OverrideCustom(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -90,7 +90,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -102,7 +102,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testDataSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -114,7 +114,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testDataDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   data {
@@ -125,7 +125,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testDataDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -137,7 +137,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_CustomFormats(t *testing.T) {
 	testDataSnakeCase(t, `default config (custom_format="custom_snake_case")`, "format: Custom Snake Case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format = "custom_snake_case"
 
@@ -152,7 +152,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Data_CustomFormats_OverridePredefined(t *testing.T) {
 	testDataSnakeCase(t, `default config (custom_format="snake_case")`, "format: Custom Snake Case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format = "snake_case"
 
@@ -553,14 +553,14 @@ data "aws_eip" "camelCase" {
 // Local values
 func Test_TerraformNamingConventionRule_Locals_DefaultEmpty(t *testing.T) {
 	testLocalsSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Locals_DefaultFormat(t *testing.T) {
 	testLocalsMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -568,7 +568,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultCustom(t *testing.T) {
 	testLocalsSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -576,7 +576,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultDisabled(t *testing.T) {
 	testLocalsDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -584,7 +584,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultFormat_OverrideFormat(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -596,7 +596,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultFormat_OverrideCustom(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -608,7 +608,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultCustom_OverrideFormat(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -620,7 +620,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultCustom_OverrideCustom(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -632,7 +632,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -644,7 +644,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testLocalsSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -656,7 +656,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testLocalsDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   locals {
@@ -667,7 +667,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Locals_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testLocalsDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -1039,14 +1039,14 @@ locals {
 // Module blocks
 func Test_TerraformNamingConventionRule_Module_DefaultEmpty(t *testing.T) {
 	testModuleSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Module_DefaultFormat(t *testing.T) {
 	testModuleMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -1054,7 +1054,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultCustom(t *testing.T) {
 	testModuleSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -1062,7 +1062,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultDisabled(t *testing.T) {
 	testModuleDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -1070,7 +1070,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultFormat_OverrideFormat(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -1082,7 +1082,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultFormat_OverrideCustom(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -1094,7 +1094,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultCustom_OverrideFormat(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -1106,7 +1106,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultCustom_OverrideCustom(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -1118,7 +1118,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -1130,7 +1130,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testModuleSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -1142,7 +1142,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testModuleDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   module {
@@ -1153,7 +1153,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Module_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testModuleDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -1525,14 +1525,14 @@ module "camelCase" {
 // Output blocks
 func Test_TerraformNamingConventionRule_Output_DefaultEmpty(t *testing.T) {
 	testOutputSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Output_DefaultFormat(t *testing.T) {
 	testOutputMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -1540,7 +1540,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultCustom(t *testing.T) {
 	testOutputSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -1548,7 +1548,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultDisabled(t *testing.T) {
 	testOutputDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -1556,7 +1556,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultFormat_OverrideFormat(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -1568,7 +1568,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultFormat_OverrideCustom(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -1580,7 +1580,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultCustom_OverrideFormat(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -1592,7 +1592,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultCustom_OverrideCustom(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -1604,7 +1604,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -1616,7 +1616,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testOutputSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -1628,7 +1628,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testOutputDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   output {
@@ -1639,7 +1639,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Output_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testOutputDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -2011,14 +2011,14 @@ output "camelCase" {
 // Resource blocks
 func Test_TerraformNamingConventionRule_Resource_DefaultEmpty(t *testing.T) {
 	testResourceSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Resource_DefaultFormat(t *testing.T) {
 	testResourceMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -2026,7 +2026,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultCustom(t *testing.T) {
 	testResourceSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -2034,7 +2034,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultDisabled(t *testing.T) {
 	testResourceDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -2042,7 +2042,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultFormat_OverrideFormat(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -2054,7 +2054,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultFormat_OverrideCustom(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -2066,7 +2066,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultCustom_OverrideFormat(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -2078,7 +2078,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultCustom_OverrideCustom(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -2090,7 +2090,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -2102,7 +2102,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testResourceSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -2114,7 +2114,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testResourceDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   resource {
@@ -2125,7 +2125,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Resource_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testResourceDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -2474,14 +2474,14 @@ resource "aws_eip" "camelCase" {
 // Variable blocks
 func Test_TerraformNamingConventionRule_Variable_DefaultEmpty(t *testing.T) {
 	testVariableSnakeCase(t, "default config", "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 }`)
 }
 
 func Test_TerraformNamingConventionRule_Variable_DefaultFormat(t *testing.T) {
 	testVariableMixedSnakeCase(t, `default config (format="mixed_snake_case")`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 }`)
@@ -2489,7 +2489,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultCustom(t *testing.T) {
 	testVariableSnakeCase(t, `default config (custom="^[a-z_]+$")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^[a-z][a-z]*(_[a-z]+)*$"
 }`)
@@ -2497,7 +2497,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultDisabled(t *testing.T) {
 	testVariableDisabled(t, `default config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 }`)
@@ -2505,7 +2505,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultFormat_OverrideFormat(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -2517,7 +2517,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultFormat_OverrideCustom(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "mixed_snake_case"
 
@@ -2529,7 +2529,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultCustom_OverrideFormat(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -2541,7 +2541,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultCustom_OverrideCustom(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   custom  = "^ignored$"
 
@@ -2553,7 +2553,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultDisabled_OverrideFormat(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "format: snake_case", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -2565,7 +2565,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultDisabled_OverrideCustom(t *testing.T) {
 	testVariableSnakeCase(t, `overridden config (format="snake_case")`, "RegExp: ^[a-z][a-z]*(_[a-z]+)*$", `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "none"
 
@@ -2577,7 +2577,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultEmpty_OverrideDisabled(t *testing.T) {
 	testVariableDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   variable {
@@ -2588,7 +2588,7 @@ rule "terraform_naming_convention" {
 
 func Test_TerraformNamingConventionRule_Variable_DefaultFormat_OverrideDisabled(t *testing.T) {
 	testVariableDisabled(t, `overridden config (format=null)`, `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
   format  = "snake_case"
 
@@ -2961,7 +2961,7 @@ func Test_TerraformNamingConventionRule_Check(t *testing.T) {
 	rule := NewTerraformNamingConventionRule()
 
 	config := `
-rule "terraform_naming_convention" {
+rule "opentofu_naming_convention" {
   enabled = true
 
   check {

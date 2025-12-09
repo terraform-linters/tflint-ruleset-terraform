@@ -24,7 +24,7 @@ func NewTerraformWorkspaceRemoteRule() *TerraformWorkspaceRemoteRule {
 
 // Name returns the rule name
 func (r *TerraformWorkspaceRemoteRule) Name() string {
-	return "terraform_workspace_remote"
+	return "opentofu_workspace_remote"
 }
 
 // Enabled returns whether the rule is enabled by default

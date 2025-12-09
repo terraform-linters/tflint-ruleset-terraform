@@ -92,7 +92,7 @@ func NewTerraformJSONSyntaxRule() *TerraformJSONSyntaxRule {
 
 // Name returns the rule name
 func (r *TerraformJSONSyntaxRule) Name() string {
-	return "terraform_json_syntax"
+	return "opentofu_json_syntax"
 }
 
 // Enabled returns whether the rule is enabled by default

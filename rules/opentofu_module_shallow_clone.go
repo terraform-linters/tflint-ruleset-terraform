@@ -32,7 +32,7 @@ func NewTerraformModuleShallowCloneRule() *TerraformModuleShallowCloneRule {
 
 // Name returns the rule name
 func (r *TerraformModuleShallowCloneRule) Name() string {
-	return "terraform_module_shallow_clone"
+	return "opentofu_module_shallow_clone"
 }
 
 // Enabled returns whether the rule is enabled by default

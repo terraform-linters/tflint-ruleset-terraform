@@ -21,7 +21,7 @@ func NewTerraformRequiredVersionRule() *TerraformRequiredVersionRule {
 
 // Name returns the rule name
 func (r *TerraformRequiredVersionRule) Name() string {
-	return "terraform_required_version"
+	return "opentofu_required_version"
 }
 
 // Enabled returns whether the rule is enabled by default

@@ -31,7 +31,7 @@ func NewTerraformModuleVersionRule() *TerraformModuleVersionRule {
 
 // Name returns the rule name
 func (r *TerraformModuleVersionRule) Name() string {
-	return "terraform_module_version"
+	return "opentofu_module_version"
 }
 
 // Enabled returns whether the rule is enabled by default
