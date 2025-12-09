@@ -6,7 +6,7 @@ import (
 
 	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
 	"github.com/diofeher/tflint-ruleset-opentofu/project"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/opentofu/registry-address"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
