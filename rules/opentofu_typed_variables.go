@@ -3,9 +3,9 @@ package rules
 import (
 	"fmt"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // TerraformTypedVariablesRule checks whether variables have a type declared

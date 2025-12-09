@@ -5,11 +5,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 // TerraformNamingConventionRule checks whether blocks follow naming convention
@@ -78,7 +78,7 @@ func (r *TerraformNamingConventionRule) Link() string {
 
 // Check checks whether blocks follow naming convention
 func (r *TerraformNamingConventionRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {

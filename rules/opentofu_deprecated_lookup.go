@@ -1,10 +1,10 @@
 package rules
 
 import (
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // TerraformDeprecatedLookupRule warns about usage of the legacy dot syntax for indexes (foo.0)

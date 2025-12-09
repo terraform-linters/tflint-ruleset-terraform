@@ -1,18 +1,18 @@
 package main
 
 import (
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
+	"github.com/diofeher/tflint-ruleset-opentofu/rules"
 	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/rules"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		RuleSet: &terraform.RuleSet{
+		RuleSet: &opentofu.RuleSet{
 			BuiltinRuleSet: tflint.BuiltinRuleSet{
-				Name:    "terraform",
+				Name:    "opentofu",
 				Version: project.Version,
 			},
 			PresetRules: rules.PresetRules,

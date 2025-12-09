@@ -4,10 +4,10 @@ import (
 	stdjson "encoding/json"
 	"strings"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/json"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // deepMerge recursively merges src into dst

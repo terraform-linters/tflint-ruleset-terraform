@@ -1,4 +1,4 @@
-module github.com/terraform-linters/tflint-ruleset-terraform
+module github.com/diofeher/tflint-ruleset-opentofu
 
 go 1.25.3
 

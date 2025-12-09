@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -9,7 +10,6 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/addrs"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/lang"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // TerraformWorkspaceRemoteRule warns of the use of terraform.workspace with a remote backend

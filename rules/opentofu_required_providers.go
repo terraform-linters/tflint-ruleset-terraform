@@ -3,13 +3,13 @@ package rules
 import (
 	"fmt"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	tfaddr "github.com/hashicorp/terraform-registry-address"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	tfsdk "github.com/terraform-linters/tflint-plugin-sdk/terraform"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -72,7 +72,7 @@ func (r *TerraformRequiredProvidersRule) config(runner tflint.Runner) (*terrafor
 
 // Check Checks whether provider required version is set
 func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -149,8 +149,8 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 	}
 
 	requiredProviders := hclext.Attributes{}
-	for _, terraform := range body.Blocks {
-		for _, requiredProvidersBlock := range terraform.Body.Blocks {
+	for _, opentofuBlock := range body.Blocks {
+		for _, requiredProvidersBlock := range opentofuBlock.Body.Blocks {
 			for name, attr := range requiredProvidersBlock.Body.Attributes {
 				requiredProviders[name] = attr
 			}

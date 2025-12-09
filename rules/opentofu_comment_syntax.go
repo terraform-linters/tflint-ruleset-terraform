@@ -3,10 +3,10 @@ package rules
 import (
 	"strings"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // TerraformCommentSyntaxRule checks whether comments use the preferred syntax

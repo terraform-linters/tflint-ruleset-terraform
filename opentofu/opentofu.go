@@ -1,4 +1,4 @@
-package terraform
+package opentofu
 
 import (
 	"github.com/hashicorp/go-version"

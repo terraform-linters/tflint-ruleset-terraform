@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/go-getter"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 // TerraformModulePinnedSourceRule checks unpinned or default version module source
@@ -55,7 +55,7 @@ func (r *TerraformModulePinnedSourceRule) Link() string {
 // Check checks if module source version is pinned
 // Note that this rule is valid only for Git or Mercurial source
 func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -86,7 +86,7 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
+func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
 	// Extract query parameters from the original source before calling getter.Detect()
 	// because go-getter may URL-encode them when there's a subdirectory path
 	originalQuery := url.Values{}
@@ -162,7 +162,7 @@ func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, modu
 	)
 }
 
-func (r *TerraformModulePinnedSourceRule) checkRevision(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig, key string, value string) error {
+func (r *TerraformModulePinnedSourceRule) checkRevision(runner tflint.Runner, module *opentofu.ModuleCall, config terraformModulePinnedSourceRuleConfig, key string, value string) error {
 	switch config.Style {
 	// The "flexible" style requires a revision that is not a default branch
 	case "flexible":

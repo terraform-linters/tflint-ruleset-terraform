@@ -7,11 +7,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 var gitCommitRegex = regexp.MustCompile("^[a-f0-9]{4,64}$")
@@ -52,7 +52,7 @@ func (r *TerraformModuleShallowCloneRule) Link() string {
 
 // Check checks if Git-hosted Terraform modules use shallow cloning
 func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -77,7 +77,7 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall) error {
+func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall) error {
 	filename := module.DefRange.Filename
 	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52

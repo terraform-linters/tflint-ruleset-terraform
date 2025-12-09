@@ -1,11 +1,11 @@
-# TFLint Ruleset for Terraform Language
+# TFLint Ruleset for OpenTofu Language
 [![Build Status](https://github.com/terraform-linters/tflint-ruleset-terraform/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/terraform-linters/tflint-ruleset-terraform/actions)
 [![GitHub release](https://img.shields.io/github/release/terraform-linters/tflint-ruleset-terraform.svg)](https://github.com/terraform-linters/tflint-ruleset-terraform/releases/latest)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-blue.svg)](LICENSE)
 
-TFLint ruleset plugin for Terraform Language
+TFLint ruleset plugin for OpenTofu Language
 
-This ruleset focus on possible errors and best practices about Terraform Language.
+This ruleset focus on possible errors and best practices about OpenTofu Language.
 
 ## Requirements
 
@@ -19,16 +19,16 @@ This ruleset is built into TFLint, so you usually don't need to worry about how 
 ```
 $ tflint -v
 TFLint version 0.52.0
-+ ruleset.terraform (0.8.0-bundled)
++ ruleset.opentofu (0.8.0-bundled)
 ```
 
 If you want to use a version different from the built-in version, you can declare `plugin` in `.tflint.hcl` as follows and install it with `tflint --init`:
 
 ```hcl
-plugin "terraform" {
+plugin "opentofu" {
     enabled = true
     version = "0.13.0"
-    source  = "github.com/terraform-linters/tflint-ruleset-terraform"
+    source  = "github.com/diofeher/tflint-ruleset-opentofu"
 }
 ```
 
@@ -55,7 +55,7 @@ $ make install
 Note that if you install the plugin with `make install`, you must omit the `version` and `source` attributes in` .tflint.hcl`:
 
 ```hcl
-plugin "terraform" {
+plugin "opentofu" {
     enabled = true
 }
 ```

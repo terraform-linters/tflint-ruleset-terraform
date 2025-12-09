@@ -1,4 +1,4 @@
-package terraform
+package opentofu
 
 // Config is the configuration for the ruleset.
 type Config struct {

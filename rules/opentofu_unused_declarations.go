@@ -3,14 +3,14 @@ package rules
 import (
 	"fmt"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/addrs"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/lang"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 // TerraformUnusedDeclarationsRule checks whether variables, data sources, or locals are declared but unused
@@ -21,7 +21,7 @@ type TerraformUnusedDeclarationsRule struct {
 type declarations struct {
 	Variables       map[string]*hclext.Block
 	DataResources   map[string]*hclext.Block
-	Locals          map[string]*terraform.Local
+	Locals          map[string]*opentofu.Local
 	ProviderAliases map[string]*hclext.Block
 }
 
@@ -52,7 +52,7 @@ func (r *TerraformUnusedDeclarationsRule) Link() string {
 
 // Check emits issues for any variables, locals, and data sources that are declared but not used
 func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -124,11 +124,11 @@ func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner) (*declarations, error) {
+func (r *TerraformUnusedDeclarationsRule) declarations(runner *opentofu.Runner) (*declarations, error) {
 	decl := &declarations{
 		Variables:       map[string]*hclext.Block{},
 		DataResources:   map[string]*hclext.Block{},
-		Locals:          map[string]*terraform.Local{},
+		Locals:          map[string]*opentofu.Local{},
 		ProviderAliases: map[string]*hclext.Block{},
 	}
 

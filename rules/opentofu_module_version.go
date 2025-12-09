@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/diofeher/tflint-ruleset-opentofu/opentofu"
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	tfaddr "github.com/hashicorp/terraform-registry-address"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
-	"github.com/terraform-linters/tflint-ruleset-terraform/terraform"
 )
 
 // SemVer regexp with optional leading =
@@ -52,7 +52,7 @@ func (r *TerraformModuleVersionRule) Link() string {
 // Check checks whether module source attributes resolve to a Terraform registry
 // If they do, it checks a version (or range) is set
 func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
-	runner := rr.(*terraform.Runner)
+	runner := rr.(*opentofu.Runner)
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -82,7 +82,7 @@ func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
 	return nil
 }
 
-func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *opentofu.ModuleCall, config TerraformModuleVersionRuleConfig) error {
 	_, err := tfaddr.ParseModuleSource(module.Source)
 	if err != nil {
 		// If parsing fails, the source does not expect to specify a version,
@@ -94,7 +94,7 @@ func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *t
 	return r.checkVersion(runner, module, config)
 }
 
-func (r *TerraformModuleVersionRule) checkVersion(runner tflint.Runner, module *terraform.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+func (r *TerraformModuleVersionRule) checkVersion(runner tflint.Runner, module *opentofu.ModuleCall, config TerraformModuleVersionRuleConfig) error {
 	if module.Version == nil {
 		return runner.EmitIssue(
 			r,

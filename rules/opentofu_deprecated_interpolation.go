@@ -1,10 +1,10 @@
 package rules
 
 import (
+	"github.com/diofeher/tflint-ruleset-opentofu/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/terraform-linters/tflint-ruleset-terraform/project"
 )
 
 // TerraformDeprecatedInterpolationRule warns of deprecated interpolation in Terraform v0.11 or earlier.
