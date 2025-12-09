@@ -18,7 +18,7 @@ type OpentofuRequiredProvidersRule struct {
 	tflint.DefaultRule
 }
 
-type terraformRequiredProvidersRuleConfig struct {
+type opentofuRequiredProvidersRuleConfig struct {
 	// Source specifies whether the rule should assert the presence of a `source` attribute
 	Source *bool `hclext:"source,optional"`
 	// Version specifies whether the rule should assert the presence of a `version` attribute
@@ -51,8 +51,8 @@ func (r *OpentofuRequiredProvidersRule) Link() string {
 }
 
 // config returns the rule config, with defaults
-func (r *OpentofuRequiredProvidersRule) config(runner tflint.Runner) (*terraformRequiredProvidersRuleConfig, error) {
-	config := &terraformRequiredProvidersRuleConfig{}
+func (r *OpentofuRequiredProvidersRule) config(runner tflint.Runner) (*opentofuRequiredProvidersRuleConfig, error) {
+	config := &opentofuRequiredProvidersRuleConfig{}
 
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
 		return nil, err
@@ -107,12 +107,12 @@ func (r *OpentofuRequiredProvidersRule) Check(rr tflint.Runner) error {
 
 	for _, provider := range body.Blocks {
 		if _, exists := provider.Body.Attributes["version"]; exists {
-			if err := runner.EmitIssue(
+			if runErr := runner.EmitIssue(
 				r,
 				"provider version constraint should be specified via `required_providers`",
 				provider.DefRange,
 			); err != nil {
-				return err
+				return runErr
 			}
 		}
 	}
@@ -214,6 +214,7 @@ func (r *OpentofuRequiredProvidersRule) Check(rr tflint.Runner) error {
 
 		if source, exists := vm["source"]; exists {
 			p, err := tfaddr.ParseProviderSource(source.AsString())
+
 			if err != nil {
 				return err
 			}

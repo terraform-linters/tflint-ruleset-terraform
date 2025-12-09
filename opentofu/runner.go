@@ -230,6 +230,7 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 			for _, data := range block.Body.Blocks {
 				if attr, exists := data.Body.Attributes["provider"]; exists {
 					ref, decodeDiags := decodeProviderRef(attr.Expr, data.DefRange)
+
 					diags = diags.Extend(decodeDiags)
 					if decodeDiags.HasErrors() {
 						continue
