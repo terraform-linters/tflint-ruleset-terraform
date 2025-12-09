@@ -42,7 +42,7 @@ Warning: terraform.workspace should not be used with a 'remote' backend (terrafo
   10:     workspace = terraform.workspace
   11:   }
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.5.0/docs/rules/terraform_workspace_remote.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.5.0/docs/rules/opentofu_workspace_remote.md
 ```
 
 ## Why

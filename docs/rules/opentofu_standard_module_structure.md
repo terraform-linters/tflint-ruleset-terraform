@@ -18,7 +18,7 @@ Warning: variable "v" should be moved from main.tf to variables.tf (terraform_st
   on main.tf line 1:
    1: variable "v" {}
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_standard_module_structure.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_standard_module_structure.md
 ```
 
 ## Why

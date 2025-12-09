@@ -55,21 +55,21 @@ Warning: Module source "git://hashicorp.com/consul.git" is not pinned (terraform
   on template.tf line 2:
    2:   source = "git://hashicorp.com/consul.git"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_pinned_source.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_module_pinned_source.md
 
 Warning: Module source "git://hashicorp.com/consul.git?ref=master" uses a default branch as ref (master) (terraform_module_pinned_source)
 
   on template.tf line 6:
    6:   source = "git://hashicorp.com/consul.git?ref=master"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_pinned_source.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_module_pinned_source.md
 
 Warning: Module source "hg::http://hashicorp.com/consul.hg?rev=default" uses a default branch as rev (default) (terraform_module_pinned_source)
 
   on template.tf line 10:
   10:   source = "hg::http://hashicorp.com/consul.hg?rev=default"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_pinned_source.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_module_pinned_source.md
 
 ```
 
@@ -100,14 +100,14 @@ Warning: Module source "git://hashicorp.com/consul.git" is not pinned (terraform
   on template.tf line 2:
    2:   source = "git://hashicorp.com/consul.git"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_pinned_source.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_module_pinned_source.md
 
 Warning: Module source "git://hashicorp.com/consul.git?ref=feature" uses a ref which is not a semantic version string (terraform_module_pinned_source)
 
   on template.tf line 6:
    6:   source = "git://hashicorp.com/consul.git?ref=feature"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_pinned_source.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_module_pinned_source.md
 
 ```
 

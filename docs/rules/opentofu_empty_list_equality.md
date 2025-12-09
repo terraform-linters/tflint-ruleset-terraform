@@ -25,7 +25,7 @@ Warning: Comparing a collection with an empty list is invalid. To detect an empt
   on test.tf line 5:
    5:   count = var.my_list == [] ? 0 : 1
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_empty_list_equality.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_empty_list_equality.md
  
 ```
 

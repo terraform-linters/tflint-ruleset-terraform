@@ -22,7 +22,7 @@ Warning: List items should be accessed using square brackets (terraform_deprecat
   on example.tf line 3:
    3:   value = list.0
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_deprecated_index.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_deprecated_index.md
 ```
 
 ```hcl
@@ -41,7 +41,7 @@ Warning: List items should be accessed using square brackets (terraform_deprecat
   on example.tf line 3:
    3:   value = list.*.a
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_deprecated_index.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_deprecated_index.md
 ```
 
 ## Why

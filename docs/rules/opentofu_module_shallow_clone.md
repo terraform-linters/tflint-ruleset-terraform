@@ -19,7 +19,7 @@ Warning: Module source "git::ssh://git@github.com/hashicorp/consul.git?ref=v1.0.
   on main.tf line 2:
    3:   source = "git::ssh://git@github.com/hashicorp/consul.git?ref=v1.0.0"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.13.0/docs/rules/terraform_module_shallow_clone.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.13.0/docs/rules/opentofu_module_shallow_clone.md
 ```
 
 ## Why

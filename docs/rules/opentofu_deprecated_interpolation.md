@@ -25,7 +25,7 @@ Warning: Interpolation-only expressions are deprecated in Terraform v0.12.14 (te
   on example.tf line 2:
    2:     instance_type = "${var.type}"
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_deprecated_interpolation.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_deprecated_interpolation.md
 
 ```
 

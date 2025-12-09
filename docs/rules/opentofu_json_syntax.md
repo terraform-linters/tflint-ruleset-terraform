@@ -17,7 +17,7 @@ Warning: JSON configuration uses array syntax at root, expected object (terrafor
   on main.tf.json line 1:
    1: [{"resource": {"aws_instance": {"example": {"ami": "ami-12345678"}}}}]
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_json_syntax.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_json_syntax.md
 ```
 
 ## Why

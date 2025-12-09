@@ -35,7 +35,7 @@ Warning: provider 'null' is declared in required_providers but not used by the m
    4:       source = "hashicorp/null"
    5:     }
 
-Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_unused_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/opentofu_unused_required_providers.md
 ```
 
 ## Why
