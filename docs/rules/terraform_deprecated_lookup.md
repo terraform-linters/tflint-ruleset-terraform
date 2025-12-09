@@ -22,7 +22,7 @@ Warning: [Fixable] Lookup with 2 arguments is deprecated (terraform_deprecated_l
   on main.tf line 3:
    3:   value = lookup(local.map, "a")
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.5.0/docs/rules/terraform_deprecated_lookup.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.5.0/docs/rules/terraform_deprecated_lookup.md
 ```
 
 ## Why

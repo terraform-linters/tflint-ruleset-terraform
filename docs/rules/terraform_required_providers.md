@@ -31,7 +31,7 @@ Warning: Missing version constraint for provider "template" in `required_provide
   on main.tf line 1:
    1: provider "template" {}
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_required_providers.md
 ```
 
 <hr>
@@ -51,14 +51,14 @@ Warning: provider.template: version constraint should be specified via "required
   on main.tf line 1:
    1: provider "template" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_required_providers.md
 
 Warning: Missing version constraint for provider "template" in `required_providers` (terraform_required_providers)
 
   on main.tf line 1:
    1: provider "template" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_required_providers.md
 ```
 
 <hr>
@@ -84,7 +84,7 @@ Warning: Legacy version constraint for provider "template" in `required_provider
   on main.tf line 5:
    5:     template = "~> 2"
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_required_providers.md
 ```
 
 <hr>
@@ -112,7 +112,7 @@ Warning: Missing `source` for provider "template" in `required_providers` (terra
    6:       version = "~> 2"
    7:     }
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_required_providers.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_required_providers.md
 ```
 
 ## Why

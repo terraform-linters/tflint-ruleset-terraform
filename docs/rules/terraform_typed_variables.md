@@ -27,7 +27,7 @@ Warning: `no_type` variable has no type (terraform_typed_variables)
   on template.tf line 1:
    1: variable "no_type" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_typed_variables.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_typed_variables.md
  
 ```
 

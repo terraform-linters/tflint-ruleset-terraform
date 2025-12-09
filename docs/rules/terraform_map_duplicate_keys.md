@@ -25,7 +25,7 @@ Warning: Duplicate key: "bar", first defined at main.tf:4,5-8 (terraform_map_dup
   on main.tf line 5:
    5:     bar = 3 // duplicated key
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.9.0/docs/rules/terraform_map_duplicate_keys.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.9.0/docs/rules/terraform_map_duplicate_keys.md
 ```
 
 ## Why

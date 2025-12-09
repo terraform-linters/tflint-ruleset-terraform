@@ -24,7 +24,7 @@ Warning: variable "not_used" is declared but not used (terraform_unused_declarat
   on config.tf line 1:
    1: variable "not_used" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_unused_declarations.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_unused_declarations.md
  
 ```
 

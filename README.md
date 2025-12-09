@@ -1,6 +1,6 @@
 # TFLint Ruleset for OpenTofu Language
-[![Build Status](https://github.com/terraform-linters/tflint-ruleset-terraform/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/terraform-linters/tflint-ruleset-terraform/actions)
-[![GitHub release](https://img.shields.io/github/release/terraform-linters/tflint-ruleset-terraform.svg)](https://github.com/terraform-linters/tflint-ruleset-terraform/releases/latest)
+[![Build Status](https://github.com/diofeher/tflint-ruleset-opentofu/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/diofeher/tflint-ruleset-opentofu/actions)
+[![GitHub release](https://img.shields.io/github/release/terraform-linters/tflint-ruleset-terraform.svg)](https://github.com/diofeher/tflint-ruleset-opentofu/releases/latest)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-blue.svg)](LICENSE)
 
 TFLint ruleset plugin for OpenTofu Language

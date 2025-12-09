@@ -77,7 +77,7 @@ Notice: data name `camelCase` must match the following format: snake_case (terra
   on template.tf line 1:
    1: data "aws_eip" "camelCase" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_naming_convention.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_naming_convention.md
  
 ```
 
@@ -113,7 +113,7 @@ Notice: resource name `Invalid_Name_With_Number123` must match the following Reg
   on template.tf line 1:
    1: resource "aws_eip" "Invalid_Name_With_Number123" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_naming_convention.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_naming_convention.md
  
 ```
 
@@ -155,7 +155,7 @@ Notice: resource name `Invalid_Name_With_Number123` must match the following for
   on template.tf line 1:
    1: resource "aws_eip" "Invalid_Name_With_Number123" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_naming_convention.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_naming_convention.md
  
 ```
 
@@ -199,7 +199,7 @@ Notice: module name `invalid_module_with_number_1a` must match the following Reg
   on template.tf line 9:
    9: module "invalid_module_with_number_1a" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_naming_convention.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_naming_convention.md
  
 ```
 
@@ -273,7 +273,7 @@ Notice: local value name `invalid-name` must match the following format: snake_c
   on template.tf line 12:
   12: invalid-name = "dashes are not allowed with snake_case"
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_naming_convention.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_naming_convention.md
  
 ```
 

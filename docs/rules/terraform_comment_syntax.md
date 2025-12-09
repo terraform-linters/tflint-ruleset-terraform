@@ -18,7 +18,7 @@ Warning: Single line comments should begin with # (terraform_comment_syntax)
   on main.tf line 2:
    2: // Bad
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_comment_syntax.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_comment_syntax.md
 ```
 
 ## Why

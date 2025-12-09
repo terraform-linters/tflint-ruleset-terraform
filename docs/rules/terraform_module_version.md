@@ -44,7 +44,7 @@ Warning: module "latest" should specify a version (terraform_module_version)
   on main.tf line 11:
   11: module "latest" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_module_version.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/blob/v0.1.0/docs/rules/terraform_module_version.md
 ```
 
 ### Exact
@@ -77,7 +77,7 @@ Warning: module "range" should specify an exact version, but a range was found (
   on main.tf line 8:
    8:   version = ">= 1.0.0"
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/v0.1.0/master/docs/rules/terraform_module_version.md
+Reference: https://github.com/diofeher/tflint-ruleset-opentofu/v0.1.0/master/docs/rules/terraform_module_version.md
 ```
 
 ## Why
