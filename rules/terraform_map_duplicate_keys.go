@@ -71,7 +71,7 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 		if !ok {
 			// In some edge cases, KeyExpr may not be an ObjectConsKeyExpr
 			// (e.g., in certain complex expressions). Skip these cases.
-			logger.Debug("KeyExpr is not an ObjectConsKeyExpr, skipping", "range", item.KeyExpr.Range(), "type", fmt.Sprintf("%T", item.KeyExpr))
+			logger.Debug("KeyExpr is not an ObjectConsKeyExpr, skipping", "range", item.KeyExpr.Range())
 			continue
 		}
 		var val cty.Value
