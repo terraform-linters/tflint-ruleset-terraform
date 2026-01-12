@@ -220,9 +220,11 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 func (r *TerraformUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
 	// Check for provider alias references (e.g., aws.west in provider = aws.west)
 	if traversal, diags := hcl.AbsTraversalForExpr(expr); diags == nil && len(traversal) == 2 {
-		// Provider aliases are referenced as <provider>.<alias> (2 parts)
-		providerRef := fmt.Sprintf("%s.%s", traversal.RootName(), traversal[1].(hcl.TraverseAttr).Name)
-		delete(decl.ProviderAliases, providerRef)
+		if attr, ok := traversal[1].(hcl.TraverseAttr); ok {
+			// Provider aliases are referenced as <provider>.<alias> (2 parts)
+			providerRef := fmt.Sprintf("%s.%s", traversal.RootName(), attr.Name)
+			delete(decl.ProviderAliases, providerRef)
+		}
 	}
 
 ReferenceLoop:

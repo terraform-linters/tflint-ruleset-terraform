@@ -417,6 +417,22 @@ resource "aws_instance" "example" {
 }
 `,
 		},
+		{
+			Name: "including traversal index in expression",
+			Content: `
+locals {
+  data = { for item in setproduct(
+    [true],
+    ["foo", "bar"]
+  ) : item[1] => { foo = item[0], bar = item[1] }
+  }
+}
+
+resource "null_resource" "example" {
+  count = local.data["foo"].foo ? 1 : 0
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformUnusedDeclarationsRule()
