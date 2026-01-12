@@ -67,7 +67,13 @@ func (r *TerraformMapDuplicateKeysRule) checkObjectConsExpr(e hcl.Expression, ru
 	keys := make(map[string]hcl.Range)
 
 	for _, item := range objExpr.Items {
-		expr := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
+		expr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
+		if !ok {
+			// In some edge cases, KeyExpr may not be an ObjectConsKeyExpr
+			// (e.g., in certain complex expressions). Skip these cases.
+			logger.Debug("KeyExpr is not an ObjectConsKeyExpr, skipping", "range", item.KeyExpr.Range(), "type", fmt.Sprintf("%T", item.KeyExpr))
+			continue
+		}
 		var val cty.Value
 
 		// There is an issue with the SDK's EvaluateExpr not being able to evaluate naked identifiers of map keys, so we will handle this here.

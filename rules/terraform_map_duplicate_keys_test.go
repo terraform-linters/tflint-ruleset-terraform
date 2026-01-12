@@ -205,6 +205,30 @@ resource "null_resource" "test" {
 			// The current implementation cannot find duplicate keys in for expressions.
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "setproduct with for expression",
+			Content: `
+locals {
+  data = { for item in setproduct(
+    [true],
+    ["foo", "bar"]
+  ) : item[1] => { foo = item[0], bar = item[1] }
+  }
+}`,
+			// This should not cause a panic or EOF error
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "map comprehension with indexing",
+			Content: `
+locals {
+  data = {
+    for k, v in { foo = { momo = "bar" } } : k => v["momo"]
+  }
+}`,
+			// This should not cause a panic or EOF error
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformMapDuplicateKeysRule()
