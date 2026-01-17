@@ -18,29 +18,24 @@ Warning: [Fixable] Comments should begin with # (terraform_comment_syntax)
 
   on t.tf line 2:
    2: // Bad
-   3: /* Bad */
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.14.1/docs/rules/terraform_comment_syntax.md
-
-Warning: Comments should begin with # (terraform_comment_syntax)
+Warning: [Fixable] Comments should begin with # (terraform_comment_syntax)
 
   on t.tf line 3:
    3: /* Bad */
-
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.14.1/docs/rules/terraform_comment_syntax.md
 ```
 
 ## Why
 
 The Terraform language supports two different syntaxes for single-line comments: `#` and `//` as well as `/*` `*/` for
-multiline comments. However `#` are considered to be idiomatic for both single and multi-line comments.
+multiline comments. However `#` is considered idiomatic for both single and multi-line comments.
 
 * [Configuration Syntax: Comments](https://developer.hashicorp.com/terraform/language/syntax/configuration#comments)
 * [Code Style](https://developer.hashicorp.com/terraform/language/style#code-style)
 
 ## How To Fix
 
-Replace the leading double-slash (`//`) in your comment with the number sign (`#`) for single-line comments which can
-also be fixed by running tflint with `--fix` flag. For multiline comments remove the `/*` and `*/` and put `#` at the
-start of each line of the comment. This is not fixed by tflint since multiline comments can be put inside expressions,
-so you need to move them to the end of the line or line above the expression they're in.
+Run `tflint --fix` to automatically replace `//` comments and multi-line `/* */` comments with `#` comments.
+
+Single-line `/* */` comments are not auto-fixed because they can appear mid-expression (e.g., `x = 1 /* comment */ + 2`),
+where converting to `#` would comment out the rest of the line. These must be fixed manually.
