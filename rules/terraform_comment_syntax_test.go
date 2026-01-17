@@ -21,21 +21,12 @@ func Test_TerraformCommentSyntaxRule(t *testing.T) {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "multi-line comment",
-			Content: `
-/*
-	This comment spans multiple lines
-*/			
-`,
-			Expected: helper.Issues{},
-		},
-		{
 			Name:    "double-slash comment",
 			Content: `// foo`,
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformCommentSyntaxRule(),
-					Message: "Single line comments should begin with #",
+					Message: "Comments should begin with #",
 					Range: hcl.Range{
 						Filename: "variables.tf",
 						Start: hcl.Pos{
@@ -59,6 +50,166 @@ variable "foo" {
 }
 `,
 			Expected: helper.Issues{},
+		},
+		{
+			// Single-line /* */ comments are ignored - they may be intentional
+			// inline comments within expressions (e.g., x = 1 /* comment */ + 2)
+			Name:     "single-line block comment",
+			Content:  `x = 1 /* comment */ + 2`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "multi-line comment",
+			Content: `
+/*
+	This comment spans multiple lines
+*/
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 3,
+						},
+					},
+				},
+			},
+			Fixed: `
+#
+#	This comment spans multiple lines
+#
+`,
+		},
+		{
+			Name:    "double-slash comment without space",
+			Content: `//foo`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   1,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   1,
+							Column: 6,
+						},
+					},
+				},
+			},
+			Fixed: `#foo`,
+		},
+		{
+			Name: "end-of-line double-slash comment",
+			Content: `
+variable "foo" {
+  type = string // a string
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   3,
+							Column: 17,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 1,
+						},
+					},
+				},
+			},
+			Fixed: `
+variable "foo" {
+  type = string # a string
+}
+`,
+		},
+		{
+			Name: "multi-line comment with asterisk prefix",
+			Content: `
+/*
+ * This is a comment
+ * with asterisks
+*/
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   5,
+							Column: 3,
+						},
+					},
+				},
+			},
+			Fixed: `
+#
+# * This is a comment
+# * with asterisks
+#
+`,
+		},
+		{
+			Name: "multiple comments",
+			Content: `// first
+// second`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   1,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+					},
+				},
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   2,
+							Column: 10,
+						},
+					},
+				},
+			},
+			Fixed: `# first
+# second`,
 		},
 		{
 			Name:     "JSON",

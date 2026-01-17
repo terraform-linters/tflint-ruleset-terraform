@@ -74,23 +74,48 @@ func (r *TerraformCommentSyntaxRule) checkComments(runner tflint.Runner, filenam
 	}
 
 	for _, token := range tokens {
-		if token.Type != hclsyntax.TokenComment {
+		if token.Type != hclsyntax.TokenComment || token.Bytes[0] == '#' {
 			continue
 		}
 
-		if strings.HasPrefix(string(token.Bytes), "//") {
-			if err := runner.EmitIssueWithFix(
-				r,
-				"Single line comments should begin with #",
-				token.Range,
-				func(f tflint.Fixer) error {
-					return f.ReplaceText(f.RangeTo("//", filename, token.Range.Start), "#")
-				},
-			); err != nil {
-				return err
-			}
+		if err := r.emitCommentIssue(runner, filename, token); err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+func (r *TerraformCommentSyntaxRule) emitCommentIssue(runner tflint.Runner, filename string, token hclsyntax.Token) error {
+	const message = "Comments should begin with #"
+
+	// // style comments: replace // with #
+	if token.Bytes[1] == '/' {
+		return runner.EmitIssueWithFix(r, message, token.Range, func(f tflint.Fixer) error {
+			return f.ReplaceText(f.RangeTo("//", filename, token.Range.Start), "#")
+		})
+	}
+
+	// /* */ style comments
+	comment := string(token.Bytes)
+
+	// Ignore single-line /* */ comments - they may be intentional
+	// inline comments within expressions (e.g., x = 1 /* comment */ + 2)
+	if !strings.Contains(comment, "\n") {
+		return nil
+	}
+
+	return runner.EmitIssueWithFix(r, message, token.Range, func(f tflint.Fixer) error {
+		return f.ReplaceText(token.Range, convertBlockComment(comment))
+	})
+}
+
+func convertBlockComment(comment string) string {
+	comment = strings.TrimPrefix(comment, "/*")
+	comment = strings.TrimSuffix(comment, "*/")
+	lines := strings.Split(comment, "\n")
+	for i, line := range lines {
+		lines[i] = "#" + line
+	}
+	return strings.Join(lines, "\n")
 }
