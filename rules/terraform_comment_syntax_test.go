@@ -52,11 +52,35 @@ variable "foo" {
 			Expected: helper.Issues{},
 		},
 		{
+			// Single-line /* */ comments can appear mid-expression (C-style),
+			// e.g. `x = 1 /* comment */ + 2` evaluates to 3. Autofixing to #
+			// would comment out the rest of the line, changing behavior.
+			Name:    "single-line block comment",
+			Content: `x = 1 /* comment */ + 2`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   1,
+							Column: 7,
+						},
+						End: hcl.Pos{
+							Line:   1,
+							Column: 20,
+						},
+					},
+				},
+			},
+		},
+		{
 			Name: "multi-line comment",
 			Content: `
 /*
 	This comment spans multiple lines
-*/			
+*/
 `,
 			Expected: helper.Issues{
 				{
@@ -75,6 +99,134 @@ variable "foo" {
 					},
 				},
 			},
+			Fixed: `
+#
+#	This comment spans multiple lines
+#
+`,
+		},
+		{
+			Name:    "double-slash comment without space",
+			Content: `//foo`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   1,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   1,
+							Column: 6,
+						},
+					},
+				},
+			},
+			Fixed: `#foo`,
+		},
+		{
+			Name: "end-of-line double-slash comment",
+			Content: `
+variable "foo" {
+  type = string // a string
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   3,
+							Column: 17,
+						},
+						End: hcl.Pos{
+							Line:   4,
+							Column: 1,
+						},
+					},
+				},
+			},
+			Fixed: `
+variable "foo" {
+  type = string # a string
+}
+`,
+		},
+		{
+			Name: "multi-line comment with asterisk prefix",
+			Content: `
+/*
+ * This is a comment
+ * with asterisks
+*/
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   5,
+							Column: 3,
+						},
+					},
+				},
+			},
+			Fixed: `
+#
+# * This is a comment
+# * with asterisks
+#
+`,
+		},
+		{
+			Name: "multiple comments",
+			Content: `// first
+// second`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   1,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+					},
+				},
+				{
+					Rule:    NewTerraformCommentSyntaxRule(),
+					Message: "Comments should begin with #",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start: hcl.Pos{
+							Line:   2,
+							Column: 1,
+						},
+						End: hcl.Pos{
+							Line:   2,
+							Column: 10,
+						},
+					},
+				},
+			},
+			Fixed: `# first
+# second`,
 		},
 		{
 			Name:     "JSON",
