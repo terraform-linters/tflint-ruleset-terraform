@@ -99,11 +99,10 @@ func (r *TerraformCommentSyntaxRule) emitCommentIssue(runner tflint.Runner, file
 	// /* */ style comments
 	comment := string(token.Bytes)
 
-	// Only autofix multi-line comments. Single-line /* */ comments
-	// may be inline within expressions where replacing with # would
-	// comment out the rest of the line.
+	// Ignore single-line /* */ comments - they may be intentional
+	// inline comments within expressions (e.g., x = 1 /* comment */ + 2)
 	if !strings.Contains(comment, "\n") {
-		return runner.EmitIssue(r, message, token.Range)
+		return nil
 	}
 
 	return runner.EmitIssueWithFix(r, message, token.Range, func(f tflint.Fixer) error {

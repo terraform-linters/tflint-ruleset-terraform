@@ -7,7 +7,9 @@ Enforce usage of `#` for comments.
 ```hcl
 # Good
 // Bad
-/* Bad */
+/*
+  Bad
+*/
 ```
 
 ```
@@ -22,7 +24,7 @@ Warning: [Fixable] Comments should begin with # (terraform_comment_syntax)
 Warning: [Fixable] Comments should begin with # (terraform_comment_syntax)
 
   on t.tf line 3:
-   3: /* Bad */
+   3: /*
 ```
 
 ## Why
@@ -37,5 +39,5 @@ multiline comments. However `#` is considered idiomatic for both single and mult
 
 Run `tflint --fix` to automatically replace `//` comments and multi-line `/* */` comments with `#` comments.
 
-Single-line `/* */` comments are not auto-fixed because they can appear mid-expression (e.g., `x = 1 /* comment */ + 2`),
-where converting to `#` would comment out the rest of the line. These must be fixed manually.
+Single-line `/* */` comments are ignored because they can appear mid-expression (e.g., `x = 1 /* comment */ + 2`),
+where converting to `#` would comment out the rest of the line.

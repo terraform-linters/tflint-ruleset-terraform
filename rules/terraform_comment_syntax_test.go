@@ -52,28 +52,11 @@ variable "foo" {
 			Expected: helper.Issues{},
 		},
 		{
-			// Single-line /* */ comments can appear mid-expression (C-style),
-			// e.g. `x = 1 /* comment */ + 2` evaluates to 3. Autofixing to #
-			// would comment out the rest of the line, changing behavior.
-			Name:    "single-line block comment",
-			Content: `x = 1 /* comment */ + 2`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewTerraformCommentSyntaxRule(),
-					Message: "Comments should begin with #",
-					Range: hcl.Range{
-						Filename: "variables.tf",
-						Start: hcl.Pos{
-							Line:   1,
-							Column: 7,
-						},
-						End: hcl.Pos{
-							Line:   1,
-							Column: 20,
-						},
-					},
-				},
-			},
+			// Single-line /* */ comments are ignored - they may be intentional
+			// inline comments within expressions (e.g., x = 1 /* comment */ + 2)
+			Name:     "single-line block comment",
+			Content:  `x = 1 /* comment */ + 2`,
+			Expected: helper.Issues{},
 		},
 		{
 			Name: "multi-line comment",
