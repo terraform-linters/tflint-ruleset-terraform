@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/addrs"
 	"github.com/terraform-linters/tflint-plugin-sdk/terraform/lang"
@@ -73,6 +74,10 @@ func (r *TerraformUnusedDeclarationsRule) Check(rr tflint.Runner) error {
 	}))
 	if diags.HasErrors() {
 		return diags
+	}
+
+	if err := r.removeUsedProviderAliases(runner, decl); err != nil {
+		return err
 	}
 
 	for _, variable := range decl.Variables {
@@ -215,6 +220,106 @@ func (r *TerraformUnusedDeclarationsRule) declarations(runner *terraform.Runner)
 	decl.Locals = locals
 
 	return decl, nil
+}
+
+// removeUsedProviderAliases queries resource, data, and module blocks for provider
+// references and removes matching aliases from declarations. This handles .tf.json
+// files where WalkExpressions only visits top-level attributes and doesn't recurse
+// into nested JSON objects.
+func (r *TerraformUnusedDeclarationsRule) removeUsedProviderAliases(runner *terraform.Runner, decl *declarations) error {
+	if len(decl.ProviderAliases) == 0 {
+		return nil
+	}
+
+	body, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{{Name: "provider"}},
+				},
+			},
+			{
+				Type:       "data",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{{Name: "provider"}},
+				},
+			},
+			{
+				Type:       "check",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Blocks: []hclext.BlockSchema{
+						{
+							Type:       "data",
+							LabelNames: []string{"type", "name"},
+							Body: &hclext.BodySchema{
+								Attributes: []hclext.AttributeSchema{{Name: "provider"}},
+							},
+						},
+					},
+				},
+			},
+			{
+				Type:       "module",
+				LabelNames: []string{"name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{{Name: "providers"}},
+				},
+			},
+		},
+	}, &tflint.GetModuleContentOption{ExpandMode: tflint.ExpandModeNone})
+	if err != nil {
+		return err
+	}
+
+	for _, block := range body.Blocks {
+		switch block.Type {
+		case "resource", "data":
+			if attr, exists := block.Body.Attributes["provider"]; exists {
+				deleteProviderAliasFromExpr(attr.Expr, decl)
+			}
+		case "check":
+			for _, data := range block.Body.Blocks {
+				if attr, exists := data.Body.Attributes["provider"]; exists {
+					deleteProviderAliasFromExpr(attr.Expr, decl)
+				}
+			}
+		case "module":
+			if attr, exists := block.Body.Attributes["providers"]; exists {
+				pairs, diags := hcl.ExprMap(attr.Expr)
+				if diags.HasErrors() {
+					continue
+				}
+				for _, pair := range pairs {
+					deleteProviderAliasFromExpr(pair.Value, decl)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// deleteProviderAliasFromExpr parses a provider reference from an expression and
+// removes it from declarations. It handles both native HCL traversals (aws.west)
+// and JSON string literals ("aws.west").
+func deleteProviderAliasFromExpr(expr hcl.Expression, decl *declarations) {
+	traversal, diags := hcl.AbsTraversalForExpr(expr)
+	if diags != nil {
+		var str string
+		if diags := gohcl.DecodeExpression(expr, nil, &str); !diags.HasErrors() {
+			traversal, _ = hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{})
+		}
+	}
+	if len(traversal) == 2 {
+		if attr, ok := traversal[1].(hcl.TraverseAttr); ok {
+			providerRef := fmt.Sprintf("%s.%s", traversal.RootName(), attr.Name)
+			delete(decl.ProviderAliases, providerRef)
+		}
+	}
 }
 
 func (r *TerraformUnusedDeclarationsRule) checkForRefsInExpr(expr hcl.Expression, decl *declarations) {
