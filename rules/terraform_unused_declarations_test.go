@@ -352,14 +352,14 @@ provider "aws" {
 }
 
 check "health" {
-  data "http" "example" {
+  data "aws_s3_bucket" "example" {
     provider = aws.west
-    url      = "https://example.com"
+    bucket   = "my-bucket"
   }
 }
 
-output "url" {
-  value = data.http.example.url
+output "bucket" {
+  value = data.aws_s3_bucket.example.arn
 }
 `,
 			Expected: helper.Issues{},
