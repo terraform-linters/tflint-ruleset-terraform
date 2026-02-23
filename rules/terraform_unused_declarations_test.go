@@ -344,6 +344,27 @@ module "example" {
 			Expected: helper.Issues{},
 		},
 		{
+			Name: "used provider alias in check data source",
+			Content: `
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+check "health" {
+  data "aws_s3_bucket" "example" {
+    provider = aws.west
+    bucket   = "my-bucket"
+  }
+}
+
+output "bucket" {
+  value = data.aws_s3_bucket.example.arn
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
 			Name: "provider without alias is not checked",
 			Content: `
 provider "aws" {
@@ -416,6 +437,139 @@ resource "aws_instance" "example" {
   ami      = "ami-12345"
 }
 `,
+		},
+		{
+			Name: "json with unused provider alias",
+			JSON: true,
+			Content: `
+{
+  "provider": {
+    "aws": [{
+      "alias": "west",
+      "region": "us-west-2"
+    }]
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `provider "aws" with alias "west" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf.json",
+						Start:    hcl.Pos{Line: 4, Column: 12},
+						End:      hcl.Pos{Line: 4, Column: 13},
+					},
+				},
+			},
+		},
+		{
+			Name: "json with used provider alias in resource",
+			JSON: true,
+			Content: `
+{
+  "provider": {
+    "aws": [{
+      "alias": "west",
+      "region": "us-west-2"
+    }]
+  },
+  "resource": {
+    "aws_instance": {
+      "example": {
+        "provider": "aws.west",
+        "ami": "ami-12345"
+      }
+    }
+  }
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "json with used provider alias in data source",
+			JSON: true,
+			Content: `
+{
+  "provider": {
+    "aws": [{
+      "alias": "west",
+      "region": "us-west-2"
+    }]
+  },
+  "data": {
+    "aws_ami": {
+      "example": {
+        "provider": "aws.west",
+        "most_recent": true
+      }
+    }
+  },
+  "output": {
+    "ami": {
+      "value": "${data.aws_ami.example.id}"
+    }
+  }
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "json with used provider alias in module",
+			JSON: true,
+			Content: `
+{
+  "provider": {
+    "aws": [{
+      "alias": "west",
+      "region": "us-west-2"
+    }]
+  },
+  "module": {
+    "example": {
+      "source": "./module",
+      "providers": {
+        "aws": "aws.west"
+      }
+    }
+  }
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "json with multiple provider aliases one unused",
+			JSON: true,
+			Content: `
+{
+  "provider": {
+    "aws": [
+      {
+        "alias": "east",
+        "region": "us-east-1"
+      },
+      {
+        "alias": "west",
+        "region": "us-west-2"
+      }
+    ]
+  },
+  "resource": {
+    "aws_instance": {
+      "example": {
+        "provider": "aws.west",
+        "ami": "ami-12345"
+      }
+    }
+  }
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformUnusedDeclarationsRule(),
+					Message: `provider "aws" with alias "east" is declared but not used`,
+					Range: hcl.Range{
+						Filename: "config.tf.json",
+						Start:    hcl.Pos{Line: 4, Column: 12},
+						End:      hcl.Pos{Line: 4, Column: 13},
+					},
+				},
+			},
 		},
 		{
 			Name: "including traversal index in expression",
