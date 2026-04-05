@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/go-getter v1.8.5
-	github.com/hashicorp/go-version v1.8.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/hashicorp/terraform-registry-address v0.4.0
 	github.com/terraform-linters/tflint-plugin-sdk v0.24.0
