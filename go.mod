@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/hashicorp/terraform-registry-address v0.4.0
 	github.com/terraform-linters/tflint-plugin-sdk v0.24.0
-	github.com/zclconf/go-cty v1.18.0
+	github.com/zclconf/go-cty v1.18.1
 )
 
 require (
