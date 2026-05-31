@@ -54,15 +54,6 @@ func (r *TerraformModuleVersionRule) Link() string {
 func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
 	runner := rr.(*terraform.Runner)
 
-	path, err := runner.GetModulePath()
-	if err != nil {
-		return err
-	}
-	if !path.IsRoot() {
-		// This rule does not evaluate child modules.
-		return nil
-	}
-
 	config := TerraformModuleVersionRuleConfig{}
 	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
 		return err
@@ -83,6 +74,10 @@ func (r *TerraformModuleVersionRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+	if !module.SourceKnown {
+		return nil
+	}
+
 	_, err := tfaddr.ParseModuleSource(module.Source)
 	if err != nil {
 		// If parsing fails, the source does not expect to specify a version,
@@ -95,6 +90,10 @@ func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *t
 }
 
 func (r *TerraformModuleVersionRule) checkVersion(runner tflint.Runner, module *terraform.ModuleCall, config TerraformModuleVersionRuleConfig) error {
+	if !module.VersionKnown {
+		return nil
+	}
+
 	if module.Version == nil {
 		return runner.EmitIssue(
 			r,

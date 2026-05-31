@@ -599,6 +599,38 @@ rule "terraform_module_pinned_source" {
 				},
 			},
 		},
+		{
+			Name: "module source with known variable",
+			Content: `
+variable "module_source" {
+  default = "git://hashicorp.com/consul.git"
+}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"git://hashicorp.com/consul.git\" is not pinned",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 7, Column: 12},
+						End:      hcl.Pos{Line: 7, Column: 29},
+					},
+				},
+			},
+		},
+		{
+			Name: "module source with unknown variable",
+			Content: `
+variable "module_source" {}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModulePinnedSourceRule()

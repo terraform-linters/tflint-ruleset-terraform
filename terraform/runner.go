@@ -51,7 +51,7 @@ func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	}
 
 	for _, block := range body.Blocks {
-		call, decodeDiags := decodeModuleCall(block)
+		call, decodeDiags := decodeModuleCall(r, block)
 		diags = diags.Extend(decodeDiags)
 		if decodeDiags.HasErrors() {
 			continue

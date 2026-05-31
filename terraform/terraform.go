@@ -3,23 +3,24 @@ package terraform
 import (
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"github.com/zclconf/go-cty/cty"
 )
 
 // ModuleCall represents a "module" block.
 type ModuleCall struct {
-	Name        string
-	DefRange    hcl.Range
-	Source      string
-	SourceAttr  *hclext.Attribute
-	Version     version.Constraints
-	VersionAttr *hclext.Attribute
+	Name         string
+	DefRange     hcl.Range
+	Source       string
+	SourceKnown  bool
+	SourceAttr   *hclext.Attribute
+	Version      version.Constraints
+	VersionKnown bool
+	VersionAttr  *hclext.Attribute
 }
 
-// @see https://github.com/hashicorp/terraform/blob/v1.2.7/internal/configs/module_call.go#L36-L224
-func decodeModuleCall(block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
+func decodeModuleCall(runner *Runner, block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 	module := &ModuleCall{
 		Name:     block.Labels[0],
 		DefRange: block.DefRange,
@@ -28,17 +29,34 @@ func decodeModuleCall(block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 
 	if source, exists := block.Body.Attributes["source"]; exists {
 		module.SourceAttr = source
-		sourceDiags := gohcl.DecodeExpression(source.Expr, nil, &module.Source)
+
+		sourceVal, sourceKnown, sourceNull, sourceDiags := evalModuleAttribute(runner, source.Expr)
+		module.Source = sourceVal
+		module.SourceKnown = sourceKnown
+		if sourceNull {
+			module.SourceAttr = nil
+		}
 		diags = diags.Extend(sourceDiags)
+	} else {
+		module.SourceKnown = true
 	}
 
 	if versionAttr, exists := block.Body.Attributes["version"]; exists {
 		module.VersionAttr = versionAttr
 
-		var versionVal string
-		versionDiags := gohcl.DecodeExpression(versionAttr.Expr, nil, &versionVal)
+		versionVal, versionKnown, versionNull, versionDiags := evalModuleAttribute(runner, versionAttr.Expr)
 		diags = diags.Extend(versionDiags)
 		if diags.HasErrors() {
+			return module, diags
+		}
+
+		if !versionKnown {
+			return module, diags
+		}
+		module.VersionKnown = true
+
+		if versionNull {
+			module.VersionAttr = nil
 			return module, diags
 		}
 
@@ -52,9 +70,42 @@ func decodeModuleCall(block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 			})
 		}
 		module.Version = constraints
+	} else {
+		module.VersionKnown = true
 	}
 
 	return module, diags
+}
+
+func evalModuleAttribute(runner *Runner, expr hcl.Expression) (val string, known bool, null bool, diags hcl.Diagnostics) {
+	var ret cty.Value
+	err := runner.EvaluateExpr(expr, &ret, nil)
+	if err != nil {
+		return "", false, false, hcl.Diagnostics{{
+			Severity: hcl.DiagError,
+			Summary:  "Failed to evaluate expression",
+			Detail:   err.Error(),
+			Subject:  expr.Range().Ptr(),
+		}}
+	}
+
+	// sensitive values are treated as unknown
+	if !ret.IsKnown() || ret.IsMarked() {
+		return "", false, false, nil
+	}
+	if ret.IsNull() {
+		return "", true, true, nil
+	}
+	if ret.Type() != cty.String {
+		return "", true, false, hcl.Diagnostics{{
+			Severity: hcl.DiagError,
+			Summary:  "Expected a string",
+			Detail:   "The expression should evaluate to a string.",
+			Subject:  expr.Range().Ptr(),
+		}}
+	}
+
+	return ret.AsString(), true, false, nil
 }
 
 // Local represents a single entry from a "locals" block.

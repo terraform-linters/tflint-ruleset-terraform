@@ -175,6 +175,69 @@ module "m" {
 				},
 			},
 		},
+		{
+			Name: "with known variables",
+			Content: `
+variable "source" {
+  default = "ns/name/provider"
+}
+variable "version" {
+  default = "1.0.0"
+}
+
+module "m" {
+  source  = var.source
+  version = var.version
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "with null version variable",
+			Content: `
+variable "source" {
+  default = "ns/name/provider"
+}
+variable "version" {
+  default = null
+}
+
+module "m" {
+  source  = var.source
+  version = var.version
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleVersionRule(),
+					Message: `module "m" should specify a version`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 9, Column: 1},
+						End:      hcl.Pos{Line: 9, Column: 11},
+					},
+				},
+			},
+		},
+		{
+			Name: "with unknown source variable",
+			Content: `
+variable "source" {}
+
+module "m" {
+  source  = var.source
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "with unknown version variable",
+			Content: `
+variable "version" {}
+
+module "m" {
+  source  = "ns/name/provider"
+  version = var.version
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModuleVersionRule()
