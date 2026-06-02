@@ -219,6 +219,38 @@ module "short_branch_name" {
   source = "github.com/hashicorp/consul?depth=1&ref=beta"
 }`,
 		},
+		{
+			Name: "module source with known variable",
+			Content: `
+variable "module_source" {
+  default = "github.com/hashicorp/consul?ref=v1.0.0"
+}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 7, Column: 12},
+						End:      hcl.Pos{Line: 7, Column: 29},
+					},
+				},
+			},
+		},
+		{
+			Name: "module source with unknown variable",
+			Content: `
+variable "module_source" {}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModuleShallowCloneRule()

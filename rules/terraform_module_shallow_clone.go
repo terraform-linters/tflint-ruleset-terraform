@@ -54,15 +54,6 @@ func (r *TerraformModuleShallowCloneRule) Link() string {
 func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 	runner := rr.(*terraform.Runner)
 
-	path, err := runner.GetModulePath()
-	if err != nil {
-		return err
-	}
-	if !path.IsRoot() {
-		// This rule does not evaluate child modules.
-		return nil
-	}
-
 	calls, diags := runner.GetModuleCalls()
 	if diags.HasErrors() {
 		return diags
@@ -78,6 +69,10 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall) error {
+	if !module.SourceKnown {
+		return nil
+	}
+
 	filename := module.DefRange.Filename
 	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52
@@ -144,6 +139,11 @@ func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, modu
 		fmt.Sprintf(`Module source %q should enable shallow cloning by adding "depth=1" parameter`, module.Source),
 		exprRange,
 		func(f tflint.Fixer) error {
+			// Cannot apply autofix if the source contains variables
+			if len(module.SourceAttr.Expr.Variables()) > 0 {
+				return tflint.ErrFixNotSupported
+			}
+
 			// Find the position of "ref=" in the source string
 			refPos := strings.Index(module.Source, "ref=")
 			if refPos == -1 {

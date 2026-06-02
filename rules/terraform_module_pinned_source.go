@@ -57,15 +57,6 @@ func (r *TerraformModulePinnedSourceRule) Link() string {
 func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 	runner := rr.(*terraform.Runner)
 
-	path, err := runner.GetModulePath()
-	if err != nil {
-		return err
-	}
-	if !path.IsRoot() {
-		// This rule does not evaluate child modules.
-		return nil
-	}
-
 	config := terraformModulePinnedSourceRuleConfig{Style: "flexible"}
 	config.DefaultBranches = append(config.DefaultBranches, "master", "main", "default", "develop")
 	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
@@ -87,6 +78,10 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
+	if !module.SourceKnown {
+		return nil
+	}
+
 	// Extract query parameters from the original source before calling getter.Detect()
 	// because go-getter may URL-encode them when there's a subdirectory path
 	originalQuery := url.Values{}
