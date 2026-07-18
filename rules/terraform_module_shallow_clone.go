@@ -69,7 +69,7 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall) error {
-	if !module.SourceKnown {
+	if !module.SourceKnown || module.SourceAttr == nil {
 		return nil
 	}
 

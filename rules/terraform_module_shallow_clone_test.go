@@ -251,6 +251,33 @@ module "dynamic" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "module source is null",
+			Content: `
+module "null_source" {
+  source = null
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "module source with null variable",
+			Content: `
+variable "module_source" {
+  default = null
+}
+
+module "null_var" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "module without source",
+			Content: `
+module "no_source" {
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModuleShallowCloneRule()

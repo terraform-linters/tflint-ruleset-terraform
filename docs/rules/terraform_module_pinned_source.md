@@ -117,6 +117,16 @@ Terraform allows you to source modules from source control repositories. If you 
 
 Pinning to a mutable reference, such as a branch, still allows for unintended breaking changes. Semver style can help avoid this.
 
+## Unresolved sources
+
+This rule only checks modules whose `source` resolves to a concrete Git or Mercurial address. It stays silent for modules whose source is not such an address, including:
+
+* an unknown value (for example an unset variable or a sensitive value),
+* a `null` value, and
+* a missing `source` attribute.
+
+These are not versionable Git/Mercurial sources, so there is nothing to pin. A missing or otherwise invalid `source` is already reported by `terraform validate`, so this rule does not emit a duplicate diagnostic.
+
 ## How To Fix
 
 Specify a version pin.  For git repositories, it should not be "master". For Mercurial repositories, it should not be "default".

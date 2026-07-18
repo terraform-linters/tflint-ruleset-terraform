@@ -30,6 +30,16 @@ When sourcing a Terraform module from a Git repository by tag or branch, enablin
 
 Shallow cloning only includes the most recent commit for a reference. Because it uses the `--branch` argument to `git clone`, it can only be used for named branches and tags, not raw commit IDs.
 
+## Unresolved sources
+
+This rule only checks modules whose `source` resolves to a concrete Git address. It stays silent for modules whose source is not such an address, including:
+
+* an unknown value (for example an unset variable or a sensitive value),
+* a `null` value, and
+* a missing `source` attribute.
+
+These are not Git sources that can be shallow cloned. A missing or otherwise invalid `source` is already reported by `terraform validate`, so this rule does not emit a duplicate diagnostic.
+
 ## How To Fix
 
 Add the `depth=1` query parameter to enable shallow cloning.
