@@ -30,6 +30,23 @@ When sourcing a Terraform module from a Git repository by tag or branch, enablin
 
 Shallow cloning only includes the most recent commit for a reference. Because it uses the `--branch` argument to `git clone`, it can only be used for named branches and tags, not raw commit IDs.
 
+## Dynamic Sources
+
+Since Terraform v1.15, `source` can be an [expression](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates the expression and checks the address it produces.
+
+```hcl
+variable "module_source" {
+  type  = string
+  const = true
+}
+
+module "consul" {
+  source = var.module_source
+}
+```
+
+A module is skipped when the expression does not produce an address: the variable may have no value, as above, or its value may be `null`. Terraform reports both during `terraform init`, so this rule stays silent instead of duplicating the error.
+
 ## How To Fix
 
 Add the `depth=1` query parameter to enable shallow cloning.

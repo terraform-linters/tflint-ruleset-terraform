@@ -78,7 +78,7 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
-	if !module.SourceKnown {
+	if !module.SourceKnown || module.SourceAttr == nil {
 		return nil
 	}
 

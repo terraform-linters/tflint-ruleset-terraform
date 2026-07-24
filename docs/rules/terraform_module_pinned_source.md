@@ -117,6 +117,23 @@ Terraform allows you to source modules from source control repositories. If you 
 
 Pinning to a mutable reference, such as a branch, still allows for unintended breaking changes. Semver style can help avoid this.
 
+## Dynamic Sources
+
+Since Terraform v1.15, `source` can be an [expression](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates the expression and checks the address it produces.
+
+```hcl
+variable "module_source" {
+  type  = string
+  const = true
+}
+
+module "consul" {
+  source = var.module_source
+}
+```
+
+A module is skipped when the expression does not produce an address: the variable may have no value, as above, or its value may be `null`. Terraform reports both during `terraform init`, so this rule stays silent instead of duplicating the error.
+
 ## How To Fix
 
 Specify a version pin.  For git repositories, it should not be "master". For Mercurial repositories, it should not be "default".
