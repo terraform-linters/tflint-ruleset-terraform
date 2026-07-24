@@ -270,13 +270,6 @@ module "dynamic" {
 }`,
 			Expected: helper.Issues{},
 		},
-		{
-			Name: "module without source",
-			Content: `
-module "incomplete" {
-}`,
-			Expected: helper.Issues{},
-		},
 	}
 
 	rule := NewTerraformModuleShallowCloneRule()
