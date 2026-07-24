@@ -30,15 +30,22 @@ When sourcing a Terraform module from a Git repository by tag or branch, enablin
 
 Shallow cloning only includes the most recent commit for a reference. Because it uses the `--branch` argument to `git clone`, it can only be used for named branches and tags, not raw commit IDs.
 
-## Unresolved sources
+## Dynamic Sources
 
-This rule only checks modules whose `source` resolves to a concrete Git address. It stays silent for modules whose source is not such an address, including:
+Since Terraform v1.15, `source` can be an [expression](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates the expression and checks the address it produces.
 
-* an unknown value (for example an unset variable or a sensitive value),
-* a `null` value, and
-* a missing `source` attribute.
+```hcl
+variable "module_source" {
+  type  = string
+  const = true
+}
 
-These are not Git sources that can be shallow cloned. A missing or otherwise invalid `source` is already reported by `terraform validate`, so this rule does not emit a duplicate diagnostic.
+module "consul" {
+  source = var.module_source
+}
+```
+
+A module is skipped when the expression does not produce an address: the variable may have no value, as above, or its value may be `null`. Terraform reports both during `terraform init`, so this rule stays silent instead of duplicating the error.
 
 ## How To Fix
 
