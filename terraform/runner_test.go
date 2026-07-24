@@ -41,8 +41,7 @@ module "server" {
 						Start:    hcl.Pos{Line: 2, Column: 1},
 						End:      hcl.Pos{Line: 2, Column: 16},
 					},
-					Source:      "./server",
-					SourceKnown: true,
+					Source: "./server",
 					SourceAttr: &hclext.Attribute{
 						Name: "source",
 						Expr: parseExpr(t, `"./server"`, hcl.Pos{Line: 3, Column: 12}),
@@ -57,7 +56,6 @@ module "server" {
 							End:      hcl.Pos{Line: 3, Column: 9},
 						},
 					},
-					VersionKnown: true,
 				},
 			},
 		},
@@ -76,8 +74,7 @@ module "vpc" {
 						Start:    hcl.Pos{Line: 2, Column: 1},
 						End:      hcl.Pos{Line: 2, Column: 13},
 					},
-					Source:      "terraform-aws-modules/vpc/aws",
-					SourceKnown: true,
+					Source: "terraform-aws-modules/vpc/aws",
 					SourceAttr: &hclext.Attribute{
 						Name: "source",
 						Expr: parseExpr(t, `"terraform-aws-modules/vpc/aws"`, hcl.Pos{Line: 3, Column: 13}),
@@ -92,8 +89,7 @@ module "vpc" {
 							End:      hcl.Pos{Line: 3, Column: 9},
 						},
 					},
-					Version:      version.MustConstraints(version.NewConstraint("3.14.2")),
-					VersionKnown: true,
+					Version: version.MustConstraints(version.NewConstraint("3.14.2")),
 					VersionAttr: &hclext.Attribute{
 						Name: "version",
 						Expr: parseExpr(t, `"3.14.2"`, hcl.Pos{Line: 4, Column: 13}),
@@ -115,9 +111,13 @@ module "vpc" {
 			name: "known variables",
 			content: `
 variable "source" {
+  type    = string
+  const   = true
   default = "terraform-aws-modules/vpc/aws"
 }
 variable "version" {
+  type    = string
+  const   = true
   default = "3.14.2"
 }
 
@@ -130,39 +130,37 @@ module "vpc" {
 					Name: "vpc",
 					DefRange: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 9, Column: 1},
-						End:      hcl.Pos{Line: 9, Column: 13},
+						Start:    hcl.Pos{Line: 13, Column: 1},
+						End:      hcl.Pos{Line: 13, Column: 13},
 					},
-					Source:      "terraform-aws-modules/vpc/aws",
-					SourceKnown: true,
+					Source: "terraform-aws-modules/vpc/aws",
 					SourceAttr: &hclext.Attribute{
 						Name: "source",
-						Expr: parseExpr(t, `var.source`, hcl.Pos{Line: 10, Column: 13}),
+						Expr: parseExpr(t, `var.source`, hcl.Pos{Line: 14, Column: 13}),
 						Range: hcl.Range{
 							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 10, Column: 3},
-							End:      hcl.Pos{Line: 10, Column: 23},
+							Start:    hcl.Pos{Line: 14, Column: 3},
+							End:      hcl.Pos{Line: 14, Column: 23},
 						},
 						NameRange: hcl.Range{
 							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 10, Column: 3},
-							End:      hcl.Pos{Line: 10, Column: 9},
+							Start:    hcl.Pos{Line: 14, Column: 3},
+							End:      hcl.Pos{Line: 14, Column: 9},
 						},
 					},
-					Version:      version.MustConstraints(version.NewConstraint("3.14.2")),
-					VersionKnown: true,
+					Version: version.MustConstraints(version.NewConstraint("3.14.2")),
 					VersionAttr: &hclext.Attribute{
 						Name: "version",
-						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 11, Column: 13}),
+						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 15, Column: 13}),
 						Range: hcl.Range{
 							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 11, Column: 3},
-							End:      hcl.Pos{Line: 11, Column: 24},
+							Start:    hcl.Pos{Line: 15, Column: 3},
+							End:      hcl.Pos{Line: 15, Column: 24},
 						},
 						NameRange: hcl.Range{
 							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 11, Column: 3},
-							End:      hcl.Pos{Line: 11, Column: 10},
+							Start:    hcl.Pos{Line: 15, Column: 3},
+							End:      hcl.Pos{Line: 15, Column: 10},
 						},
 					},
 				},
@@ -171,127 +169,46 @@ module "vpc" {
 		{
 			name: "unknown variables",
 			content: `
-variable "source" {}
-variable "version" {}
-
-module "vpc" {
-  source  = var.source
-  version = var.version
-}`,
-			want: []*ModuleCall{
-				{
-					Name: "vpc",
-					DefRange: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 5, Column: 1},
-						End:      hcl.Pos{Line: 5, Column: 13},
-					},
-					Source:      "",
-					SourceKnown: false,
-					SourceAttr: &hclext.Attribute{
-						Name: "source",
-						Expr: parseExpr(t, `var.source`, hcl.Pos{Line: 6, Column: 13}),
-						Range: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 6, Column: 3},
-							End:      hcl.Pos{Line: 6, Column: 23},
-						},
-						NameRange: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 6, Column: 3},
-							End:      hcl.Pos{Line: 6, Column: 9},
-						},
-					},
-					Version:      nil,
-					VersionKnown: false,
-					VersionAttr: &hclext.Attribute{
-						Name: "version",
-						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 7, Column: 13}),
-						Range: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 7, Column: 3},
-							End:      hcl.Pos{Line: 7, Column: 24},
-						},
-						NameRange: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 7, Column: 3},
-							End:      hcl.Pos{Line: 7, Column: 10},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "sensitive variables",
-			content: `
 variable "source" {
-  default   = "terraform-aws-modules/vpc/aws"
-  sensitive = true
+  type  = string
+  const = true
 }
 variable "version" {
-  default   = "3.14.2"
-  sensitive = true
+  type  = string
+  const = true
 }
 
 module "vpc" {
   source  = var.source
   version = var.version
 }`,
-			want: []*ModuleCall{
-				{
-					Name: "vpc",
-					DefRange: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 11, Column: 1},
-						End:      hcl.Pos{Line: 11, Column: 13},
-					},
-					Source:      "",
-					SourceKnown: false,
-					SourceAttr: &hclext.Attribute{
-						Name: "source",
-						Expr: parseExpr(t, `var.source`, hcl.Pos{Line: 12, Column: 13}),
-						Range: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 12, Column: 3},
-							End:      hcl.Pos{Line: 12, Column: 23},
-						},
-						NameRange: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 12, Column: 3},
-							End:      hcl.Pos{Line: 12, Column: 9},
-						},
-					},
-					Version:      nil,
-					VersionKnown: false,
-					VersionAttr: &hclext.Attribute{
-						Name: "version",
-						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 13, Column: 13}),
-						Range: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 13, Column: 3},
-							End:      hcl.Pos{Line: 13, Column: 24},
-						},
-						NameRange: hcl.Range{
-							Filename: "main.tf",
-							Start:    hcl.Pos{Line: 13, Column: 3},
-							End:      hcl.Pos{Line: 13, Column: 10},
-						},
-					},
-				},
-			},
+			want: []*ModuleCall{},
 		},
 		{
-			name: "null variables",
+			name: "null source variable",
 			content: `
 variable "source" {
-  default = null
-}
-variable "version" {
+  type    = string
+  const   = true
   default = null
 }
 
 module "vpc" {
-  source  = var.source
+  source = var.source
+}`,
+			want: []*ModuleCall{},
+		},
+		{
+			name: "null version variable",
+			content: `
+variable "version" {
+  type    = string
+  const   = true
+  default = null
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
   version = var.version
 }`,
 			want: []*ModuleCall{
@@ -299,15 +216,39 @@ module "vpc" {
 					Name: "vpc",
 					DefRange: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 9, Column: 1},
-						End:      hcl.Pos{Line: 9, Column: 13},
+						Start:    hcl.Pos{Line: 8, Column: 1},
+						End:      hcl.Pos{Line: 8, Column: 13},
 					},
-					Source:       "",
-					SourceKnown:  true,
-					SourceAttr:   nil,
-					Version:      nil,
-					VersionKnown: true,
-					VersionAttr:  nil,
+					Source: "terraform-aws-modules/vpc/aws",
+					SourceAttr: &hclext.Attribute{
+						Name: "source",
+						Expr: parseExpr(t, `"terraform-aws-modules/vpc/aws"`, hcl.Pos{Line: 9, Column: 13}),
+						Range: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 44},
+						},
+						NameRange: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 9},
+						},
+					},
+					Version: nil,
+					VersionAttr: &hclext.Attribute{
+						Name: "version",
+						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 10, Column: 13}),
+						Range: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 10, Column: 3},
+							End:      hcl.Pos{Line: 10, Column: 24},
+						},
+						NameRange: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 10, Column: 3},
+							End:      hcl.Pos{Line: 10, Column: 10},
+						},
+					},
 				},
 			},
 		},

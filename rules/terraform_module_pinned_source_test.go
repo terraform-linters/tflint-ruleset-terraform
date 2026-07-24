@@ -603,6 +603,8 @@ rule "terraform_module_pinned_source" {
 			Name: "module source with known variable",
 			Content: `
 variable "module_source" {
+  type    = string
+  const   = true
   default = "git://hashicorp.com/consul.git"
 }
 
@@ -615,8 +617,8 @@ module "dynamic" {
 					Message: "Module source \"git://hashicorp.com/consul.git\" is not pinned",
 					Range: hcl.Range{
 						Filename: "module.tf",
-						Start:    hcl.Pos{Line: 7, Column: 12},
-						End:      hcl.Pos{Line: 7, Column: 29},
+						Start:    hcl.Pos{Line: 9, Column: 12},
+						End:      hcl.Pos{Line: 9, Column: 29},
 					},
 				},
 			},
@@ -624,7 +626,24 @@ module "dynamic" {
 		{
 			Name: "module source with unknown variable",
 			Content: `
-variable "module_source" {}
+variable "module_source" {
+  type  = string
+  const = true
+}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "module source with null variable",
+			Content: `
+variable "module_source" {
+  type    = string
+  const   = true
+  default = null
+}
 
 module "dynamic" {
   source = var.module_source

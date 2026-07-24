@@ -6,82 +6,80 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 )
 
 // ModuleCall represents a "module" block.
 type ModuleCall struct {
-	Name         string
-	DefRange     hcl.Range
-	Source       string
-	SourceKnown  bool
-	SourceAttr   *hclext.Attribute
-	Version      version.Constraints
-	VersionKnown bool
-	VersionAttr  *hclext.Attribute
+	Name        string
+	DefRange    hcl.Range
+	Source      string
+	SourceAttr  *hclext.Attribute
+	Version     version.Constraints
+	VersionAttr *hclext.Attribute
 }
 
+// decodeModuleCall evaluates a module block's source and version, mirroring
+// how Terraform evaluates them when loading the configuration: anything that
+// does not produce a known, non-null string is rejected, except a null
+// version, which is treated as unset. A call Terraform would reject is
+// returned as nil with no diagnostics.
 func decodeModuleCall(runner *Runner, block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
+	source, exists := block.Body.Attributes["source"]
+	if !exists {
+		return nil, nil
+	}
+
 	module := &ModuleCall{
-		Name:     block.Labels[0],
-		DefRange: block.DefRange,
+		Name:       block.Labels[0],
+		DefRange:   block.DefRange,
+		SourceAttr: source,
 	}
-	diags := hcl.Diagnostics{}
 
-	if source, exists := block.Body.Attributes["source"]; exists {
-		module.SourceAttr = source
-
-		sourceVal, sourceKnown, sourceNull, sourceDiags := evalModuleAttribute(runner, source.Expr)
-		module.Source = sourceVal
-		module.SourceKnown = sourceKnown
-		if sourceNull {
-			module.SourceAttr = nil
-		}
-		diags = diags.Extend(sourceDiags)
-	} else {
-		module.SourceKnown = true
+	sourceVal, sourceDiags := evalModuleAttribute(runner, source.Expr)
+	if sourceDiags.HasErrors() {
+		return nil, sourceDiags
 	}
+	if !sourceVal.IsKnown() || sourceVal.IsMarked() || sourceVal.IsNull() {
+		return nil, nil
+	}
+	module.Source = sourceVal.AsString()
 
 	if versionAttr, exists := block.Body.Attributes["version"]; exists {
 		module.VersionAttr = versionAttr
 
-		versionVal, versionKnown, versionNull, versionDiags := evalModuleAttribute(runner, versionAttr.Expr)
-		diags = diags.Extend(versionDiags)
-		if diags.HasErrors() {
-			return module, diags
+		versionVal, versionDiags := evalModuleAttribute(runner, versionAttr.Expr)
+		if versionDiags.HasErrors() {
+			return nil, versionDiags
+		}
+		if !versionVal.IsKnown() || versionVal.IsMarked() {
+			return nil, nil
+		}
+		if versionVal.IsNull() {
+			return module, nil
 		}
 
-		if !versionKnown {
-			return module, diags
-		}
-		module.VersionKnown = true
-
-		if versionNull {
-			module.VersionAttr = nil
-			return module, diags
-		}
-
-		constraints, err := version.NewConstraint(versionVal)
+		constraints, err := version.NewConstraint(versionVal.AsString())
 		if err != nil {
-			diags = append(diags, &hcl.Diagnostic{
+			return module, hcl.Diagnostics{{
 				Severity: hcl.DiagError,
 				Summary:  "Invalid version constraint",
 				Detail:   "This string does not use correct version constraint syntax.",
 				Subject:  versionAttr.Expr.Range().Ptr(),
-			})
+			}}
 		}
 		module.Version = constraints
-	} else {
-		module.VersionKnown = true
 	}
 
-	return module, diags
+	return module, nil
 }
 
-func evalModuleAttribute(runner *Runner, expr hcl.Expression) (val string, known bool, null bool, diags hcl.Diagnostics) {
-	var ret cty.Value
-	err := runner.EvaluateExpr(expr, &ret, nil)
-	if err != nil {
-		return "", false, false, hcl.Diagnostics{{
+// evalModuleAttribute evaluates an expression to a string-typed cty.Value,
+// which may be unknown, marked, or null.
+func evalModuleAttribute(runner *Runner, expr hcl.Expression) (cty.Value, hcl.Diagnostics) {
+	var val cty.Value
+	if err := runner.EvaluateExpr(expr, &val, nil); err != nil {
+		return cty.NilVal, hcl.Diagnostics{{
 			Severity: hcl.DiagError,
 			Summary:  "Failed to evaluate expression",
 			Detail:   err.Error(),
@@ -89,15 +87,9 @@ func evalModuleAttribute(runner *Runner, expr hcl.Expression) (val string, known
 		}}
 	}
 
-	// sensitive values are treated as unknown
-	if !ret.IsKnown() || ret.IsMarked() {
-		return "", false, false, nil
-	}
-	if ret.IsNull() {
-		return "", true, true, nil
-	}
-	if ret.Type() != cty.String {
-		return "", true, false, hcl.Diagnostics{{
+	converted, err := convert.Convert(val, cty.String)
+	if err != nil {
+		return cty.NilVal, hcl.Diagnostics{{
 			Severity: hcl.DiagError,
 			Summary:  "Expected a string",
 			Detail:   "The expression should evaluate to a string.",
@@ -105,7 +97,7 @@ func evalModuleAttribute(runner *Runner, expr hcl.Expression) (val string, known
 		}}
 	}
 
-	return ret.AsString(), true, false, nil
+	return converted, nil
 }
 
 // Local represents a single entry from a "locals" block.
