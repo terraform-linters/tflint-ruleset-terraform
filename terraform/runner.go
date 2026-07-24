@@ -21,7 +21,9 @@ func NewRunner(runner tflint.Runner) *Runner {
 	return &Runner{Runner: runner}
 }
 
-// GetModuleCalls returns all "module" blocks, including uncreated module calls.
+// GetModuleCalls returns "module" blocks, including uncreated module calls.
+// Only calls whose source and version statically resolve are returned, since
+// Terraform rejects any other configuration when loading it.
 func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	calls := []*ModuleCall{}
 	diags := hcl.Diagnostics{}
@@ -53,7 +55,7 @@ func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	for _, block := range body.Blocks {
 		call, decodeDiags := decodeModuleCall(r, block)
 		diags = diags.Extend(decodeDiags)
-		if decodeDiags.HasErrors() {
+		if decodeDiags.HasErrors() || call == nil {
 			continue
 		}
 		calls = append(calls, call)

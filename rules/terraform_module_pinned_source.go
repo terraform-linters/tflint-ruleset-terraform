@@ -78,10 +78,6 @@ func (r *TerraformModulePinnedSourceRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModulePinnedSourceRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall, config terraformModulePinnedSourceRuleConfig) error {
-	if !module.SourceKnown {
-		return nil
-	}
-
 	// Extract query parameters from the original source before calling getter.Detect()
 	// because go-getter may URL-encode them when there's a subdirectory path
 	originalQuery := url.Values{}
