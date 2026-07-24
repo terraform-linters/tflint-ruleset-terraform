@@ -191,6 +191,22 @@ func TestApplyConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "rule config enabled + only excludes it",
+			global: &tflint.Config{
+				Rules: map[string]*tflint.RuleConfig{
+					"terraform_comment_syntax": {
+						Name:    "terraform_comment_syntax",
+						Enabled: true,
+					},
+				},
+				Only: []string{"terraform_deprecated_interpolation"},
+			},
+			config: &hclext.BodyContent{},
+			want: []string{
+				"terraform_deprecated_interpolation",
+			},
+		},
+		{
 			name: "disabled by default + preset + rule config",
 			global: &tflint.Config{
 				Rules: map[string]*tflint.RuleConfig{
