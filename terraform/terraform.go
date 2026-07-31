@@ -44,6 +44,9 @@ func decodeModuleCall(runner *Runner, block *hclext.Block) (*ModuleCall, hcl.Dia
 		return nil, nil
 	}
 	module.Source = sourceVal.AsString()
+	if module.Source == "" {
+		return nil, nil
+	}
 
 	if versionAttr, exists := block.Body.Attributes["version"]; exists {
 		module.VersionAttr = versionAttr
