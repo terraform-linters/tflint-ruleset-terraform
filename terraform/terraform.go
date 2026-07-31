@@ -20,10 +20,10 @@ type ModuleCall struct {
 }
 
 // decodeModuleCall evaluates a module block's source and version, mirroring
-// how Terraform evaluates them when loading the configuration: anything that
-// does not produce a known, non-null string is rejected, except a null
-// version, which is treated as unset. A call Terraform would reject is
-// returned as nil with no diagnostics.
+// how Terraform evaluates them when loading the configuration.
+//
+// Unresolvable expressions (unknown/marked/null source; unknown/marked version)
+// return (nil, nil) so callers can skip the module; a null version is unset.
 func decodeModuleCall(runner *Runner, block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 	source, exists := block.Body.Attributes["source"]
 	if !exists {
