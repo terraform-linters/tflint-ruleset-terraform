@@ -86,12 +86,17 @@ func (r *TerraformModuleVersionRule) checkModule(runner tflint.Runner, module *t
 }
 
 func (r *TerraformModuleVersionRule) checkVersion(runner tflint.Runner, module *terraform.ModuleCall, config TerraformModuleVersionRuleConfig) error {
-	if module.Version == nil {
+	if module.VersionAttr == nil {
 		return runner.EmitIssue(
 			r,
 			fmt.Sprintf("module %q should specify a version", module.Name),
 			module.DefRange,
 		)
+	}
+
+	// A version is set, but its value is not statically known
+	if module.Version == nil {
+		return nil
 	}
 
 	if !config.Exact {

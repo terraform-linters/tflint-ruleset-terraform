@@ -9,7 +9,15 @@ import (
 	"github.com/zclconf/go-cty/cty/convert"
 )
 
-// ModuleCall represents a "module" block.
+// ModuleCall represents a "module" block whose source statically resolved.
+//
+//   - Source is always a known, non-empty string and SourceAttr is always set.
+//   - VersionAttr is set if and only if the call pins a version. A version
+//     attribute that evaluates to null counts as unset, as in Terraform.
+//   - Version is set if and only if the constraint statically resolved.
+//     VersionAttr set with Version nil means the call pins a version whose
+//     value is not statically known (e.g. a const variable supplied at
+//     terraform init).
 type ModuleCall struct {
 	Name        string
 	DefRange    hcl.Range
@@ -19,60 +27,62 @@ type ModuleCall struct {
 	VersionAttr *hclext.Attribute
 }
 
-// decodeModuleCall evaluates a module block's source and version, mirroring
-// how Terraform evaluates them when loading the configuration.
-//
-// Unresolvable expressions (unknown/marked/null source; unknown/marked version)
-// return (nil, nil) so callers can skip the module; a null version is unset.
+// decodeModuleCall evaluates a module block's source and version. A call
+// whose source does not statically resolve to a known, unmarked, non-null,
+// non-empty string is returned as nil with no diagnostics, since no rule can
+// act on it. Version resolution never discards the call: an unresolvable
+// version is represented as VersionAttr set with Version nil. Diagnostics are
+// returned for expressions that fail to evaluate and for version strings that
+// are not valid constraints.
 func decodeModuleCall(runner *Runner, block *hclext.Block) (*ModuleCall, hcl.Diagnostics) {
 	source, exists := block.Body.Attributes["source"]
 	if !exists {
 		return nil, nil
 	}
 
-	module := &ModuleCall{
-		Name:       block.Labels[0],
-		DefRange:   block.DefRange,
-		SourceAttr: source,
-	}
-
 	sourceVal, sourceDiags := evalModuleAttribute(runner, source.Expr)
 	if sourceDiags.HasErrors() {
 		return nil, sourceDiags
 	}
-	if !sourceVal.IsKnown() || sourceVal.IsMarked() || sourceVal.IsNull() {
-		return nil, nil
-	}
-	module.Source = sourceVal.AsString()
-	if module.Source == "" {
+	if !sourceVal.IsKnown() || sourceVal.IsMarked() || sourceVal.IsNull() || sourceVal.AsString() == "" {
 		return nil, nil
 	}
 
-	if versionAttr, exists := block.Body.Attributes["version"]; exists {
+	module := &ModuleCall{
+		Name:       block.Labels[0],
+		DefRange:   block.DefRange,
+		Source:     sourceVal.AsString(),
+		SourceAttr: source,
+	}
+
+	versionAttr, exists := block.Body.Attributes["version"]
+	if !exists {
+		return module, nil
+	}
+
+	versionVal, versionDiags := evalModuleAttribute(runner, versionAttr.Expr)
+	if versionDiags.HasErrors() {
+		return nil, versionDiags
+	}
+	if !versionVal.IsKnown() || versionVal.IsMarked() {
 		module.VersionAttr = versionAttr
-
-		versionVal, versionDiags := evalModuleAttribute(runner, versionAttr.Expr)
-		if versionDiags.HasErrors() {
-			return nil, versionDiags
-		}
-		if !versionVal.IsKnown() || versionVal.IsMarked() {
-			return nil, nil
-		}
-		if versionVal.IsNull() {
-			return module, nil
-		}
-
-		constraints, err := version.NewConstraint(versionVal.AsString())
-		if err != nil {
-			return module, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
-				Summary:  "Invalid version constraint",
-				Detail:   "This string does not use correct version constraint syntax.",
-				Subject:  versionAttr.Expr.Range().Ptr(),
-			}}
-		}
-		module.Version = constraints
+		return module, nil
 	}
+	if versionVal.IsNull() {
+		return module, nil
+	}
+	module.VersionAttr = versionAttr
+
+	constraints, err := version.NewConstraint(versionVal.AsString())
+	if err != nil {
+		return nil, hcl.Diagnostics{{
+			Severity: hcl.DiagError,
+			Summary:  "Invalid version constraint",
+			Detail:   "This string does not use correct version constraint syntax.",
+			Subject:  versionAttr.Expr.Range().Ptr(),
+		}}
+	}
+	module.Version = constraints
 
 	return module, nil
 }

@@ -270,6 +270,40 @@ module "dynamic" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "deep clone module source with unknown version",
+			Content: `
+variable "module_version" {
+  type  = string
+  const = true
+}
+
+module "deep" {
+  source  = "github.com/hashicorp/consul?ref=v1.0.0"
+  version = var.module_version
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 8, Column: 13},
+						End:      hcl.Pos{Line: 8, Column: 53},
+					},
+				},
+			},
+			Fixed: `
+variable "module_version" {
+  type  = string
+  const = true
+}
+
+module "deep" {
+  source  = "github.com/hashicorp/consul?depth=1&ref=v1.0.0"
+  version = var.module_version
+}`,
+		},
 	}
 
 	rule := NewTerraformModuleShallowCloneRule()

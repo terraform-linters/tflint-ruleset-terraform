@@ -234,6 +234,100 @@ module "vpc" {
 							End:      hcl.Pos{Line: 9, Column: 9},
 						},
 					},
+					Version:     nil,
+					VersionAttr: nil,
+				},
+			},
+		},
+		{
+			name: "unknown version variable",
+			content: `
+variable "version" {
+  type  = string
+  const = true
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = var.version
+}`,
+			want: []*ModuleCall{
+				{
+					Name: "vpc",
+					DefRange: hcl.Range{
+						Filename: "main.tf",
+						Start:    hcl.Pos{Line: 7, Column: 1},
+						End:      hcl.Pos{Line: 7, Column: 13},
+					},
+					Source: "terraform-aws-modules/vpc/aws",
+					SourceAttr: &hclext.Attribute{
+						Name: "source",
+						Expr: parseExpr(t, `"terraform-aws-modules/vpc/aws"`, hcl.Pos{Line: 8, Column: 13}),
+						Range: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 8, Column: 3},
+							End:      hcl.Pos{Line: 8, Column: 44},
+						},
+						NameRange: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 8, Column: 3},
+							End:      hcl.Pos{Line: 8, Column: 9},
+						},
+					},
+					Version: nil,
+					VersionAttr: &hclext.Attribute{
+						Name: "version",
+						Expr: parseExpr(t, `var.version`, hcl.Pos{Line: 9, Column: 13}),
+						Range: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 24},
+						},
+						NameRange: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 10},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "sensitive version variable",
+			content: `
+variable "version" {
+  type      = string
+  sensitive = true
+  default   = "3.14.2"
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = var.version
+}`,
+			want: []*ModuleCall{
+				{
+					Name: "vpc",
+					DefRange: hcl.Range{
+						Filename: "main.tf",
+						Start:    hcl.Pos{Line: 8, Column: 1},
+						End:      hcl.Pos{Line: 8, Column: 13},
+					},
+					Source: "terraform-aws-modules/vpc/aws",
+					SourceAttr: &hclext.Attribute{
+						Name: "source",
+						Expr: parseExpr(t, `"terraform-aws-modules/vpc/aws"`, hcl.Pos{Line: 9, Column: 13}),
+						Range: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 44},
+						},
+						NameRange: hcl.Range{
+							Filename: "main.tf",
+							Start:    hcl.Pos{Line: 9, Column: 3},
+							End:      hcl.Pos{Line: 9, Column: 9},
+						},
+					},
 					Version: nil,
 					VersionAttr: &hclext.Attribute{
 						Name: "version",
@@ -251,6 +345,44 @@ module "vpc" {
 					},
 				},
 			},
+		},
+		{
+			name: "sensitive source variable",
+			content: `
+variable "source" {
+  type      = string
+  sensitive = true
+  default   = "terraform-aws-modules/vpc/aws"
+}
+
+module "vpc" {
+  source = var.source
+}`,
+			want: []*ModuleCall{},
+		},
+		{
+			name: "missing source",
+			content: `
+module "vpc" {
+  version = "3.14.2"
+}`,
+			want: []*ModuleCall{},
+		},
+		{
+			name: "null source",
+			content: `
+module "vpc" {
+  source = null
+}`,
+			want: []*ModuleCall{},
+		},
+		{
+			name: "empty source",
+			content: `
+module "vpc" {
+  source = ""
+}`,
+			want: []*ModuleCall{},
 		},
 	}
 

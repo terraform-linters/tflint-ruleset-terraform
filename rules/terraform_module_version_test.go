@@ -252,6 +252,21 @@ module "m" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "exact version with unknown version variable",
+			Content: `
+variable "version" {
+  type  = string
+  const = true
+}
+
+module "m" {
+  source  = "ns/name/provider"
+  version = var.version
+}`,
+			Config:   testTerraformModuleVersionExactConfig,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModuleVersionRule()

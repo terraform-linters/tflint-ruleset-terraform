@@ -650,6 +650,30 @@ module "dynamic" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "unpinned module source with unknown version",
+			Content: `
+variable "module_version" {
+  type  = string
+  const = true
+}
+
+module "unpinned" {
+  source  = "git://hashicorp.com/consul.git"
+  version = var.module_version
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModulePinnedSourceRule(),
+					Message: "Module source \"git://hashicorp.com/consul.git\" is not pinned",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 8, Column: 13},
+						End:      hcl.Pos{Line: 8, Column: 45},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformModulePinnedSourceRule()

@@ -22,8 +22,10 @@ func NewRunner(runner tflint.Runner) *Runner {
 }
 
 // GetModuleCalls returns "module" blocks, including uncreated module calls.
-// Only calls whose source and version statically resolve are returned, since
-// Terraform rejects any other configuration when loading it.
+// Only calls whose source statically resolves are returned, since no rule can
+// act on a call without its source. Version is resolved best-effort and never
+// causes a call to be omitted. See ModuleCall for how unresolved versions are
+// represented.
 func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	calls := []*ModuleCall{}
 	diags := hcl.Diagnostics{}

@@ -96,7 +96,9 @@ Keep in mind that the module may include further child modules, which have their
 
 ## Dynamic Sources and Versions
 
-Since Terraform v1.15, `source` and `version` can be [expressions](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates them and checks the results. A module is skipped when its source or version does not resolve, such as when a `const` variable has no value. Terraform already errors on this during `terraform init`. A `null` version is different: Terraform treats it as unset, so a registry module with a `null` version is still reported.
+Since Terraform v1.15, `source` and `version` can be [expressions](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates them and checks the results. A module is skipped when its source does not resolve, such as when a `const` variable has no value. Terraform already errors on this during `terraform init`.
+
+A version that does not resolve, such as a `const` variable whose value is only supplied at `terraform init`, satisfies this rule: the module specifies a version, even though its value is not known statically. A `null` version is different: Terraform treats it as unset, so a registry module with a `null` version is still reported.
 
 ## How To Fix
 
