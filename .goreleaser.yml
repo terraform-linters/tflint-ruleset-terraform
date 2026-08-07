@@ -11,6 +11,7 @@ builds:
       - linux_amd64
       - linux_arm
       - linux_arm64
+      - linux_riscv64
       - windows_386
       - windows_amd64
     hooks:
