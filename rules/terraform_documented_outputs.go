@@ -1,9 +1,6 @@
 package rules
 
 import (
-	"fmt"
-
-	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/terraform-linters/tflint-ruleset-terraform/project"
@@ -12,6 +9,11 @@ import (
 // TerraformDocumentedOutputsRule checks whether outputs have descriptions
 type TerraformDocumentedOutputsRule struct {
 	tflint.DefaultRule
+}
+
+// TerraformDocumentedOutputsRuleConfig is the config structure for the TerraformDocumentedOutputsRule
+type TerraformDocumentedOutputsRuleConfig struct {
+	Unique bool `hclext:"unique,optional"`
 }
 
 // NewTerraformDocumentedOutputsRule returns a new rule
@@ -50,6 +52,11 @@ func (r *TerraformDocumentedOutputsRule) Check(runner tflint.Runner) error {
 		return nil
 	}
 
+	config := TerraformDocumentedOutputsRuleConfig{}
+	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+		return err
+	}
+
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
 		Blocks: []hclext.BlockSchema{
 			{
@@ -65,35 +72,5 @@ func (r *TerraformDocumentedOutputsRule) Check(runner tflint.Runner) error {
 		return err
 	}
 
-	for _, output := range body.Blocks {
-		attr, exists := output.Body.Attributes["description"]
-		if !exists {
-			if err := runner.EmitIssue(
-				r,
-				fmt.Sprintf("`%s` output has no description", output.Labels[0]),
-				output.DefRange,
-			); err != nil {
-				return err
-			}
-			continue
-		}
-
-		var description string
-		diags := gohcl.DecodeExpression(attr.Expr, nil, &description)
-		if diags.HasErrors() {
-			return diags
-		}
-
-		if description == "" {
-			if err := runner.EmitIssue(
-				r,
-				fmt.Sprintf("`%s` output has no description", output.Labels[0]),
-				output.DefRange,
-			); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return checkDocumentedDescriptions(runner, r, body.Blocks, "output", config.Unique)
 }
