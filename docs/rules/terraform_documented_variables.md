@@ -53,7 +53,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ```
 
-### Unique descriptions
+### Unique
 
 When `unique = true`, variable descriptions are compared using exact string equality. Every variable sharing a duplicated description is reported.
 
