@@ -55,7 +55,7 @@ Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0
 
 ### Unique
 
-When `unique = true`, output descriptions are compared using exact string equality. Every output sharing a duplicated description is reported.
+With `unique = true`, every output that shares its description with another output is reported. Descriptions are compared exactly, so a difference in case or whitespace makes two descriptions distinct.
 
 ```hcl
 rule "terraform_documented_outputs" {
@@ -66,10 +66,12 @@ rule "terraform_documented_outputs" {
 
 ```hcl
 output "first" {
+  value       = aws_alb.first.dns_name
   description = "Shared description"
 }
 
 output "second" {
+  value       = aws_alb.second.dns_name
   description = "Shared description"
 }
 ```
@@ -80,19 +82,26 @@ $ tflint
 
 Notice: `first` output description is not unique: "Shared description" (terraform_documented_outputs)
 
-  on outputs.tf line 2:
-   2:   description = "Shared description"
+  on template.tf line 3:
+   3:   description = "Shared description"
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_documented_outputs.md
 
 Notice: `second` output description is not unique: "Shared description" (terraform_documented_outputs)
 
-  on outputs.tf line 6:
-   6:   description = "Shared description"
+  on template.tf line 8:
+   8:   description = "Shared description"
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_documented_outputs.md
+
 ```
 
 ## Why
 
 Since `description` is optional value, it is not always necessary to write it. But this rule is useful if you want to force the writing of description. Especially it is useful when combined with [terraform-docs](https://github.com/terraform-docs/terraform-docs).
 
+Duplicated descriptions are usually copy-paste leftovers that document a different output. Setting `unique = true` catches them.
+
 ## How To Fix
 
-Write a description other than an empty string. When `unique = true`, manually reword duplicated descriptions so each output has distinct, meaningful documentation.
+Write a description other than an empty string. With `unique = true`, rewrite duplicated descriptions so each one describes its own output.
