@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"maps"
 	"testing"
 
 	hcl "github.com/hashicorp/hcl/v2"
@@ -63,28 +64,11 @@ variable "with_description" {
 			Name: "duplicate descriptions allowed by default",
 			Content: `
 variable "first" {
-  description = "Shared description"
+  description = "Shared"
 }
 
 variable "second" {
-  description = "Shared description"
-}`,
-			Expected: helper.Issues{},
-		},
-		{
-			Name: "duplicate descriptions explicitly allowed",
-			Content: `
-variable "first" {
-  description = "Shared description"
-}
-
-variable "second" {
-  description = "Shared description"
-}`,
-			Config: `
-rule "terraform_documented_variables" {
-  enabled = true
-  unique  = false
+  description = "Shared"
 }`,
 			Expected: helper.Issues{},
 		},
@@ -92,11 +76,11 @@ rule "terraform_documented_variables" {
 			Name: "duplicate descriptions",
 			Content: `
 variable "first" {
-  description = "Shared description"
+  description = "Shared"
 }
 
 variable "second" {
-  description = "Shared description"
+  description = "Shared"
 }`,
 			Config: `
 rule "terraform_documented_variables" {
@@ -106,20 +90,20 @@ rule "terraform_documented_variables" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformDocumentedVariablesRule(),
-					Message: "`first` variable description is not unique: \"Shared description\"",
+					Message: "`first` variable description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "variables.tf",
 						Start:    hcl.Pos{Line: 3, Column: 3},
-						End:      hcl.Pos{Line: 3, Column: 37},
+						End:      hcl.Pos{Line: 3, Column: 25},
 					},
 				},
 				{
 					Rule:    NewTerraformDocumentedVariablesRule(),
-					Message: "`second` variable description is not unique: \"Shared description\"",
+					Message: "`second` variable description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "variables.tf",
 						Start:    hcl.Pos{Line: 7, Column: 3},
-						End:      hcl.Pos{Line: 7, Column: 37},
+						End:      hcl.Pos{Line: 7, Column: 25},
 					},
 				},
 			},
@@ -229,14 +213,38 @@ rule "terraform_documented_variables" {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "empty and populated descriptions",
+			Name: "descriptions differing in case or whitespace",
 			Content: `
-variable "empty" {
-  description = ""
+variable "first" {
+  description = "Shared"
 }
 
-variable "populated" {
-  description = "Description"
+variable "second" {
+  description = "shared"
+}
+
+variable "third" {
+  description = "Shared "
+}`,
+			Config: `
+rule "terraform_documented_variables" {
+  enabled = true
+  unique  = true
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "undocumented variable alongside duplicate descriptions",
+			Content: `
+variable "undocumented" {
+}
+
+variable "first" {
+  description = "Shared"
+}
+
+variable "second" {
+  description = "Shared"
 }`,
 			Config: `
 rule "terraform_documented_variables" {
@@ -246,17 +254,35 @@ rule "terraform_documented_variables" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformDocumentedVariablesRule(),
-					Message: "`empty` variable has no description",
+					Message: "`undocumented` variable has no description",
 					Range: hcl.Range{
 						Filename: "variables.tf",
 						Start:    hcl.Pos{Line: 2, Column: 1},
-						End:      hcl.Pos{Line: 2, Column: 17},
+						End:      hcl.Pos{Line: 2, Column: 24},
+					},
+				},
+				{
+					Rule:    NewTerraformDocumentedVariablesRule(),
+					Message: "`first` variable description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start:    hcl.Pos{Line: 6, Column: 3},
+						End:      hcl.Pos{Line: 6, Column: 25},
+					},
+				},
+				{
+					Rule:    NewTerraformDocumentedVariablesRule(),
+					Message: "`second` variable description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "variables.tf",
+						Start:    hcl.Pos{Line: 10, Column: 3},
+						End:      hcl.Pos{Line: 10, Column: 25},
 					},
 				},
 			},
 		},
 		{
-			Name: "two empty descriptions",
+			Name: "empty descriptions are not duplicates",
 			Content: `
 variable "empty_one" {
   description = ""
@@ -297,13 +323,8 @@ rule "terraform_documented_variables" {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			files := map[string]string{"variables.tf": tc.Content}
-			if tc.Config != "" {
-				files[".tflint.hcl"] = tc.Config
-			}
-			for name, content := range tc.ExtraFiles {
-				files[name] = content
-			}
+			files := map[string]string{"variables.tf": tc.Content, ".tflint.hcl": tc.Config}
+			maps.Copy(files, tc.ExtraFiles)
 
 			runner := helper.TestRunner(t, files)
 

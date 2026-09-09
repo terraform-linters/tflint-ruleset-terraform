@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"maps"
 	"testing"
 
 	hcl "github.com/hashicorp/hcl/v2"
@@ -65,28 +66,13 @@ output "endpoint" {
 			Name: "duplicate descriptions allowed by default",
 			Content: `
 output "first" {
-  description = "Shared description"
+  value       = aws_alb.first.dns_name
+  description = "Shared"
 }
 
 output "second" {
-  description = "Shared description"
-}`,
-			Expected: helper.Issues{},
-		},
-		{
-			Name: "duplicate descriptions explicitly allowed",
-			Content: `
-output "first" {
-  description = "Shared description"
-}
-
-output "second" {
-  description = "Shared description"
-}`,
-			Config: `
-rule "terraform_documented_outputs" {
-  enabled = true
-  unique  = false
+  value       = aws_alb.second.dns_name
+  description = "Shared"
 }`,
 			Expected: helper.Issues{},
 		},
@@ -94,50 +80,12 @@ rule "terraform_documented_outputs" {
 			Name: "duplicate descriptions",
 			Content: `
 output "first" {
-  description = "Shared description"
-}
-
-output "second" {
-  description = "Shared description"
-}`,
-			Config: `
-rule "terraform_documented_outputs" {
-  enabled = true
-  unique  = true
-}`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewTerraformDocumentedOutputsRule(),
-					Message: "`first` output description is not unique: \"Shared description\"",
-					Range: hcl.Range{
-						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 3, Column: 3},
-						End:      hcl.Pos{Line: 3, Column: 37},
-					},
-				},
-				{
-					Rule:    NewTerraformDocumentedOutputsRule(),
-					Message: "`second` output description is not unique: \"Shared description\"",
-					Range: hcl.Range{
-						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 7, Column: 3},
-						End:      hcl.Pos{Line: 7, Column: 37},
-					},
-				},
-			},
-		},
-		{
-			Name: "three duplicate descriptions",
-			Content: `
-output "first" {
+  value       = aws_alb.first.dns_name
   description = "Shared"
 }
 
 output "second" {
-  description = "Shared"
-}
-
-output "third" {
+  value       = aws_alb.second.dns_name
   description = "Shared"
 }`,
 			Config: `
@@ -151,8 +99,8 @@ rule "terraform_documented_outputs" {
 					Message: "`first` output description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 3, Column: 3},
-						End:      hcl.Pos{Line: 3, Column: 25},
+						Start:    hcl.Pos{Line: 4, Column: 3},
+						End:      hcl.Pos{Line: 4, Column: 25},
 					},
 				},
 				{
@@ -160,8 +108,51 @@ rule "terraform_documented_outputs" {
 					Message: "`second` output description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 7, Column: 3},
-						End:      hcl.Pos{Line: 7, Column: 25},
+						Start:    hcl.Pos{Line: 9, Column: 3},
+						End:      hcl.Pos{Line: 9, Column: 25},
+					},
+				},
+			},
+		},
+		{
+			Name: "three duplicate descriptions",
+			Content: `
+output "first" {
+  value       = aws_alb.first.dns_name
+  description = "Shared"
+}
+
+output "second" {
+  value       = aws_alb.second.dns_name
+  description = "Shared"
+}
+
+output "third" {
+  value       = aws_alb.third.dns_name
+  description = "Shared"
+}`,
+			Config: `
+rule "terraform_documented_outputs" {
+  enabled = true
+  unique  = true
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformDocumentedOutputsRule(),
+					Message: "`first` output description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "outputs.tf",
+						Start:    hcl.Pos{Line: 4, Column: 3},
+						End:      hcl.Pos{Line: 4, Column: 25},
+					},
+				},
+				{
+					Rule:    NewTerraformDocumentedOutputsRule(),
+					Message: "`second` output description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "outputs.tf",
+						Start:    hcl.Pos{Line: 9, Column: 3},
+						End:      hcl.Pos{Line: 9, Column: 25},
 					},
 				},
 				{
@@ -169,8 +160,8 @@ rule "terraform_documented_outputs" {
 					Message: "`third` output description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 11, Column: 3},
-						End:      hcl.Pos{Line: 11, Column: 25},
+						Start:    hcl.Pos{Line: 14, Column: 3},
+						End:      hcl.Pos{Line: 14, Column: 25},
 					},
 				},
 			},
@@ -179,6 +170,7 @@ rule "terraform_documented_outputs" {
 			Name: "duplicate descriptions in multiple files",
 			Content: `
 output "first" {
+  value       = aws_alb.first.dns_name
   description = "Shared"
 }`,
 			Config: `
@@ -189,6 +181,7 @@ rule "terraform_documented_outputs" {
 			ExtraFiles: map[string]string{
 				"other_outputs.tf": `
 output "second" {
+  value       = aws_alb.second.dns_name
   description = "Shared"
 }`,
 			},
@@ -198,8 +191,8 @@ output "second" {
 					Message: "`first` output description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 3, Column: 3},
-						End:      hcl.Pos{Line: 3, Column: 25},
+						Start:    hcl.Pos{Line: 4, Column: 3},
+						End:      hcl.Pos{Line: 4, Column: 25},
 					},
 				},
 				{
@@ -207,8 +200,8 @@ output "second" {
 					Message: "`second` output description is not unique: \"Shared\"",
 					Range: hcl.Range{
 						Filename: "other_outputs.tf",
-						Start:    hcl.Pos{Line: 3, Column: 3},
-						End:      hcl.Pos{Line: 3, Column: 25},
+						Start:    hcl.Pos{Line: 4, Column: 3},
+						End:      hcl.Pos{Line: 4, Column: 25},
 					},
 				},
 			},
@@ -217,10 +210,12 @@ output "second" {
 			Name: "unique descriptions",
 			Content: `
 output "first" {
+  value       = aws_alb.first.dns_name
   description = "First description"
 }
 
 output "second" {
+  value       = aws_alb.second.dns_name
   description = "Second description"
 }`,
 			Config: `
@@ -231,14 +226,44 @@ rule "terraform_documented_outputs" {
 			Expected: helper.Issues{},
 		},
 		{
-			Name: "empty and populated descriptions",
+			Name: "descriptions differing in case or whitespace",
 			Content: `
-output "empty" {
-  description = ""
+output "first" {
+  value       = aws_alb.first.dns_name
+  description = "Shared"
 }
 
-output "populated" {
-  description = "Description"
+output "second" {
+  value       = aws_alb.second.dns_name
+  description = "shared"
+}
+
+output "third" {
+  value       = aws_alb.third.dns_name
+  description = "Shared "
+}`,
+			Config: `
+rule "terraform_documented_outputs" {
+  enabled = true
+  unique  = true
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "undocumented output alongside duplicate descriptions",
+			Content: `
+output "undocumented" {
+  value = aws_alb.undocumented.dns_name
+}
+
+output "first" {
+  value       = aws_alb.first.dns_name
+  description = "Shared"
+}
+
+output "second" {
+  value       = aws_alb.second.dns_name
+  description = "Shared"
 }`,
 			Config: `
 rule "terraform_documented_outputs" {
@@ -248,23 +273,43 @@ rule "terraform_documented_outputs" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformDocumentedOutputsRule(),
-					Message: "`empty` output has no description",
+					Message: "`undocumented` output has no description",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
 						Start:    hcl.Pos{Line: 2, Column: 1},
-						End:      hcl.Pos{Line: 2, Column: 15},
+						End:      hcl.Pos{Line: 2, Column: 22},
+					},
+				},
+				{
+					Rule:    NewTerraformDocumentedOutputsRule(),
+					Message: "`first` output description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "outputs.tf",
+						Start:    hcl.Pos{Line: 8, Column: 3},
+						End:      hcl.Pos{Line: 8, Column: 25},
+					},
+				},
+				{
+					Rule:    NewTerraformDocumentedOutputsRule(),
+					Message: "`second` output description is not unique: \"Shared\"",
+					Range: hcl.Range{
+						Filename: "outputs.tf",
+						Start:    hcl.Pos{Line: 13, Column: 3},
+						End:      hcl.Pos{Line: 13, Column: 25},
 					},
 				},
 			},
 		},
 		{
-			Name: "two empty descriptions",
+			Name: "empty descriptions are not duplicates",
 			Content: `
 output "empty_one" {
+  value       = aws_alb.first.dns_name
   description = ""
 }
 
 output "empty_two" {
+  value       = aws_alb.second.dns_name
   description = ""
 }`,
 			Config: `
@@ -287,8 +332,8 @@ rule "terraform_documented_outputs" {
 					Message: "`empty_two` output has no description",
 					Range: hcl.Range{
 						Filename: "outputs.tf",
-						Start:    hcl.Pos{Line: 6, Column: 1},
-						End:      hcl.Pos{Line: 6, Column: 19},
+						Start:    hcl.Pos{Line: 7, Column: 1},
+						End:      hcl.Pos{Line: 7, Column: 19},
 					},
 				},
 			},
@@ -299,13 +344,8 @@ rule "terraform_documented_outputs" {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			files := map[string]string{"outputs.tf": tc.Content}
-			if tc.Config != "" {
-				files[".tflint.hcl"] = tc.Config
-			}
-			for name, content := range tc.ExtraFiles {
-				files[name] = content
-			}
+			files := map[string]string{"outputs.tf": tc.Content, ".tflint.hcl": tc.Config}
+			maps.Copy(files, tc.ExtraFiles)
 
 			runner := helper.TestRunner(t, files)
 
