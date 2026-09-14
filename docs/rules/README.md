@@ -19,6 +19,7 @@ All rules are enabled by default, but by setting `preset = "recommended"`, you c
 |[terraform_module_shallow_clone](terraform_module_shallow_clone.md)|Require pinned Git-hosted Terraform modules to use shallow cloning||
 |[terraform_module_version](terraform_module_version.md)|Checks that Terraform modules sourced from a registry specify a version|✔|
 |[terraform_naming_convention](terraform_naming_convention.md)|Enforces naming conventions for resources, data sources, etc||
+|[terraform_no_short_circuit_evaluation](terraform_no_short_circuit_evaluation.md)|Disallow using logical operators with null checks that could lead to errors|✔|
 |[terraform_required_providers](terraform_required_providers.md)|Require that all providers have version constraints through required_providers|✔|
 |[terraform_required_version](terraform_required_version.md)|Disallow `terraform` declarations without require_version|✔|
 |[terraform_standard_module_structure](terraform_standard_module_structure.md)|Ensure that a module complies with the Terraform Standard Module Structure||
