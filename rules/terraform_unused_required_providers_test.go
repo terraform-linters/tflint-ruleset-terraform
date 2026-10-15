@@ -328,3 +328,34 @@ func Test_TerraformUnusedRequiredProvidersRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_TerraformUnusedRequiredProvidersRule_DuplicateFiles(t *testing.T) {
+	content := `terraform {
+  required_providers {
+    null = { source = "hashicorp/null" }
+  }
+}
+`
+	// Map iteration must not determine which declaration receives the warning.
+	for range 100 {
+		runner := testRunner(t, map[string]string{
+			"a.tf": content,
+			"z.tf": content,
+		})
+		rule := NewTerraformUnusedRequiredProvidersRule()
+		if err := rule.Check(runner); err != nil {
+			t.Fatalf("Unexpected error occurred: %s", err)
+		}
+		helper.AssertIssues(t, helper.Issues{
+			{
+				Rule:    rule,
+				Message: "provider 'null' is declared in required_providers but not used by the module",
+				Range: hcl.Range{
+					Filename: "z.tf",
+					Start:    hcl.Pos{Line: 3, Column: 5},
+					End:      hcl.Pos{Line: 3, Column: 41},
+				},
+			},
+		}, runner.Runner.(*helper.Runner).Issues)
+	}
+}

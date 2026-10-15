@@ -2,6 +2,8 @@ package rules
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
@@ -63,7 +65,8 @@ func (r *TerraformUnusedRequiredProvidersRule) Check(rr tflint.Runner) error {
 	}
 
 	requiredProviders := hcl.Attributes{}
-	for _, file := range files {
+	for _, filename := range slices.Sorted(maps.Keys(files)) {
+		file := files[filename]
 		content, _, schemaDiags := file.Body.PartialContent(&hcl.BodySchema{
 			Blocks: []hcl.BlockHeaderSchema{{Type: "terraform"}},
 		})
