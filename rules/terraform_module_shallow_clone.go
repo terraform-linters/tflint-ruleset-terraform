@@ -69,10 +69,6 @@ func (r *TerraformModuleShallowCloneRule) Check(rr tflint.Runner) error {
 }
 
 func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, module *terraform.ModuleCall) error {
-	if !module.SourceKnown {
-		return nil
-	}
-
 	filename := module.DefRange.Filename
 	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52

@@ -94,6 +94,12 @@ Depending on your workflow, you may want to enforce that modules specify an _exa
 
 Keep in mind that the module may include further child modules, which have their own version constraints. TFLint _does not_ check version constraints set in child modules. **Enabling this rule cannot guarantee that `terraform init` will be deterministic**. Use [Terraform dependency lock files](https://developer.hashicorp.com/terraform/language/files/dependency-lock) to ensure that Terraform will always use the same version of all modules (and providers) until you explicitly update them.
 
+## Dynamic Sources and Versions
+
+Since Terraform v1.15, `source` and `version` can be [expressions](https://developer.hashicorp.com/terraform/language/modules/configuration#source-and-version-expressions) built from `const` input variables and local values. This rule evaluates them and checks the results. A module is skipped when its source does not resolve, such as when a `const` variable has no value. Terraform already errors on this during `terraform init`.
+
+A version that does not resolve, such as a `const` variable whose value is only supplied at `terraform init`, satisfies this rule: the module specifies a version, even though its value is not known statically. A `null` version is different: Terraform treats it as unset, so a registry module with a `null` version is still reported.
+
 ## How To Fix
 
 Specify a `version`. If `exact = true`, this must be an exact version.
