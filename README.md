@@ -26,7 +26,7 @@ If you want to use a version different from the built-in version, you can declar
 ```hcl
 plugin "terraform" {
     enabled = true
-    version = "0.15.0"
+    version = "0.16.0"
     source  = "github.com/terraform-linters/tflint-ruleset-terraform"
 }
 ```
