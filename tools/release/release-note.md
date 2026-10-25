@@ -34,9 +34,12 @@
 * build(deps): bump github.com/hashicorp/go-getter from 1.8.9 to 1.8.10 by @dependabot[bot] in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/386
 * Bump GoReleaser to v2.19.0 by @wata727 in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/388
 * docs: Remove Go version requirement by @wata727 in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/389
+* release: Migrate attest-build-provenance to attest by @wata727 in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/390
+* Fix GoReleaser formats by @wata727 in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/391
 
 ## New Contributors
 * @SetagGnaw made their first contribution in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/366
 * @EricLiu2000 made their first contribution in https://github.com/terraform-linters/tflint-ruleset-terraform/pull/384
 
-**Full Changelog**: https://github.com/terraform-linters/tflint-ruleset-terraform/compare/v0.15.0...v0.16.0
+**Full Changelog**: https://github.com/terraform-linters/tflint-ruleset-terraform/compare/v0.15.0...v0.16.1
+
