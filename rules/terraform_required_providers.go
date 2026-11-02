@@ -176,49 +176,73 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			continue
 		}
 
-		val, diags := requiredProvider.Expr.Value(&hcl.EvalContext{
-			Variables: map[string]cty.Value{
-				// configuration_aliases can declare additional provider instances
-				// required provider "foo" could have: configuration_aliases = [foo.a, foo.b]
-				// @see https://www.terraform.io/language/modules/develop/providers#provider-aliases-within-modules
-				name: cty.DynamicVal,
-			},
-		})
+		// required_providers entries are objects like `{ source = "...", version = "..." }`.
+		// Each attribute is evaluated individually instead of evaluating the whole object,
+		// because configuration_aliases contains provider references (e.g. [foo.a, foo.b])
+		// that cannot be evaluated as expressions.
+		// @see https://www.terraform.io/language/modules/develop/providers#provider-aliases-within-modules
+		kvs, diags := hcl.ExprMap(requiredProvider.Expr)
 		if diags.HasErrors() {
-			return diags
-		}
+			// Not an object. Check whether this is the legacy version constraint string.
+			var val cty.Value
+			if err := runner.EvaluateExpr(requiredProvider.Expr, &val, nil); err != nil {
+				return err
+			}
 
-		if val.Type() == cty.String {
-			if err := runner.EmitIssueWithFix(
-				r,
-				fmt.Sprintf("Legacy version constraint for provider %q in `required_providers`", name),
-				requiredProvider.Expr.Range(),
-				func(f tflint.Fixer) error {
-					if tfsdk.IsJSONFilename(requiredProvider.Expr.Range().Filename) {
-						return tflint.ErrFixNotSupported
-					}
+			if val.Type() == cty.String {
+				if err := runner.EmitIssueWithFix(
+					r,
+					fmt.Sprintf("Legacy version constraint for provider %q in `required_providers`", name),
+					requiredProvider.Expr.Range(),
+					func(f tflint.Fixer) error {
+						if tfsdk.IsJSONFilename(requiredProvider.Expr.Range().Filename) {
+							return tflint.ErrFixNotSupported
+						}
+						// Autofix that replaces the whole expression is only supported for literal expressions
+						// to avoid rewriting expressions that reference variables.
+						if len(requiredProvider.Expr.Variables()) > 0 {
+							return tflint.ErrFixNotSupported
+						}
 
-					return f.ReplaceText(requiredProvider.Expr.Range(), fmt.Sprintf(`{
+						return f.ReplaceText(requiredProvider.Expr.Range(), fmt.Sprintf(`{
 						source  = "hashicorp/%s" 
 						version = %s
 					}`, name, f.TextAt(requiredProvider.Expr.Range()).Bytes))
-				},
-			); err != nil {
-				return err
+					},
+				); err != nil {
+					return err
+				}
 			}
 
 			continue
 		}
 
-		vm := val.AsValueMap()
+		attrs := map[string]hcl.Expression{}
+		for _, kv := range kvs {
+			// Keys are static (naked identifiers or string literals)
+			key, diags := kv.Key.Value(nil)
+			if diags.HasErrors() || !key.IsKnown() || key.IsNull() || key.Type() != cty.String {
+				continue
+			}
+			attrs[key.AsString()] = kv.Value
+		}
 
-		if source, exists := vm["source"]; exists {
-			p, err := tfaddr.ParseProviderSource(source.AsString())
-			if err != nil {
+		if source, exists := attrs["source"]; exists {
+			// Since Terraform v1.17, the source can contain variables (e.g. "app.terraform.io/${var.org}/foo").
+			// Unknown, null, and sensitive values are ignored because the callback is not called for them.
+			var builtin bool
+			if err := runner.EvaluateExpr(source, func(source string) error {
+				p, err := tfaddr.ParseProviderSource(source)
+				if err != nil {
+					return err
+				}
+				builtin = p.IsBuiltIn()
+				return nil
+			}, nil); err != nil {
 				return err
 			}
 
-			if p.IsBuiltIn() {
+			if builtin {
 				continue
 			}
 		} else if *config.Source {
@@ -229,11 +253,6 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 				func(f tflint.Fixer) error {
 					if tfsdk.IsJSONFilename(requiredProvider.Expr.Range().Filename) {
 						return tflint.ErrFixNotSupported
-					}
-
-					kvs, diags := hcl.ExprMap(requiredProvider.Expr)
-					if diags.HasErrors() {
-						return diags
 					}
 					if len(kvs) == 0 {
 						return f.ReplaceText(requiredProvider.Expr.Range(), fmt.Sprintf(`{
@@ -247,7 +266,7 @@ func (r *TerraformRequiredProvidersRule) Check(rr tflint.Runner) error {
 			}
 		}
 
-		if _, exists := vm["version"]; !exists && *config.Version {
+		if _, exists := attrs["version"]; !exists && *config.Version {
 			if err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("Missing version constraint for provider %q in `required_providers`", name),

@@ -265,6 +265,137 @@ provider "template" {}
 `,
 		},
 		{
+			Name: "legacy required_providers string with variables",
+			Content: `
+variable "template_version" {
+  type    = string
+  default = "~> 2"
+}
+
+terraform {
+  required_providers {
+    template = "${var.template_version}"
+  }
+}
+provider "template" {}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Legacy version constraint for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   9,
+							Column: 16,
+						},
+						End: hcl.Pos{
+							Line:   9,
+							Column: 41,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "required_providers object missing source with variables",
+			Content: `
+variable "template_version" {
+  type    = string
+  default = "~> 2"
+}
+
+terraform {
+  required_providers {
+    template = {
+      version = var.template_version
+    }
+  }
+}
+
+provider "template" {}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing `source` for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   9,
+							Column: 16,
+						},
+						End: hcl.Pos{
+							Line:   11,
+							Column: 6,
+						},
+					},
+				},
+			},
+			Fixed: `
+variable "template_version" {
+  type    = string
+  default = "~> 2"
+}
+
+terraform {
+  required_providers {
+    template = {
+      source  = "hashicorp/template"
+      version = var.template_version
+    }
+  }
+}
+
+provider "template" {}
+`,
+		},
+		{
+			Name: "required_providers object missing source with configuration_aliases",
+			Content: `
+terraform {
+  required_providers {
+    template = {
+      version               = "~> 2"
+      configuration_aliases = [template.alias]
+    }
+  }
+}
+
+provider "template" {}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing `source` for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   4,
+							Column: 16,
+						},
+						End: hcl.Pos{
+							Line:   7,
+							Column: 6,
+						},
+					},
+				},
+			},
+			Fixed: `
+terraform {
+  required_providers {
+    template = {
+      source                = "hashicorp/template"
+      version               = "~> 2"
+      configuration_aliases = [template.alias]
+    }
+  }
+}
+
+provider "template" {}
+`,
+		},
+		{
 			Name: "required_providers object missing source ignored",
 			Content: `
 terraform {
@@ -416,6 +547,104 @@ terraform {
 data "template_file" "foo" {
   provider = template.alias
 }
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "source with variables",
+			Content: `
+variable "org" {
+  type    = string
+  default = "example"
+}
+
+terraform {
+  required_providers {
+    template = {
+      source  = "app.terraform.io/${var.org}/template"
+      version = "~> 2"
+    }
+  }
+}
+
+provider "template" {}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "source with variables missing version",
+			Content: `
+variable "org" {
+  type    = string
+  default = "example"
+}
+
+terraform {
+  required_providers {
+    template = {
+      source = "app.terraform.io/${var.org}/template"
+    }
+  }
+}
+
+provider "template" {}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredProvidersRule(),
+					Message: "Missing version constraint for provider \"template\" in `required_providers`",
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start: hcl.Pos{
+							Line:   9,
+							Column: 16,
+						},
+						End: hcl.Pos{
+							Line:   11,
+							Column: 6,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "builtin provider source with variables",
+			Content: `
+variable "source" {
+  type    = string
+  default = "terraform.io/builtin/terraform"
+}
+
+terraform {
+  required_providers {
+    builtin = {
+      source = var.source
+    }
+  }
+}
+
+provider "builtin" {}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "version with variables",
+			Content: `
+variable "template_version" {
+  type    = string
+  default = "~> 2"
+}
+
+terraform {
+  required_providers {
+    template = {
+      source  = "hashicorp/template"
+      version = var.template_version
+    }
+  }
+}
+
+provider "template" {}
 `,
 			Expected: helper.Issues{},
 		},
