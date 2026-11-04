@@ -251,6 +251,58 @@ module "dynamic" {
 }`,
 			Expected: helper.Issues{},
 		},
+		{
+			Name: "pinned github module with subdirectory",
+			Content: `
+module "subdir" {
+  source = "github.com/hashicorp/consul.git/subdirectory?ref=v1.0.0"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul.git/subdirectory?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 69},
+					},
+				},
+			},
+			Fixed: `
+module "subdir" {
+  source = "github.com/hashicorp/consul.git/subdirectory?depth=1&ref=v1.0.0"
+}`,
+		},
+		{
+			Name: "pinned github module with multiple subdirectories",
+			Content: `
+module "subdirs" {
+  source = "github.com/hashicorp/consul.git/directory/subdirectory?ref=v1.0.0"
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul.git/directory/subdirectory?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 79},
+					},
+				},
+			},
+			Fixed: `
+module "subdirs" {
+  source = "github.com/hashicorp/consul.git/directory/subdirectory?depth=1&ref=v1.0.0"
+}`,
+		},
+		{
+			Name: "github module with subdirectory and shallow clone enabled",
+			Content: `
+module "subdir_shallow" {
+  source = "github.com/hashicorp/consul.git/subdirectory?depth=1&ref=v1.0.0"
+}`,
+			Expected: helper.Issues{},
+		},
 	}
 
 	rule := NewTerraformModuleShallowCloneRule()
