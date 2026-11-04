@@ -223,6 +223,8 @@ module "short_branch_name" {
 			Name: "module source with known variable",
 			Content: `
 variable "module_source" {
+  type    = string
+  const   = true
   default = "github.com/hashicorp/consul?ref=v1.0.0"
 }
 
@@ -235,8 +237,8 @@ module "dynamic" {
 					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
 					Range: hcl.Range{
 						Filename: "module.tf",
-						Start:    hcl.Pos{Line: 7, Column: 12},
-						End:      hcl.Pos{Line: 7, Column: 29},
+						Start:    hcl.Pos{Line: 9, Column: 12},
+						End:      hcl.Pos{Line: 9, Column: 29},
 					},
 				},
 			},
@@ -244,12 +246,63 @@ module "dynamic" {
 		{
 			Name: "module source with unknown variable",
 			Content: `
-variable "module_source" {}
+variable "module_source" {
+  type  = string
+  const = true
+}
 
 module "dynamic" {
   source = var.module_source
 }`,
 			Expected: helper.Issues{},
+		},
+		{
+			Name: "module source with null variable",
+			Content: `
+variable "module_source" {
+  type    = string
+  const   = true
+  default = null
+}
+
+module "dynamic" {
+  source = var.module_source
+}`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "deep clone module source with unknown version",
+			Content: `
+variable "module_version" {
+  type  = string
+  const = true
+}
+
+module "deep" {
+  source  = "github.com/hashicorp/consul?ref=v1.0.0"
+  version = var.module_version
+}`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleShallowCloneRule(),
+					Message: `Module source "github.com/hashicorp/consul?ref=v1.0.0" should enable shallow cloning by adding "depth=1" parameter`,
+					Range: hcl.Range{
+						Filename: "module.tf",
+						Start:    hcl.Pos{Line: 8, Column: 13},
+						End:      hcl.Pos{Line: 8, Column: 53},
+					},
+				},
+			},
+			Fixed: `
+variable "module_version" {
+  type  = string
+  const = true
+}
+
+module "deep" {
+  source  = "github.com/hashicorp/consul?depth=1&ref=v1.0.0"
+  version = var.module_version
+}`,
 		},
 	}
 
