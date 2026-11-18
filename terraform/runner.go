@@ -21,7 +21,11 @@ func NewRunner(runner tflint.Runner) *Runner {
 	return &Runner{Runner: runner}
 }
 
-// GetModuleCalls returns all "module" blocks, including uncreated module calls.
+// GetModuleCalls returns "module" blocks, including uncreated module calls.
+// Only calls whose source statically resolves are returned, since no rule can
+// act on a call without its source. Version is resolved best-effort and never
+// causes a call to be omitted. See ModuleCall for how unresolved versions are
+// represented.
 func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	calls := []*ModuleCall{}
 	diags := hcl.Diagnostics{}
@@ -53,7 +57,7 @@ func (r *Runner) GetModuleCalls() ([]*ModuleCall, hcl.Diagnostics) {
 	for _, block := range body.Blocks {
 		call, decodeDiags := decodeModuleCall(r, block)
 		diags = diags.Extend(decodeDiags)
-		if decodeDiags.HasErrors() {
+		if decodeDiags.HasErrors() || call == nil {
 			continue
 		}
 		calls = append(calls, call)
