@@ -74,6 +74,16 @@ func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, modu
 	}
 
 	filename := module.DefRange.Filename
+
+	// Extract query parameters from the original source before calling getter.Detect()
+	// because go-getter may URL-encode them when there's a subdirectory path
+	originalQuery := url.Values{}
+	if idx := strings.Index(module.Source, "?"); idx != -1 {
+		if parsedQuery, err := url.ParseQuery(module.Source[idx+1:]); err == nil {
+			originalQuery = parsedQuery
+		}
+	}
+
 	source, err := getter.Detect(module.Source, filepath.Dir(filename), []getter.Detector{
 		// https://github.com/hashicorp/terraform/blob/51b0aee36cc2145f45f5b04051a01eb6eb7be8bf/internal/getmodules/getter.go#L30-L52
 		new(getter.GitHubDetector),
@@ -112,7 +122,13 @@ func (r *TerraformModuleShallowCloneRule) checkModule(runner tflint.Runner, modu
 		return nil
 	}
 
+	// Merge query parameters from both the detected URL and the original source
 	query := u.Query()
+	for key, values := range originalQuery {
+		if len(query[key]) == 0 {
+			query[key] = values
+		}
+	}
 
 	// Check if module is pinned to a specific version
 	ref := query.Get("ref")
